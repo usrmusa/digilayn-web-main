@@ -4,7 +4,7 @@ Digilayn is Musa Mgijima's software business. We build practical mobile apps, we
 
 This repository contains Digilayn's main website: our services, founder profile, portfolio, and project support pages.
 
-- **Website:** [www.digilayn.com](https://www.digilayn.com/)
+- **Website:** [www.digilayn.co.za](https://www.digilayn.co.za/)
 - **Contact:** [digilayn@gmail.com](mailto:digilayn@gmail.com)
 
 ## Website Structure
@@ -22,41 +22,27 @@ The website uses static HTML, CSS, and JavaScript, with Firebase-backed function
 The only active local checkout is:
 
 ```text
-/Users/lincoln.mgijima/Digilayn/Web/web-digilayn
+/Users/lincoln.mgijima/Digilayn/Web/web-main
 ```
 
 Do not resume work in the retired `WebstormProjects/web-digilayn` copy. Firebase Cloud Functions belong in `/Users/lincoln.mgijima/Digilayn/Firebase/Backend/functions/`, not in this repository.
 
-## Two GitHub Copies, One Workflow
+## Repository and Hosting
 
-- [usrmusa/digilayn-web-main](https://github.com/usrmusa/digilayn-web-main) — primary development repository and fetch source.
-- [MGI0X1D/digilayn-web-main](https://github.com/MGI0X1D/digilayn-web-main) — public hosting copy for `www.digilayn.com`.
+[usrmusa/digilayn-web-main](https://github.com/usrmusa/digilayn-web-main) is the only development and GitHub Pages hosting repository. The previous dual-repository workflow is retired.
 
-The canonical checkout's `origin` has two push URLs. A normal push from `main` sends the same commit to both repositories:
+`origin` must fetch and push only to `usrmusa/digilayn-web-main`. The owner runs commits and pushes; the agent never pushes.
 
-```sh
-git add <changed-files>
-git commit -m "Describe the change"
-git push origin main
-```
-
-Keep `CNAME` set to `www.digilayn.com`. The hosting copy publishes `main` from `/`. Do not enable a competing Pages deployment or change DNS as part of routine synchronization.
+`CNAME` is set to `www.digilayn.co.za` for the current domain test. GitHub Pages publishes `main` from `/`.
 
 ### Configure a Fresh Checkout
 
-Remote configuration is local to each checkout; it is not included in commits. From a fresh clone, configure:
-
 ```sh
-git remote set-url origin https://github.com/usrmusa/digilayn-web-main.git
-git config --local --replace-all remote.origin.pushurl https://github.com/usrmusa/digilayn-web-main.git
-git config --local --add remote.origin.pushurl https://github.com/MGI0X1D/digilayn-web-main.git
-git config --local remote.pushDefault origin
-git config --local push.default simple
+git remote set-url origin git@github.com:usrmusa/digilayn-web-main.git
+git config --local --replace-all remote.origin.pushurl git@github.com:usrmusa/digilayn-web-main.git
 git remote -v
 ```
 
-Authentication needs push access to both accounts' repositories. Two-server pushes are not atomic: one can succeed while the other fails. Read both push results and retry after fixing any failure; do not force-push to hide a divergence. Avoid editing either copy independently on GitHub. This setup synchronizes local pushes, not changes made elsewhere automatically.
-
 ## Local Preview
 
-Serve the repository with WebStorm's local web server or another static HTTP server. Firebase-backed pages still require the appropriate authentication and permissions. Never commit credentials, service-account keys, or private account records: everything pushed here is also published to the public hosting repository.
+Serve the repository with WebStorm's local web server or another static HTTP server. Firebase-backed pages still require the appropriate authentication and permissions. Never commit credentials, service-account keys, or private account records: this repository and its published website are public.

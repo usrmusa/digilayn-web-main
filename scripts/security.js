@@ -13,7 +13,7 @@
 ╚═════╝ ╚═╝ ╚═════╝ ╚═╝╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═══╝
 
 Built by Musa Mgijima
-https://digilayn.com
+https://www.digilayn.co.za
 `;
 
     console.log(
