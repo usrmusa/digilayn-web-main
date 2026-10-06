@@ -850,7 +850,7 @@
       if (!user || user.email?.toLowerCase() !== global.MANAGER_EMAIL?.toLowerCase()) {
         unsubFirestore.forEach((unsubscribe) => unsubscribe());
         unsubFirestore = [];
-        window.location.replace('index.html');
+        window.location.replace('./');
         return;
       }
       if (unsubFirestore.length === 0) {
