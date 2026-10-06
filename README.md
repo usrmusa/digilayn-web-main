@@ -4,7 +4,7 @@ Digilayn is Musa Mgijima's software business. We build practical mobile apps, we
 
 This repository contains Digilayn's main website: our services, founder profile, portfolio, and project support pages.
 
-- **Website:** [www.digilayn.co.za](https://www.digilayn.co.za/)
+- **Website:** [digilayn.co.za](https://digilayn.co.za/)
 - **Contact:** [digilayn@gmail.com](mailto:digilayn@gmail.com)
 
 ## Website Structure
@@ -33,7 +33,7 @@ Do not resume work in the retired `WebstormProjects/web-digilayn` copy. Firebase
 
 `origin` must fetch and push only to `usrmusa/digilayn-web-main`. The owner runs commits and pushes; the agent never pushes.
 
-`CNAME` is set to `www.digilayn.co.za` for the current domain test. GitHub Pages publishes `main` from `/`.
+`CNAME` is set to `digilayn.co.za` as the primary domain. GitHub Pages publishes `main` from `/`.
 
 ### Configure a Fresh Checkout
 
