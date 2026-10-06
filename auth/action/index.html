@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#15803d">
+  <title>Your account | Digilayn</title>
+  <link rel="icon" href="/favicon/favicon.svg">
+  <link rel="stylesheet" href="/auth/action/action.css">
+</head>
+<body>
+  <header><a class="brand" href="/">digilayn<span>.</span></a><span class="header-label">Your account, protected</span></header>
+  <main>
+    <section class="account-card" aria-labelledby="page-title">
+      <div class="account-icon" aria-hidden="true">&#10003;</div>
+      <p class="eyebrow">DIGILAYN ACCOUNT</p>
+      <h1 id="page-title">Let’s secure your account.</h1>
+      <p id="description">Open the link in your Digilayn account email to continue.</p>
+      <p id="status" role="status" aria-live="polite">Checking your link…</p>
+      <form id="password-form" hidden>
+        <p id="account-email" class="account-email"></p>
+        <label for="new-password">New password</label>
+        <div class="password-field"><input id="new-password" type="password" autocomplete="new-password" required minlength="6" maxlength="4096" aria-describedby="password-help"><button id="show-password" type="button" aria-pressed="false">Show</button></div>
+        <p id="password-help" class="field-help">Use a strong password that you don’t use elsewhere. At least 6 characters.</p>
+        <label for="confirm-password">Confirm new password</label>
+        <input id="confirm-password" type="password" autocomplete="new-password" required minlength="6" maxlength="4096">
+        <button class="primary-button" type="submit" id="reset-button">Save new password</button>
+      </form>
+      <button class="primary-button" id="confirm-action" type="button" hidden>Continue</button>
+      <p id="error" role="alert" hidden></p>
+      <div id="completion" hidden><p>You can now return to your app or website and sign in.</p><a id="continue-link" class="primary-button" href="/">Return to Digilayn</a></div>
+      <noscript><p>Enable JavaScript to securely complete this account action.</p></noscript>
+      <div class="support">Need a hand? <a href="mailto:digilayn@gmail.com">Contact Digilayn</a></div>
+    </section>
+    <p class="footer-note">One Digilayn account. Your apps and websites, connected.</p>
+  </main>
+  <script type="module" src="/auth/action/action.js"></script>
+</body>
+</html>
