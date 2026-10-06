@@ -7,22 +7,16 @@
  * security rules. Until those rules are locked down, the manager gate here is
  * enforced client-side by the signed-in email only (dev-grade — see manager.js).
  *
- * This page is intentionally ISOLATED from the rest of web-poortjie: it inits
- * its own Firebase app instance and pulls in no shared scripts.
+ * Firebase project settings are supplied by /scripts/firebase-settings.js.
+ * The dashboard retains its own SDK initialization and manager metadata.
  */
 (function (global) {
   'use strict';
 
-  global.LAYNFLEET_FIREBASE_CONFIG = {
-    apiKey: 'AIzaSyANCpYHeLyWkgVtWL06xpI7XsP08xu9GPA',
-    authDomain: 'digilayn-projects.firebaseapp.com',
-    databaseURL: 'https://digilayn-projects-default-rtdb.europe-west1.firebasedatabase.app',
-    projectId: 'digilayn-projects',
-    storageBucket: 'digilayn-projects.firebasestorage.app',
-    messagingSenderId: '95485356681',
-    appId: '1:95485356681:web:3cf619a266961009e17458',
-    measurementId: 'G-27H9WZSCGQ'
-  };
+  if (!global.DIGILAYN_FIREBASE_CONFIG) {
+    throw new Error('Load /scripts/firebase-settings.js before this script.');
+  }
+  global.LAYNFLEET_FIREBASE_CONFIG = global.DIGILAYN_FIREBASE_CONFIG;
 
   // Only this account may access the manager dashboard (blueprint: static manager).
   global.MANAGER_EMAIL = 'usrmusa@gmail.com';

@@ -1,3 +1,5 @@
+import "/scripts/firebase-settings.js";
+
 const element = (id) => document.getElementById(id);
 const params = new URLSearchParams(window.location.search);
 const mode = params.get('mode');
@@ -60,7 +62,7 @@ async function start() {
     // Use the existing project's pinned SDK version. No analytics on action-code pages.
     const { initializeApp } = await import('https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js');
     const { getAuth, inMemoryPersistence, setPersistence, verifyPasswordResetCode, confirmPasswordReset, checkActionCode, applyActionCode, validatePassword } = await import('https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js');
-    const app = initializeApp({ apiKey: 'AIzaSyANCpYHeLyWkgVtWL06xpI7XsP08xu9GPA', authDomain: 'auth.digilayn.co.za', projectId: 'digilayn-projects' }, 'account-actions');
+    const app = initializeApp(window.DIGILAYN_FIREBASE_CONFIG, 'account-actions');
     const auth = getAuth(app);
     await setPersistence(auth, inMemoryPersistence);
     if (mode === 'resetPassword') {
