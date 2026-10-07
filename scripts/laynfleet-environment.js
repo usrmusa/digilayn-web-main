@@ -2,21 +2,33 @@
   'use strict';
   const url = new URL(global.location.href);
   const values = url.searchParams.getAll('env');
-  if (values.length > 1 || (values.length === 1 && values[0] !== 'main' && values[0] !== 'dev')) {
-    throw new Error('Choose env=main or env=dev.');
+  if (values.length > 1 || (values.length === 1 && values[0] !== 'prod' && values[0] !== 'dev')) {
+    throw new Error('Choose env=prod or env=dev.');
   }
-  const environment = values.length === 0 ? 'main' : values[0];
+  const environment = values.length === 0 ? 'prod' : values[0];
   const isDev = environment === 'dev';
   global.LaynFleetEnvironment = Object.freeze({
     environment, isDev,
+    async request(path, body) {
+      const user = global.firebase.auth().currentUser;
+      if (!user) throw new Error('Sign in required.');
+      const token = await user.getIdToken();
+      const response = await fetch(`https://api.digilayn.co.za/v2/${environment}${path}`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const result = await response.json();
+      if (!response.ok || !result.data) throw new Error(result.error?.message || 'Request failed.');
+      return result;
+    },
     presenceForDriver(presence) {
       if (!presence) return undefined;
-      if (!Object.prototype.hasOwnProperty.call(presence, 'activeSessionId')) return presence;
+      if (presence.active !== true) return undefined;
       const owner = presence.activeSessionId;
       return typeof owner === 'string' && owner.length > 0 ? presence.sessions?.[owner] : undefined;
     },
-    locationsPath: isDev ? 'driverLocationsDev' : 'driverLocations',
-    driverStoragePath: isDev ? 'laynfleet/dev/drivers' : 'laynfleet/drivers',
+    locationsPath: `laynfleet/${environment}/driverLocations`,
+    driverStoragePath: `laynfleet/${environment}/drivers`,
     membershipKey: isDev ? 'laynFleetDev' : 'laynFleet',
     riderPackage: isDev ? 'com.digilayn.laynrider.dev' : 'com.digilayn.laynrider',
     driverPackage: isDev ? 'com.digilayn.layndriver.dev' : 'com.digilayn.layndriver',
@@ -29,7 +41,7 @@
     if (select) {
       select.value = environment;
       select.addEventListener('change', () => {
-        if (select.value !== 'main' && select.value !== 'dev') throw new Error('Invalid environment');
+        if (select.value !== 'prod' && select.value !== 'dev') throw new Error('Invalid environment');
         const target = new URL(global.location.href);
         target.searchParams.set('env', select.value);
         global.location.assign(target.href);

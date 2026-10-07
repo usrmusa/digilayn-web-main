@@ -31,7 +31,7 @@
     riders: 'riders',
     bookings: 'bookings',
     adminActions: 'adminActions',
-    reviews: 'reviews'
+    reviews: 'ratings'
   };
 
   // Provenance strings written by the apps at registration.

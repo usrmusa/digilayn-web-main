@@ -113,7 +113,7 @@
         sortOrder: Number(byId('notice-order').value), startsAt: timestamp(byId('notice-start').value), endsAt: timestamp(byId('notice-end').value)
       };
       if (payload.startsAt !== null && payload.endsAt !== null && payload.endsAt <= payload.startsAt) throw new Error('End must be after start.');
-      const response = await firebase.app().functions('us-central1').httpsCallable('managerSaveDashboardNotice')(payload);
+      const response = await window.LaynFleetEnvironment.request('/admin/dashboard-notices', payload);
       if (!response.data || !response.data.noticeId || !Number.isSafeInteger(response.data.version)) throw new Error('Save was not confirmed.');
       if (currentGeneration !== connectionGeneration) return;
       resetEditor();

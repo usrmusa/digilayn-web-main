@@ -36,7 +36,8 @@
   const pricingCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection('pricing');
   const pricingProposalsCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection('pricingProposals');
   const pricingHistoryCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection('pricingHistory');
-  const appConfigCol = db.collection('appConfig');
+  const appConfigCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection('appConfig');
+  const appConfigId = pkg => pkg === fleetEnv.riderPackage ? 'laynrider' : pkg === fleetEnv.driverPackage ? 'layndriver' : pkg;
   const adminActionsCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(FS.adminActions);
   const usersCol = db.collection(FS.users);
   document.querySelectorAll('[data-app-tab]').forEach((button) => {
@@ -1241,7 +1242,8 @@
         }
         const configs = {};
         snap.docs.forEach((doc) => {
-          configs[doc.id] = { id: doc.id, ...doc.data() };
+          const pkg = doc.id === 'laynrider' ? fleetEnv.riderPackage : doc.id === 'layndriver' ? fleetEnv.driverPackage : doc.id;
+          configs[pkg] = { id: doc.id, ...doc.data() };
         });
         state.appConfig = configs;
         renderAppControl();
@@ -2163,9 +2165,6 @@
         demotedAt: firebase.firestore.FieldValue.delete(),
         demotedBy: firebase.firestore.FieldValue.delete()
       });
-      batch.set(usersCol.doc(uid), {
-        applications: { [fleetEnv.membershipKey]: { isDriver: true } }
-      }, { merge: true });
       await batch.commit();
       userCache.delete(uid); // force fresh identity join
       await logAdminAction(isReapproval ? 'reapproveDriver' : 'approveDriver', uid, name);
@@ -2199,9 +2198,6 @@
         demotedAt: serverTimestamp(),
         demoteReason: res.reason || ''
       });
-      batch.set(usersCol.doc(uid), {
-        applications: { [fleetEnv.membershipKey]: { isDriver: false } }
-      }, { merge: true });
       await batch.commit();
       userCache.delete(uid); // force fresh identity join
       await logAdminAction('demoteDriver', uid, name, res.reason);
@@ -2232,9 +2228,6 @@
         approvedBy: MANAGER_EMAIL,
         approvedAt: serverTimestamp()
       });
-      batch.set(usersCol.doc(uid), {
-        applications: { [fleetEnv.membershipKey]: { isDriver: false } }
-      }, { merge: true });
       await batch.commit();
       userCache.delete(uid);
       await logAdminAction('rejectDriver', uid, name, res.reason);
@@ -3306,8 +3299,7 @@
     const buttons = [...document.querySelectorAll('[data-pricing-decision]')];
     buttons.forEach((item) => { item.disabled = true; });
     try {
-      const resolve = firebase.app().functions('us-central1').httpsCallable('managerResolvePricingProposal');
-      await resolve({ environment: fleetEnv.environment, proposalId, decision, reason: reason.trim() });
+      await fleetEnv.request('/admin/pricing-resolution', { proposalId, decision, reason: reason.trim() });
       toast(approving ? 'Proposal force approved.' : 'Proposal force declined.', 'success');
     } catch (error) {
       console.error('manager pricing resolution failed', error);
@@ -3843,7 +3835,7 @@ This applies immediately to all connected devices.`,
         updatedBy: MANAGER_EMAIL
       };
 
-      await appConfigCol.doc(pkg).set(payload, { merge: true });
+      await appConfigCol.doc(appConfigId(pkg)).set(payload, { merge: true });
 
       // If LaynDriver is put in maintenance or force-upgrade, immediately force all drivers offline
       if (pkg === fleetEnv.driverPackage && (maintenanceMode || minVersionCode > 1)) {
@@ -3896,7 +3888,7 @@ This applies immediately to all connected devices.`,
       const packages = fleetEnv.appPackages;
 
       packages.forEach((pkg) => {
-        const ref = appConfigCol.doc(pkg);
+        const ref = appConfigCol.doc(appConfigId(pkg));
         batch.set(ref, {
           maintenanceMode: enable,
           maintenanceMessage: enable
