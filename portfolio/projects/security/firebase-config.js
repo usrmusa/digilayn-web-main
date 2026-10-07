@@ -25,7 +25,7 @@
   global.FS = {
     users: 'users',
     laynfleet: 'laynfleet',
-    laynfleetDoc: 'main',
+    laynfleetDoc: global.LaynFleetEnvironment.environment,
     drivers: 'drivers',
     riders: 'riders',
     bookings: 'bookings',
@@ -34,5 +34,5 @@
   };
 
   // Provenance strings written by the apps at registration.
-  global.APP_PACKAGES = ['com.digilayn.laynrider', 'com.digilayn.layndriver', 'com.digilayn.laynassist'];
+  global.APP_PACKAGES = global.LaynFleetEnvironment.appPackages;
 })(window);

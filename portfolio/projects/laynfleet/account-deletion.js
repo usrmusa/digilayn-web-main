@@ -1,5 +1,5 @@
 (function(){'use strict';
-firebase.initializeApp(window.LAYNFLEET_FIREBASE_CONFIG);
+firebase.initializeApp(window.DIGILAYN_FIREBASE_CONFIG);
 const auth=firebase.auth();const functions=firebase.app().functions('us-central1');
 const getMyData=functions.httpsCallable('getMyLaynRiderDataCallable');const deleteMyAccount=functions.httpsCallable('deleteMyLaynRiderAccountCallable');
 const byId=(id)=>document.getElementById(id);const loginCard=byId('login-card');const accountCard=byId('account-card');const deleteCard=byId('delete-card');const confirmation=byId('delete-confirmation');const understood=byId('understand-checkbox');const deleteButton=byId('delete-button');

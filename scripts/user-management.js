@@ -2,6 +2,9 @@ import { auth, functions, db } from "./firebase-config.js";
 import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, Timestamp, writeBatch } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { httpsCallable } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-functions.js";
 
+const fleetEnv = window.LaynFleetEnvironment;
+if (!fleetEnv) throw new Error("Fleet environment is required");
+
 export function getTimestampMs(ts) {
   if (!ts) return 0;
   if (typeof ts.toMillis === "function") return ts.toMillis();
@@ -131,7 +134,7 @@ class UserManagement {
       }
     }
     booleanFilter("hasUsername", (user) => user.username);
-    booleanFilter("laynFleetDriver", (user) => user.applications?.laynFleet?.isDriver);
+    booleanFilter("laynFleetDriver", (user) => user.applications?.[fleetEnv.membershipKey]?.isDriver);
     booleanFilter("poortjieAdmin", (user) => user.roles?.poortjie?.isAdmin);
     booleanFilter("poortjieTaxiAdmin", (user) => user.roles?.poortjie?.isTaxiRankAdmin);
     booleanFilter("poortjieSupport", (user) => user.roles?.poortjie?.listForSupport);
@@ -304,7 +307,7 @@ class UserManagement {
   }
 
   async toggleLaynFleetDriver(uid, currentStatus) {
-    await updateDoc(doc(db, "users", uid), { "applications.laynFleet.isDriver": !currentStatus, updatedAt: Timestamp.now() });
+    await updateDoc(doc(db, "users", uid), { [`applications.${fleetEnv.membershipKey}.isDriver`]: !currentStatus, updatedAt: Timestamp.now() });
     await this.refresh();
     return { success: true };
   }
@@ -316,7 +319,7 @@ class UserManagement {
   }
 
   async fetchLaynFleetDrivers() {
-    const snapshot = await getDocs(collection(db, "laynfleet", "main", "drivers"));
+    const snapshot = await getDocs(collection(db, "laynfleet", fleetEnv.environment, "drivers"));
     const usersByUid = new Map(this.users.map((u) => [u.userId || u.uid, u]));
 
     return snapshot.docs.map((docSnap) => {
@@ -354,6 +357,7 @@ class UserManagement {
   }
 
   async fetchDogTowingDrivers() {
+    if (fleetEnv.isDev) throw new Error("Dog Towing is production only; select Production");
     const snapshot = await getDocs(collection(db, "laynfleet", "dog-towing", "drivers"));
     const usersByUid = new Map(this.users.map((u) => [u.userId || u.uid, u]));
 
@@ -390,7 +394,7 @@ class UserManagement {
   }
 
   async fetchLaynFleetRiders() {
-    const snapshot = await getDocs(collection(db, "laynfleet", "main", "riders"));
+    const snapshot = await getDocs(collection(db, "laynfleet", fleetEnv.environment, "riders"));
     const usersByUid = new Map(this.users.map((u) => [u.userId || u.uid, u]));
 
     return snapshot.docs.map((docSnap) => {
@@ -420,7 +424,7 @@ class UserManagement {
 
   async promoteLaynDriver(uid, vehicleData = {}) {
     const batch = writeBatch(db);
-    const driverRef = doc(db, "laynfleet", "main", "drivers", uid);
+    const driverRef = doc(db, "laynfleet", fleetEnv.environment, "drivers", uid);
     const userRef = doc(db, "users", uid);
     const managerEmail = auth.currentUser?.email || "usrmusa@gmail.com";
 
@@ -444,7 +448,7 @@ class UserManagement {
 
     batch.set(userRef, {
       applications: {
-        laynFleet: {
+        [fleetEnv.membershipKey]: {
           isDriver: true
         }
       },
@@ -458,7 +462,7 @@ class UserManagement {
 
   async demoteLaynDriver(uid, reason = "") {
     const batch = writeBatch(db);
-    const driverRef = doc(db, "laynfleet", "main", "drivers", uid);
+    const driverRef = doc(db, "laynfleet", fleetEnv.environment, "drivers", uid);
     const userRef = doc(db, "users", uid);
     const managerEmail = auth.currentUser?.email || "usrmusa@gmail.com";
 
@@ -473,7 +477,7 @@ class UserManagement {
 
     batch.set(userRef, {
       applications: {
-        laynFleet: {
+        [fleetEnv.membershipKey]: {
           isDriver: false
         }
       },
@@ -490,6 +494,7 @@ class UserManagement {
   }
 
   async promoteDogTowingUser(uid, role = "DRIVER", vehicleData = {}) {
+    if (fleetEnv.isDev) throw new Error("Dog Towing is production only; select Production");
     const batch = writeBatch(db);
     const driverRef = doc(db, "laynfleet", "dog-towing", "drivers", uid);
     const userRef = doc(db, "users", uid);
@@ -528,6 +533,7 @@ class UserManagement {
   }
 
   async demoteDogTowingUser(uid, newRole = "DRIVER", reason = "") {
+    if (fleetEnv.isDev) throw new Error("Dog Towing is production only; select Production");
     const batch = writeBatch(db);
     const driverRef = doc(db, "laynfleet", "dog-towing", "drivers", uid);
     const userRef = doc(db, "users", uid);
@@ -579,6 +585,7 @@ class UserManagement {
   }
 
   async reapproveDogTowingDriver(uid) {
+    if (fleetEnv.isDev) throw new Error("Dog Towing is production only; select Production");
     const batch = writeBatch(db);
     const driverRef = doc(db, "laynfleet", "dog-towing", "drivers", uid);
     const userRef = doc(db, "users", uid);

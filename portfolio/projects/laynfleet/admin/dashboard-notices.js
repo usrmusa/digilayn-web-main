@@ -106,6 +106,7 @@
     saving = true; setSaveEnabled(); render();
     try {
       const payload = {
+        environment: window.LaynFleetEnvironment.environment,
         noticeId: editingId, expectedVersion: editingVersion,
         type: byId('notice-type').value, title: byId('notice-title').value.trim(), message: byId('notice-message').value.trim(),
         enabled: byId('notice-enabled').checked, dismissible: byId('notice-dismissible').checked,
@@ -129,7 +130,7 @@
       connectionGeneration += 1;
       const generation = connectionGeneration;
       ready = false; saving = false; notices = []; resetEditor(); render(); message('Loading notices…');
-      const unsubscribe = db.collection('laynfleet').doc('main').collection('dashboardNotices')
+      const unsubscribe = db.collection('laynfleet').doc(window.LaynFleetEnvironment.environment).collection('dashboardNotices')
         .onSnapshot({ includeMetadataChanges: true }, (snapshot) => {
           if (generation !== connectionGeneration) return;
           if (snapshot.metadata.fromCache || snapshot.metadata.hasPendingWrites) {

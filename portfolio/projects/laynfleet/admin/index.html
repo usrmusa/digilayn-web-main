@@ -16,6 +16,7 @@
   <script src="../../../../scripts/theme.js"></script>
 
   <link rel="stylesheet" href="manager.css" />
+  <link rel="stylesheet" href="/styles/laynfleet-environment.css">
 </head>
 <body>
   <!-- ===================== LOGIN GATE ===================== -->
@@ -65,7 +66,7 @@
 
       <nav class="side-nav">
         <button class="nav-item is-active" data-section="overview"><span class="nav-glyph">▦</span> Overview</button>
-        <a href="tracking" class="nav-item" style="text-decoration:none;"><span class="nav-glyph">🛰️</span> Live Radar <span class="badge badge-online" style="font-size:9px; padding:1px 6px; margin-left:auto;">Live</span></a>
+        <a href="tracking" data-fleet-link class="nav-item" style="text-decoration:none;"><span class="nav-glyph">🛰️</span> Live Radar <span class="badge badge-online" style="font-size:9px; padding:1px 6px; margin-left:auto;">Live</span></a>
         <button class="nav-item" data-section="drivers"><span class="nav-glyph">🚗</span> Drivers <span id="nav-badge-drivers" class="nav-badge is-hidden">0</span></button>
         <button class="nav-item" data-section="riders"><span class="nav-glyph">🧑</span> Riders</button>
         <button class="nav-item" data-section="bookings"><span class="nav-glyph">🧾</span> Bookings</button>
@@ -91,6 +92,10 @@
           <p id="section-subtitle" class="section-subtitle">Live operations across LaynFleet</p>
         </div>
         <div class="topbar-actions">
+          <label class="fleet-environment">Fleet environment
+            <select id="fleet-environment"><option value="main">Production</option><option value="dev">Dev</option></select>
+            <span class="fleet-dev-badge" data-fleet-dev-badge hidden>DEV</span>
+          </label>
           <input id="search-input" type="search" class="search-input" placeholder="Search name, phone, plate…" />
         </div>
       </header>
@@ -155,6 +160,7 @@
 
       <!-- RIDERS -->
       <section id="section-riders" class="section">
+        <p class="fleet-global-notice">Accounts and personal profiles are shared. Suspension and reactivation affect dev and production.</p>
         <div id="riders-list" class="table-wrap"></div>
       </section>
 
@@ -605,7 +611,7 @@
             <span class="panel-badge panel-badge-danger">High Impact</span>
           </div>
           <p style="color: var(--text-dim); margin-bottom: 16px; font-size: 13px;">
-            Emergency controls apply immediate system-wide locks across both LaynRider and LaynDriver. Use with caution.
+            Emergency controls apply to apps in the selected fleet environment.
           </p>
           <div class="emergency-actions-grid">
             <div class="emergency-action-card">
@@ -803,7 +809,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
-  <script src="/scripts/firebase-settings.js"></script><script src="firebase-config.js"></script>
+  <script src="/scripts/laynfleet-environment.js"></script><script src="/scripts/firebase-settings.js"></script><script src="firebase-config.js"></script>
   <script src="driver-order.js"></script>
   <script src="dashboard-notices.js"></script>
   <script src="manager.js"></script>

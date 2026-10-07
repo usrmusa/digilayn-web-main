@@ -21,6 +21,8 @@
   // ---------------------------------------------------------------------------
   // Firebase init (own isolated app instance)
   // ---------------------------------------------------------------------------
+  const fleetEnv = window.LaynFleetEnvironment;
+  if (!fleetEnv) throw new Error("Fleet environment is required");
   firebase.initializeApp(window.LAYNFLEET_FIREBASE_CONFIG);
   const auth = firebase.auth();
   const db = firebase.firestore();
@@ -37,6 +39,15 @@
   const appConfigCol = db.collection('appConfig');
   const adminActionsCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(FS.adminActions);
   const usersCol = db.collection(FS.users);
+  document.querySelectorAll('[data-app-tab]').forEach((button) => {
+    const pkg = button.getAttribute('data-app-tab');
+    if (pkg === 'com.digilayn.laynrider') button.setAttribute('data-app-tab', fleetEnv.riderPackage);
+    if (pkg === 'com.digilayn.layndriver') button.setAttribute('data-app-tab', fleetEnv.driverPackage);
+    if (pkg === 'com.digilayn.laynassist' && fleetEnv.isDev) button.hidden = true;
+  });
+  const assistCard = document.getElementById('stat-app-assist-status');
+  if (assistCard && fleetEnv.isDev) assistCard.closest('.stat-card').hidden = true;
+
 
   // ---------------------------------------------------------------------------
   // Tiny DOM helpers
@@ -254,6 +265,7 @@
       if (typeof firebase.storage === 'function' && url) {
         try {
           const storageRef = firebase.storage().refFromURL(url);
+          if (!storageRef.fullPath.startsWith(fleetEnv.driverStoragePath + '/' + uid + '/')) throw new Error('Licence is outside this environment');
           await storageRef.delete();
         } catch (storageErr) {
           console.warn('Storage delete non-fatal notice (file may not exist or external URL):', storageErr);
@@ -424,7 +436,7 @@
       // and NOT shared with the user's personal profile photo.
       const cachedUser = userCache.get(uid);
       const isSharedWithUser = cachedUser && cachedUser.photoUrl === photoUrl;
-      const isDriverStorage = photoUrl && (photoUrl.includes('/laynfleet%2Fdrivers%2F') || photoUrl.includes('/laynfleet/drivers/'));
+      const isDriverStorage = photoUrl && typeof firebase.storage === 'function' && firebase.storage().refFromURL(photoUrl).fullPath.startsWith(fleetEnv.driverStoragePath + '/' + uid + '/');
 
       if (typeof firebase.storage === 'function' && photoUrl && !isSharedWithUser && isDriverStorage) {
         try {
@@ -1026,7 +1038,8 @@
     pricingProposals: [],
     pricingHistory: [],
     appConfig: {},
-    appConfigTab: 'com.digilayn.laynrider',
+    appConfigVerified: false,
+    appConfigTab: fleetEnv.riderPackage,
     appConfigAudit: [],
     driverLocations: {}
   };
@@ -1216,7 +1229,13 @@
 
     // App Config & System Gates
     unsub.push(
-      appConfigCol.onSnapshot((snap) => {
+      appConfigCol.onSnapshot({ includeMetadataChanges: true }, (snap) => {
+        state.appConfigVerified = !snap.metadata.fromCache && !snap.metadata.hasPendingWrites;
+        if (!state.appConfigVerified) {
+          state.appConfig = {};
+          renderAppControl();
+          return;
+        }
         const configs = {};
         snap.docs.forEach((doc) => {
           configs[doc.id] = { id: doc.id, ...doc.data() };
@@ -1224,6 +1243,9 @@
         state.appConfig = configs;
         renderAppControl();
       }, (err) => {
+        state.appConfigVerified = false;
+        state.appConfig = {};
+        renderAppControl();
         console.warn('appConfig listener', err);
       })
     );
@@ -1243,7 +1265,7 @@
     // RTDB Presence & Location listener
     if (rtdb) {
       try {
-        const locRef = rtdb.ref('driverLocations');
+        const locRef = rtdb.ref(fleetEnv.locationsPath);
         const onLocValue = (snap) => {
           state.driverLocations = snap.val() || {};
           renderDrivers();
@@ -1605,7 +1627,7 @@
 
     const rows = list.map((r) => {
       const u = r.user || {};
-      const isDriver = u.applications && u.applications.laynFleet && u.applications.laynFleet.isDriver;
+      const isDriver = state.drivers.some((driver) => driver.uid === r.uid && driver.approvalStatus === 'APPROVED');
       const avatar = u.photoUrl
         ? `<img class="row-avatar" src="${escapeHtml(u.photoUrl)}" alt="" />`
         : `<div class="row-avatar">${escapeHtml(initials(u.displayName || u.email))}</div>`;
@@ -2111,7 +2133,7 @@
         demotedBy: firebase.firestore.FieldValue.delete()
       });
       batch.set(usersCol.doc(uid), {
-        applications: { laynFleet: { isDriver: true } }
+        applications: { [fleetEnv.membershipKey]: { isDriver: true } }
       }, { merge: true });
       await batch.commit();
       userCache.delete(uid); // force fresh identity join
@@ -2147,7 +2169,7 @@
         demoteReason: res.reason || ''
       });
       batch.set(usersCol.doc(uid), {
-        applications: { laynFleet: { isDriver: false } }
+        applications: { [fleetEnv.membershipKey]: { isDriver: false } }
       }, { merge: true });
       await batch.commit();
       userCache.delete(uid); // force fresh identity join
@@ -2180,7 +2202,7 @@
         approvedAt: serverTimestamp()
       });
       batch.set(usersCol.doc(uid), {
-        applications: { laynFleet: { isDriver: false } }
+        applications: { [fleetEnv.membershipKey]: { isDriver: false } }
       }, { merge: true });
       await batch.commit();
       userCache.delete(uid);
@@ -2218,7 +2240,7 @@
     const name = u.displayName || 'this member';
     const res = await openModal({
       title: 'Reactivate account',
-      message: `Reactivate ${name}? They will regain access immediately.`,
+      message: `Reactivate ${name}? This restores their shared account across dev, production and other Digilayn apps.`,
       confirmText: 'Reactivate', confirmClass: 'btn-primary'
     });
     if (!res.confirmed) return;
@@ -3389,15 +3411,17 @@
   // APP CONTROL & SYSTEM GATES
   // ---------------------------------------------------------------------------
   const APP_NAMES = {
+    'com.digilayn.laynrider.dev': 'LaynRider DEV',
+    'com.digilayn.layndriver.dev': 'LaynDriver DEV',
     'com.digilayn.laynrider': 'LaynRider (Rider App)',
     'com.digilayn.layndriver': 'LaynDriver (Driver App)',
     'com.digilayn.laynassist': 'LaynAssist (Dog Towing)'
   };
 
   function renderAppControl() {
-    const riderConfig = state.appConfig['com.digilayn.laynrider'] || {};
-    const driverConfig = state.appConfig['com.digilayn.layndriver'] || {};
-    const assistConfig = state.appConfig['com.digilayn.laynassist'] || {};
+    const riderConfig = state.appConfig[fleetEnv.riderPackage] || {};
+    const driverConfig = state.appConfig[fleetEnv.driverPackage] || {};
+    const assistConfig = fleetEnv.isDev ? {} : (state.appConfig['com.digilayn.laynassist'] || {});
 
     // 1. Update KPI overview cards
     const riderMaint = riderConfig.maintenanceMode === true;
@@ -3502,6 +3526,14 @@
 
     // Render active tab config form
     updateAppConfigFormFromState();
+    for (const [app, pkg] of [['rider', fleetEnv.riderPackage], ['driver', fleetEnv.driverPackage], ['assist', 'com.digilayn.laynassist']]) {
+      if (!state.appConfigVerified || !state.appConfig[pkg]) {
+        const text = state.appConfigVerified ? 'Not configured' : 'Unavailable';
+        if ($('stat-app-' + app + '-status')) $('stat-app-' + app + '-status').textContent = text;
+        if ($('stat-app-' + app + '-details')) $('stat-app-' + app + '-details').textContent = 'No verified launch gate settings';
+        if ($('badge-tab-' + app)) $('badge-tab-' + app).textContent = text;
+      }
+    }
   }
 
   function updateAppConfigFormFromState() {
@@ -3518,7 +3550,19 @@
     show(formPanel);
     hide(emergencyPanel);
 
-    const config = state.appConfig[pkg] || {};
+    const config = state.appConfig[pkg];
+    if (!config) {
+      if ($('app-config-title')) $('app-config-title').textContent = `${APP_NAMES[pkg] || pkg} Configuration`;
+      if ($('app-config-pkg')) $('app-config-pkg').textContent = pkg;
+      if ($('app-config-state-badge')) $('app-config-state-badge').textContent = state.appConfigVerified ? 'Not configured' : 'Unavailable';
+      $('input-app-maintenance').checked = false;
+      $('input-app-maintenance-msg').value = '';
+      $('input-app-min-version').value = '';
+      $('input-app-store-url').value = '';
+      $('preview-sim-result').textContent = 'No saved settings';
+      $('preview-sim-text').textContent = 'Enter and save explicit settings for this app.';
+      return;
+    }
     if ($('app-config-title')) $('app-config-title').textContent = `${APP_NAMES[pkg] || pkg} Configuration`;
     if ($('app-config-pkg')) $('app-config-pkg').textContent = pkg;
 
@@ -3552,12 +3596,17 @@
 
     const maint = maintInput.checked;
     const msg = (msgInput.value || '').trim();
-    const minVer = parseInt(minVerInput.value, 10) || 1;
+    const minVer = Number(minVerInput.value);
     const storeUrl = storeUrlInput ? (storeUrlInput.value || '').trim() : '';
 
     const resultEl = $('preview-sim-result');
     const textEl = $('preview-sim-text');
     if (!resultEl || !textEl) return;
+    if (!Number.isSafeInteger(minVer) || minVer < 1) {
+      resultEl.textContent = 'Draft incomplete';
+      textEl.textContent = 'Enter a minimum version of 1 or higher.';
+      return;
+    }
 
     if (maint) {
       resultEl.textContent = 'Blocked by Maintenance Gate';
@@ -3628,10 +3677,13 @@
   async function saveCurrentAppConfig() {
     const pkg = state.appConfigTab;
     if (pkg === 'emergency') return;
+    if (!fleetEnv.appPackages.includes(pkg)) throw new Error('App does not belong to this environment');
 
     const maintenanceMode = $('input-app-maintenance').checked;
     const maintenanceMessage = ($('input-app-maintenance-msg').value || '').trim();
-    const minVersionCode = Math.max(1, parseInt($('input-app-min-version').value, 10) || 1);
+    const minVersionCode = Number($('input-app-min-version').value);
+    if (!state.appConfigVerified) return toast('Wait for verified app settings.', 'error');
+    if (!Number.isSafeInteger(minVersionCode) || minVersionCode < 1) return toast('Enter a minimum version of 1 or higher.', 'error');
     const storeUrl = ($('input-app-store-url').value || '').trim();
 
     const appTitle = APP_NAMES[pkg] || pkg;
@@ -3647,7 +3699,7 @@ This applies immediately to all connected devices.`,
       confirmClass: maintenanceMode ? 'btn-danger' : 'btn-primary'
     });
 
-    if (!confirm) return;
+    if (!confirm.confirmed) return;
 
     try {
       const payload = {
@@ -3667,7 +3719,7 @@ This applies immediately to all connected devices.`,
       await appConfigCol.doc(pkg).set(payload, { merge: true });
 
       // If LaynDriver is put in maintenance or force-upgrade, immediately force all drivers offline
-      if (pkg === 'com.digilayn.layndriver' && (maintenanceMode || minVersionCode > 1)) {
+      if (pkg === fleetEnv.driverPackage && (maintenanceMode || minVersionCode > 1)) {
         try {
           const onlineDrivers = await driversCol.where('online', '==', true).get();
           if (!onlineDrivers.empty) {
@@ -3700,20 +3752,21 @@ This applies immediately to all connected devices.`,
   }
 
   async function setEmergencyMaintenance(enable) {
+    if (!state.appConfigVerified) return toast('Wait for verified app settings.', 'error');
     const confirm = await openModal({
       title: enable ? 'EMERGENCY: Lock Entire Fleet?' : 'Restore Entire Fleet to Operational?',
       message: enable
-        ? 'WARNING: This will immediately enable Maintenance Mode on LaynRider, LaynDriver, and LaynAssist, blocking all user logins, dispatches, and ride requests.'
-        : 'This will clear Maintenance Mode across all LaynFleet applications and resume normal operations.',
+        ? `WARNING: Enable Maintenance Mode for ${fleetEnv.environment === 'dev' ? 'DEV' : 'production'} apps: ${fleetEnv.appPackages.join(', ')}.`
+        : `Clear Maintenance Mode for ${fleetEnv.environment === 'dev' ? 'DEV' : 'production'} apps only.`,
       confirmText: enable ? 'LOCK ALL APPS' : 'RESTORE ALL APPS',
       confirmClass: enable ? 'btn-danger' : 'btn-primary'
     });
 
-    if (!confirm) return;
+    if (!confirm.confirmed) return;
 
     try {
       const batch = db.batch();
-      const packages = ['com.digilayn.laynrider', 'com.digilayn.layndriver', 'com.digilayn.laynassist'];
+      const packages = fleetEnv.appPackages;
 
       packages.forEach((pkg) => {
         const ref = appConfigCol.doc(pkg);

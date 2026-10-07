@@ -722,7 +722,7 @@
 
       // 1. RTDB Driver Locations Listener
       if (rtdb) {
-        const locRef = rtdb.ref('driverLocations');
+        const locRef = rtdb.ref(window.LaynFleetEnvironment.locationsPath);
         locRef.on('value', (snap) => {
           state.rawRtdbLocations = snap.val() || {};
           consolidateFleet();
@@ -730,7 +730,7 @@
       }
 
       // 2. Firestore Drivers Collection
-      const driversCol = db.collection('laynfleet').doc('main').collection('drivers');
+      const driversCol = db.collection('laynfleet').doc(window.LaynFleetEnvironment.environment).collection('drivers');
       const unsubDrivers = driversCol.onSnapshot(async (snap) => {
         const docs = snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
         await Promise.all(docs.map(async (d) => {
@@ -751,7 +751,7 @@
       unsubFirestore.push(unsubDrivers);
 
       // 3. Firestore Active Bookings Collection
-      const bookingsCol = db.collection('laynfleet').doc('main').collection('bookings');
+      const bookingsCol = db.collection('laynfleet').doc(window.LaynFleetEnvironment.environment).collection('bookings');
       const unsubBookings = bookingsCol.where('status', 'in', ['ACCEPTED', 'EN_ROUTE', 'ARRIVED', 'IN_TRIP', 'AT_DESTINATION', 'RETURN_TRIP'])
         .onSnapshot((snap) => {
           state.rawActiveBookings = snap.docs.map((d) => ({ id: d.id, ...d.data() }));

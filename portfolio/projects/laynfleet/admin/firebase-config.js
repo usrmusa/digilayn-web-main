@@ -22,10 +22,11 @@
   global.MANAGER_EMAIL = 'usrmusa@gmail.com';
 
   // Firestore layout (must match the Android app — camelCase, app-first).
+  if (!global.LaynFleetEnvironment) throw new Error('Load laynfleet-environment.js first.');
   global.FS = {
     users: 'users',
     laynfleet: 'laynfleet',
-    laynfleetDoc: 'main',
+    laynfleetDoc: global.LaynFleetEnvironment.environment,
     drivers: 'drivers',
     riders: 'riders',
     bookings: 'bookings',
@@ -34,5 +35,5 @@
   };
 
   // Provenance strings written by the apps at registration.
-  global.APP_PACKAGES = ['com.digilayn.laynrider', 'com.digilayn.layndriver', 'com.digilayn.laynassist'];
+  global.APP_PACKAGES = global.LaynFleetEnvironment.appPackages;
 })(window);

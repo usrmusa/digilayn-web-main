@@ -17,6 +17,7 @@
 
   <!-- Live Tracking Custom Styles -->
   <link rel="stylesheet" href="tracking.css" />
+  <link rel="stylesheet" href="/styles/laynfleet-environment.css">
 </head>
 <body>
 
@@ -24,7 +25,7 @@
     <!-- ===================== TOP MISSION CONTROL HEADER ===================== -->
     <header class="tracker-header">
       <div class="flex items-center gap-4">
-        <a href="./" class="header-brand" title="Return to LaynFleet Overview">
+        <a href="./" data-fleet-link class="header-brand" title="Return to LaynFleet Overview">
           <div class="brand-icon-wrap">
             <span>LF</span>
             <span class="brand-ping-dot"></span>
@@ -65,11 +66,15 @@
 
       <!-- Right Header Actions -->
       <div class="header-actions">
-        <a href="./" class="btn-header" title="Return to LaynFleet Overview">
+          <label class="fleet-environment">Fleet environment
+            <select id="fleet-environment"><option value="main">Production</option><option value="dev">Dev</option></select>
+            <span class="fleet-dev-badge" data-fleet-dev-badge hidden>DEV</span>
+          </label>
+        <a href="./" data-fleet-link class="btn-header" title="Return to LaynFleet Overview">
           <span>▦</span> <span>Overview</span>
         </a>
 
-        <a href="./#drivers" class="btn-header" title="View Fleet Drivers Console">
+        <a href="./#drivers" data-fleet-link class="btn-header" title="View Fleet Drivers Console">
           <span>🚗</span> <span>Drivers</span>
         </a>
 
@@ -289,7 +294,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <!-- Firebase Project Configuration -->
-  <script src="/scripts/firebase-settings.js"></script><script src="firebase-config.js"></script>
+  <script src="/scripts/laynfleet-environment.js"></script><script src="/scripts/firebase-settings.js"></script><script src="firebase-config.js"></script>
 
   <!-- Live Tracking Controller & Telemetry Engine -->
   <script src="driver-order.js"></script>
