@@ -1267,7 +1267,8 @@
       try {
         const locRef = rtdb.ref(fleetEnv.locationsPath);
         const onLocValue = (snap) => {
-          state.driverLocations = snap.val() || {};
+          state.driverLocations = Object.fromEntries(Object.entries(snap.val() || {}).map(([uid, presence]) =>
+            [uid, fleetEnv.presenceForDriver(presence)]));
           renderDrivers();
           renderOverview();
         };

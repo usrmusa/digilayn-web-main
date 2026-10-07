@@ -9,6 +9,12 @@
   const isDev = environment === 'dev';
   global.LaynFleetEnvironment = Object.freeze({
     environment, isDev,
+    presenceForDriver(presence) {
+      if (!presence) return undefined;
+      if (!Object.prototype.hasOwnProperty.call(presence, 'activeSessionId')) return presence;
+      const owner = presence.activeSessionId;
+      return typeof owner === 'string' && owner.length > 0 ? presence.sessions?.[owner] : undefined;
+    },
     locationsPath: isDev ? 'driverLocationsDev' : 'driverLocations',
     driverStoragePath: isDev ? 'laynfleet/dev/drivers' : 'laynfleet/drivers',
     membershipKey: isDev ? 'laynFleetDev' : 'laynFleet',

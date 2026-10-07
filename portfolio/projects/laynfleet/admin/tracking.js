@@ -724,7 +724,8 @@
       if (rtdb) {
         const locRef = rtdb.ref(window.LaynFleetEnvironment.locationsPath);
         locRef.on('value', (snap) => {
-          state.rawRtdbLocations = snap.val() || {};
+          state.rawRtdbLocations = Object.fromEntries(Object.entries(snap.val() || {}).map(([uid, presence]) =>
+            [uid, window.LaynFleetEnvironment.presenceForDriver(presence)]));
           consolidateFleet();
         });
       }
