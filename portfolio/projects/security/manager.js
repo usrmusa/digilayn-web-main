@@ -36,7 +36,8 @@
   const pricingCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection('pricing');
   const pricingProposalsCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection('pricingProposals');
   const pricingHistoryCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection('pricingHistory');
-  const appConfigCol = db.collection('appConfig');
+  const appConfigCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection('appConfig');
+  const appConfigId = pkg => pkg === fleetEnv.riderPackage ? 'laynrider' : pkg === fleetEnv.driverPackage ? 'layndriver' : 'laynassist';
   const adminActionsCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(FS.adminActions);
   const usersCol = db.collection(FS.users);
   document.querySelectorAll('[data-app-tab]').forEach((button) => {
@@ -1238,7 +1239,14 @@
         }
         const configs = {};
         snap.docs.forEach((doc) => {
-          configs[doc.id] = { id: doc.id, ...doc.data() };
+          // Strict slug-only: laynrider / layndriver / laynassist. Legacy or unknown doc ids
+          // (e.g. the old flat package-named documents) are ignored — no backward fallback.
+          const pkg = doc.id === 'laynrider' ? fleetEnv.riderPackage
+            : doc.id === 'layndriver' ? fleetEnv.driverPackage
+            : doc.id === 'laynassist' ? 'com.digilayn.laynassist'
+            : null;
+          if (!pkg) return;
+          configs[pkg] = { id: doc.id, ...doc.data() };
         });
         state.appConfig = configs;
         renderAppControl();
@@ -3717,7 +3725,7 @@ This applies immediately to all connected devices.`,
         updatedBy: MANAGER_EMAIL
       };
 
-      await appConfigCol.doc(pkg).set(payload, { merge: true });
+      await appConfigCol.doc(appConfigId(pkg)).set(payload, { merge: true });
 
       // If LaynDriver is put in maintenance or force-upgrade, immediately force all drivers offline
       if (pkg === fleetEnv.driverPackage && (maintenanceMode || minVersionCode > 1)) {
@@ -3770,7 +3778,7 @@ This applies immediately to all connected devices.`,
       const packages = fleetEnv.appPackages;
 
       packages.forEach((pkg) => {
-        const ref = appConfigCol.doc(pkg);
+        const ref = appConfigCol.doc(appConfigId(pkg));
         batch.set(ref, {
           maintenanceMode: enable,
           maintenanceMessage: enable

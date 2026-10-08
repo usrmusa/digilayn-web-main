@@ -37,7 +37,7 @@
   const pricingProposalsCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection('pricingProposals');
   const pricingHistoryCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection('pricingHistory');
   const appConfigCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection('appConfig');
-  const appConfigId = pkg => pkg === fleetEnv.riderPackage ? 'laynrider' : pkg === fleetEnv.driverPackage ? 'layndriver' : pkg;
+  const appConfigId = pkg => pkg === fleetEnv.riderPackage ? 'laynrider' : pkg === fleetEnv.driverPackage ? 'layndriver' : 'laynassist';
   const adminActionsCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(FS.adminActions);
   const usersCol = db.collection(FS.users);
   document.querySelectorAll('[data-app-tab]').forEach((button) => {
@@ -1242,7 +1242,13 @@
         }
         const configs = {};
         snap.docs.forEach((doc) => {
-          const pkg = doc.id === 'laynrider' ? fleetEnv.riderPackage : doc.id === 'layndriver' ? fleetEnv.driverPackage : doc.id;
+          // Strict slug-only: laynrider / layndriver / laynassist. Legacy or unknown doc ids
+          // (e.g. the old package-named Assist document) are ignored — no backward fallback.
+          const pkg = doc.id === 'laynrider' ? fleetEnv.riderPackage
+            : doc.id === 'layndriver' ? fleetEnv.driverPackage
+            : doc.id === 'laynassist' ? 'com.digilayn.laynassist'
+            : null;
+          if (!pkg) return;
           configs[pkg] = { id: doc.id, ...doc.data() };
         });
         state.appConfig = configs;
