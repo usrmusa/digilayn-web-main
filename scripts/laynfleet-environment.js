@@ -34,7 +34,7 @@
     driverPackage: isDev ? 'com.digilayn.layndriver.dev' : 'com.digilayn.layndriver',
     appPackages: Object.freeze(isDev
       ? ['com.digilayn.laynrider.dev', 'com.digilayn.layndriver.dev']
-      : ['com.digilayn.laynrider', 'com.digilayn.layndriver', 'com.digilayn.laynassist'])
+      : ['com.digilayn.laynrider', 'com.digilayn.layndriver'])
   });
   document.addEventListener('DOMContentLoaded', () => {
     const select = document.getElementById('fleet-environment');
@@ -53,7 +53,6 @@
       target.searchParams.set('env', environment);
       link.href = target.href;
     });
-    if (isDev) document.querySelectorAll('[data-app="laynassist"]').forEach((button) => { button.hidden = true; });
     if (isDev) document.title = 'DEV · ' + document.title;
   });
 })(window);

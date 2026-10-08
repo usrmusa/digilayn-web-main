@@ -37,17 +37,14 @@
   const pricingProposalsCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection('pricingProposals');
   const pricingHistoryCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection('pricingHistory');
   const appConfigCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection('appConfig');
-  const appConfigId = pkg => pkg === fleetEnv.riderPackage ? 'laynrider' : pkg === fleetEnv.driverPackage ? 'layndriver' : 'laynassist';
+  const appConfigId = pkg => pkg === fleetEnv.riderPackage ? 'laynrider' : 'layndriver';
   const adminActionsCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(FS.adminActions);
   const usersCol = db.collection(FS.users);
   document.querySelectorAll('[data-app-tab]').forEach((button) => {
     const pkg = button.getAttribute('data-app-tab');
     if (pkg === 'com.digilayn.laynrider') button.setAttribute('data-app-tab', fleetEnv.riderPackage);
     if (pkg === 'com.digilayn.layndriver') button.setAttribute('data-app-tab', fleetEnv.driverPackage);
-    if (pkg === 'com.digilayn.laynassist' && fleetEnv.isDev) button.hidden = true;
   });
-  const assistCard = document.getElementById('stat-app-assist-status');
-  if (assistCard && fleetEnv.isDev) assistCard.closest('.stat-card').hidden = true;
 
 
   // ---------------------------------------------------------------------------
@@ -1242,11 +1239,10 @@
         }
         const configs = {};
         snap.docs.forEach((doc) => {
-          // Strict slug-only: laynrider / layndriver / laynassist. Legacy or unknown doc ids
-          // (e.g. the old package-named Assist document) are ignored — no backward fallback.
+          // Strict slug-only: laynrider / layndriver. Legacy or unknown doc ids are ignored
+          // — no backward fallback.
           const pkg = doc.id === 'laynrider' ? fleetEnv.riderPackage
             : doc.id === 'layndriver' ? fleetEnv.driverPackage
-            : doc.id === 'laynassist' ? 'com.digilayn.laynassist'
             : null;
           if (!pkg) return;
           configs[pkg] = { id: doc.id, ...doc.data() };
@@ -3539,14 +3535,12 @@
     'com.digilayn.laynrider.dev': 'LaynRider DEV',
     'com.digilayn.layndriver.dev': 'LaynDriver DEV',
     'com.digilayn.laynrider': 'LaynRider (Rider App)',
-    'com.digilayn.layndriver': 'LaynDriver (Driver App)',
-    'com.digilayn.laynassist': 'LaynAssist (Dog Towing)'
+    'com.digilayn.layndriver': 'LaynDriver (Driver App)'
   };
 
   function renderAppControl() {
     const riderConfig = state.appConfig[fleetEnv.riderPackage] || {};
     const driverConfig = state.appConfig[fleetEnv.driverPackage] || {};
-    const assistConfig = fleetEnv.isDev ? {} : (state.appConfig['com.digilayn.laynassist'] || {});
 
     // 1. Update KPI overview cards
     const riderMaint = riderConfig.maintenanceMode === true;
@@ -3583,28 +3577,11 @@
       }
     }
 
-    const assistMaint = assistConfig.maintenanceMode === true;
-    const assistMinVer = Number(assistConfig.minVersionCode || 1);
-    const statAssistEl = $('stat-app-assist-status');
-    const statAssistDetailsEl = $('stat-app-assist-details');
-    if (statAssistEl && statAssistDetailsEl) {
-      if (assistMaint) {
-        statAssistEl.innerHTML = '<span class="status-pill status-demoted" style="font-size: 14px;">🚧 Maintenance Active</span>';
-        statAssistDetailsEl.textContent = assistConfig.maintenanceMessage || 'App entrance blocked';
-      } else if (assistMinVer > 1) {
-        statAssistEl.innerHTML = `<span class="status-pill status-approved" style="font-size: 14px;">Operational (Min v${assistMinVer})</span>`;
-        statAssistDetailsEl.textContent = 'Force upgrade policy active';
-      } else {
-        statAssistEl.innerHTML = '<span class="status-pill status-approved" style="font-size: 14px;">🟢 Operational</span>';
-        statAssistDetailsEl.textContent = 'Min v1 · Dedicated Devices';
-      }
-    }
-
     const statGlobalEl = $('stat-app-global-status');
     const statLastUpdatedEl = $('stat-app-last-updated');
     if (statGlobalEl && statLastUpdatedEl) {
-      const activeCount = [riderMaint, driverMaint, assistMaint].filter(Boolean).length;
-      if (activeCount === 3) {
+      const activeCount = [riderMaint, driverMaint].filter(Boolean).length;
+      if (activeCount === 2) {
         statGlobalEl.innerHTML = '<span style="color: var(--danger, #ef4444);">Full Fleet Locked</span>';
         statLastUpdatedEl.textContent = 'All apps in maintenance';
       } else if (activeCount > 0) {
@@ -3612,7 +3589,6 @@
         const locked = [];
         if (riderMaint) locked.push('Rider');
         if (driverMaint) locked.push('Driver');
-        if (assistMaint) locked.push('Assist');
         statLastUpdatedEl.textContent = `${locked.join(' & ')} locked`;
       } else {
         statGlobalEl.innerHTML = '<span style="color: var(--success, #22c55e);">All Systems Live</span>';
@@ -3631,16 +3607,10 @@
       driverBadge.textContent = driverMaint ? 'MAINTENANCE' : `v${driverMinVer}`;
       driverBadge.className = 'tab-badge-pill ' + (driverMaint ? 'pill-danger' : 'pill-success');
     }
-    const assistBadge = $('badge-tab-assist');
-    if (assistBadge) {
-      assistBadge.textContent = assistMaint ? 'MAINTENANCE' : `v${assistMinVer}`;
-      assistBadge.className = 'tab-badge-pill ' + (assistMaint ? 'pill-danger' : 'pill-success');
-    }
-
     // Sidebar badge
     const navBadge = $('nav-badge-appcontrol');
     if (navBadge) {
-      const hasActiveAlert = riderMaint || driverMaint || assistMaint;
+      const hasActiveAlert = riderMaint || driverMaint;
       navBadge.classList.toggle('is-hidden', !hasActiveAlert);
       if (hasActiveAlert) {
         navBadge.textContent = '!';
@@ -3651,7 +3621,7 @@
 
     // Render active tab config form
     updateAppConfigFormFromState();
-    for (const [app, pkg] of [['rider', fleetEnv.riderPackage], ['driver', fleetEnv.driverPackage], ['assist', 'com.digilayn.laynassist']]) {
+    for (const [app, pkg] of [['rider', fleetEnv.riderPackage], ['driver', fleetEnv.driverPackage]]) {
       if (!state.appConfigVerified || !state.appConfig[pkg]) {
         const text = state.appConfigVerified ? 'Not configured' : 'Unavailable';
         if ($('stat-app-' + app + '-status')) $('stat-app-' + app + '-status').textContent = text;
