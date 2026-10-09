@@ -111,7 +111,7 @@
   }
 
   function isBookingActive(status) {
-    return ['ACCEPTED', 'SCHEDULED_CONFIRMED', 'EN_ROUTE', 'ARRIVED', 'IN_TRIP', 'QUOTED', 'PENDING'].includes(status);
+    return ['ACCEPTED', 'SCHEDULED_CONFIRMED', 'EN_ROUTE', 'ARRIVED', 'IN_TRIP', 'AT_DESTINATION', 'RETURN_TRIP', 'QUOTED', 'PENDING'].includes(status);
   }
 
   function getBookingDate(b) {
@@ -128,10 +128,13 @@
   }
 
   function getBookingPrice(b) {
-    if (!b) return 0;
-    const val = b.quotedPrice != null ? b.quotedPrice : (b.fare != null ? b.fare : (b.amount != null ? b.amount : b.price));
-    const num = Number(val);
-    return isNaN(num) ? 0 : num;
+    const price = b?.upfrontPrice;
+    return typeof price === 'number' && Number.isFinite(price) && price > 0 ? price : null;
+  }
+
+  function getBookingDriverId(b) {
+    const uid = b.driverId || (b.status === 'PENDING' ? b.currentDriverId : null);
+    return typeof uid === 'string' && uid.trim() ? uid : null;
   }
 
   // ---------------------------------------------------------------------------
@@ -1166,7 +1169,8 @@
         // Preload identities for participants
         await Promise.all(docs.map(async (b) => {
           if (b.riderId && !userCache.has(b.riderId)) await getUser(b.riderId);
-          if (b.driverId && !userCache.has(b.driverId)) await getUser(b.driverId);
+          const driverId = getBookingDriverId(b);
+          if (driverId && !userCache.has(driverId)) await getUser(driverId);
         }));
         state.bookings = docs;
         updateBookingTypeOptions();
@@ -1807,26 +1811,27 @@
 
       // 6. Fare / Price filter
       const price = getBookingPrice(b);
-      if (priceMin != null && price < priceMin) return false;
-      if (priceMax != null && price > priceMax) return false;
+      if (priceMin != null && (price == null || price < priceMin)) return false;
+      if (priceMax != null && (price == null || price > priceMax)) return false;
 
       // 7. Search filter
       if (term) {
         const rider = userCache.get(b.riderId) || {};
-        const driverDoc = state.drivers && state.drivers.find((x) => x.uid === b.driverId);
-        const driver = userCache.get(b.driverId) || {};
-        const driverPhone = (driverDoc && driverDoc.phone) || (!driverDoc?.phoneDeletedAt ? (driver.phone || '') : '');
-        const pickup = b.pickupAddress || (b.pickup && b.pickup.address) || '';
-        const dest = b.dropoffAddress || (b.destination && b.destination.address) || '';
+        const driverId = getBookingDriverId(b);
+        const driverDoc = state.drivers && state.drivers.find((x) => x.uid === driverId);
+        const driver = userCache.get(driverId) || {};
+        const driverPhone = driverDoc?.phone || '';
+        const pickup = b.pickup?.address || '';
+        const dest = b.dropoff?.address || '';
         const matches = [
           b.id,
           b.status,
           b.type,
           b.riderId,
-          rider.displayName,
-          rider.phone,
+          b.riderName,
+          b.riderPhone,
           rider.email,
-          b.driverId,
+          driverId,
           driver.displayName,
           driverPhone,
           driver.phone,
@@ -1848,8 +1853,8 @@
 
       switch (bf.sortBy) {
         case 'oldest': return dateA - dateB;
-        case 'price-desc': return priceB - priceA;
-        case 'price-asc': return priceA - priceB;
+        case 'price-desc': return priceA == null ? (priceB == null ? 0 : 1) : priceB == null ? -1 : priceB - priceA;
+        case 'price-asc': return priceA == null ? (priceB == null ? 0 : 1) : priceB == null ? -1 : priceA - priceB;
         case 'newest':
         default:
           return dateB - dateA;
@@ -1857,7 +1862,8 @@
     });
 
     // Summary calculation
-    const totalValue = list.reduce((sum, b) => sum + getBookingPrice(b), 0);
+    const totalValue = list.every((b) => getBookingPrice(b) != null)
+      ? list.reduce((sum, b) => sum + getBookingPrice(b), 0) : null;
     const summaryEl = $('booking-filter-summary');
     if (summaryEl) {
       const hasActiveFilters = bf.quickTab !== 'all' || bf.status !== 'all' || bf.type !== 'all' ||
@@ -1867,7 +1873,7 @@
       summaryEl.innerHTML = `
         <span>Showing <strong class="filter-summary-highlight">${list.length}</strong> of ${state.bookings.length} bookings</span>
         <span>·</span>
-        <span>Total Value: <strong class="filter-summary-highlight">${formatZar(totalValue)}</strong></span>
+        <span>Total Value: <strong class="filter-summary-highlight">${totalValue == null ? 'Unavailable' : formatZar(totalValue)}</strong></span>
         ${hasActiveFilters ? '<span class="badge badge-pending">Filtered</span>' : ''}`;
     }
 
@@ -1885,20 +1891,21 @@
 
     const rows = list.map((b) => {
       const rider = userCache.get(b.riderId) || {};
-      const driverDoc = state.drivers && state.drivers.find((x) => x.uid === b.driverId);
-      const driver = userCache.get(b.driverId) || {};
-      const driverPhone = (driverDoc && driverDoc.phone) || (!driverDoc?.phoneDeletedAt ? (driver.phone || '') : '');
-      const riderName = rider.displayName || (b.riderId ? `UID: ${b.riderId.slice(0, 6)}…` : '—');
-      const driverName = driver.displayName || (b.driverId ? `UID: ${b.driverId.slice(0, 6)}…` : null);
+      const driverId = getBookingDriverId(b);
+      const driverDoc = state.drivers && state.drivers.find((x) => x.uid === driverId);
+      const driver = userCache.get(driverId) || {};
+      const driverPhone = driverDoc?.phone || '';
+      const riderName = b.riderName || (b.riderId ? `UID: ${b.riderId.slice(0, 6)}…` : '—');
+      const driverName = driver.displayName || (driverId ? `UID: ${driverId.slice(0, 6)}…` : null);
       const price = getBookingPrice(b);
       const typeStr = b.type ? titleCase(String(b.type).replace(/_/g, ' ')) : 'Standard';
 
       const driverCell = driverName
-        ? `<div class="cell-strong">${escapeHtml(driverName)}</div><div class="cell-dim">${escapeHtml(driverPhone || (b.driverId || '').slice(0, 8))}</div>`
+        ? `<div class="cell-strong">${escapeHtml(driverName)}${b.status === 'PENDING' && !b.driverId ? ' · Reviewing' : ''}</div><div class="cell-dim">${escapeHtml(driverPhone || (driverId || '').slice(0, 8))}</div>`
         : '<span class="badge badge-unassigned">Unassigned</span>';
 
-      const pickup = b.pickupAddress || (b.pickup && b.pickup.address) || '';
-      const dest = b.dropoffAddress || (b.destination && b.destination.address) || '';
+      const pickup = b.pickup?.address || '';
+      const dest = b.dropoff?.address || '';
       const routeText = (pickup || dest)
         ? `<div class="cell-dim" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(pickup + ' → ' + dest)}">${escapeHtml(pickup || '—')} → ${escapeHtml(dest || '—')}</div>`
         : '';
@@ -1910,7 +1917,7 @@
           </td>
           <td>
             <div class="cell-strong">${escapeHtml(riderName)}</div>
-            <div class="cell-dim">${escapeHtml(rider.phone || rider.email || '—')}</div>
+            <div class="cell-dim">${escapeHtml(b.riderPhone || rider.email || '—')}</div>
           </td>
           <td>
             ${driverCell}
@@ -1920,7 +1927,7 @@
             ${routeText}
           </td>
           <td>${statusBadgeHtml(b.status)}</td>
-          <td class="cell-strong">${escapeHtml(formatZar(price))}</td>
+          <td class="cell-strong">${escapeHtml(price == null ? 'Fare unavailable' : formatZar(price))}</td>
           <td class="cell-dim">${escapeHtml(formatDate(b.createdAt))}</td>
           <td style="text-align:right;">
             <button class="btn btn-ghost btn-sm" data-view-booking="${escapeHtml(b.id)}" title="View complete booking details">Details</button>
@@ -1965,17 +1972,18 @@
     if (!b) return;
 
     const rider = userCache.get(b.riderId) || {};
-    const driver = userCache.get(b.driverId) || {};
-    const driverDoc = state.drivers && state.drivers.find((x) => x.uid === b.driverId);
-    const driverPhone = (driverDoc && driverDoc.phone) || (!driverDoc?.phoneDeletedAt ? (driver.phone || '—') : '—');
+      const driverId = getBookingDriverId(b);
+    const driver = userCache.get(driverId) || {};
+    const driverDoc = state.drivers && state.drivers.find((x) => x.uid === driverId);
+    const driverPhone = driverDoc?.phone || 'Phone unavailable';
 
     $('booking-modal-title').textContent = 'Booking Details';
     $('booking-modal-id').textContent = 'ID: ' + b.id;
 
     const statusBadge = statusBadgeHtml(b.status);
     const price = getBookingPrice(b);
-    const pickup = b.pickupAddress || (b.pickup && (b.pickup.address || b.pickup.name)) || 'Not specified';
-    const dest = b.dropoffAddress || (b.destination && (b.destination.address || b.destination.name)) || 'Not specified';
+    const pickup = b.pickup?.address || 'Address unavailable';
+    const dest = b.dropoff?.address || 'Address unavailable';
     const typeStr = b.type ? titleCase(String(b.type).replace(/_/g, ' ')) : 'Standard';
 
     const modalBody = $('booking-modal-body');
@@ -1991,8 +1999,8 @@
             <span class="detail-item-value">${escapeHtml(typeStr)}</span>
           </div>
           <div class="detail-item">
-            <span class="detail-item-label">Quoted Fare</span>
-            <span class="detail-item-value">${escapeHtml(formatZar(price))}</span>
+            <span class="detail-item-label">Upfront Fare</span>
+            <span class="detail-item-value">${escapeHtml(price == null ? 'Fare unavailable' : formatZar(price))}</span>
           </div>
           <div class="detail-item">
             <span class="detail-item-label">Created At</span>
@@ -2005,7 +2013,7 @@
             </div>` : ''}
           <div class="detail-item">
             <span class="detail-item-label">Payment Method</span>
-            <span class="detail-item-value">${escapeHtml(b.paymentMethod || 'Cash / In-app')}</span>
+            <span class="detail-item-value">${escapeHtml(b.paymentMethod || 'Offline payment')}</span>
           </div>
           ${b.cancelReason ? `
             <div class="detail-item detail-item-full">
@@ -2020,11 +2028,11 @@
         <div class="detail-grid">
           <div class="detail-item">
             <span class="detail-item-label">Name</span>
-            <span class="detail-item-value">${escapeHtml(rider.displayName || 'Unnamed rider')}</span>
+            <span class="detail-item-value">${escapeHtml(b.riderName || 'Name unavailable')}</span>
           </div>
           <div class="detail-item">
             <span class="detail-item-label">Phone</span>
-            <span class="detail-item-value">${escapeHtml(rider.phone || '—')}</span>
+            <span class="detail-item-value">${escapeHtml(b.riderPhone || 'Phone unavailable')}</span>
           </div>
           <div class="detail-item">
             <span class="detail-item-label">Email</span>
@@ -2038,8 +2046,8 @@
       </div>
 
       <div class="detail-section">
-        <div class="detail-section-title"><span>Assigned Driver</span></div>
-        ${b.driverId ? `
+        <div class="detail-section-title"><span>${b.status === 'PENDING' && !b.driverId && driverId ? 'Reviewing Driver' : 'Assigned Driver'}</span></div>
+        ${driverId ? `
           <div class="detail-grid">
             <div class="detail-item">
               <span class="detail-item-label">Name</span>
@@ -2051,7 +2059,7 @@
             </div>
             <div class="detail-item">
               <span class="detail-item-label">Driver UID</span>
-              <span class="uid-chip" data-copy="${escapeHtml(b.driverId)}" title="Copy UID">${escapeHtml(b.driverId)}</span>
+              <span class="uid-chip" data-copy="${escapeHtml(driverId)}" title="Copy UID">${escapeHtml(driverId)}</span>
             </div>
           </div>` : `
           <div class="detail-item">
@@ -2772,11 +2780,11 @@
           <div class="detail-grid">
             <div class="detail-item detail-item-full">
               <span class="detail-item-label">Route</span>
-              <span class="detail-item-value">${escapeHtml(b.pickupAddress || (b.pickup && b.pickup.address) || '—')} → ${escapeHtml(b.dropoffAddress || (b.destination && b.destination.address) || '—')}</span>
+              <span class="detail-item-value">${escapeHtml(b.pickup?.address || 'Address unavailable')} → ${escapeHtml(b.dropoff?.address || 'Address unavailable')}</span>
             </div>
             <div class="detail-item">
               <span class="detail-item-label">Fare</span>
-              <span class="detail-item-value">${escapeHtml(formatZar(getBookingPrice(b)))}</span>
+              <span class="detail-item-value">${escapeHtml(getBookingPrice(b) == null ? 'Fare unavailable' : formatZar(getBookingPrice(b)))}</span>
             </div>
             <div class="detail-item">
               <span class="detail-item-label">Ride Type</span>
