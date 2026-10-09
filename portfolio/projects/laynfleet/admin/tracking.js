@@ -218,7 +218,7 @@
         <div class="popup-meta-line">⚡ ${speed} km/h · Heading ${cardinalDirection(driver.location.heading)} (${Math.round(driver.location.heading || 0)}°)</div>
         ${driver.activeBooking ? `
           <div class="popup-meta-line" style="color:var(--intrip); font-weight:700;">
-            📍 On Trip #${escapeHtml(driver.activeBooking.id.slice(-6))} · ${escapeHtml(driver.activeBooking.destinationAddress || 'Active Route')}
+            📍 On Trip #${escapeHtml(driver.activeBooking.id.slice(-6))} · ${escapeHtml(driver.activeBooking.dropoff?.address || 'Address unavailable')}
           </div>
         ` : ''}
         <button class="popup-btn-action" onclick="window.LaynFleetTracker.selectDriver('${escapeHtml(driver.uid)}', true)">
@@ -413,10 +413,10 @@
             <div class="driver-trip-snippet">
               <div class="trip-snippet-route">
                 <span class="trip-dot pickup"></span>
-                <span>${escapeHtml(d.activeBooking.pickupAddress || 'Pickup')}</span>
+                <span>${escapeHtml(d.activeBooking.pickup?.address || 'Address unavailable')}</span>
                 <span style="color:var(--text-faint);">➔</span>
                 <span class="trip-dot dropoff"></span>
-                <span>${escapeHtml(d.activeBooking.destinationAddress || 'Dropoff')}</span>
+                <span>${escapeHtml(d.activeBooking.dropoff?.address || 'Address unavailable')}</span>
               </div>
               <div class="trip-snippet-meta">
                 <span>Trip #${escapeHtml(d.activeBooking.id.slice(-6))}</span>
@@ -523,10 +523,11 @@
 
     if (driver.activeBooking) {
       const b = driver.activeBooking;
-      const destination = b.dropoffLocation;
-      const lat = Number(destination?.latitude ?? destination?.lat);
-      const lng = Number(destination?.longitude ?? destination?.lng);
-      if (destination && Number.isFinite(lat) && Number.isFinite(lng)) {
+      const destination = b.dropoff;
+      const lat = destination?.lat;
+      const lng = destination?.lng;
+      if (destination && Number.isFinite(lat) && Number.isFinite(lng) &&
+          lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
         const end = { lat, lng };
         overlays.push(new google.maps.Polyline({
           map,
@@ -640,8 +641,8 @@
     if (driver.activeBooking) {
       tripCard.classList.remove('is-hidden');
       $('inspector-trip-id').textContent = `Trip #${driver.activeBooking.id.slice(-6)}`;
-      $('inspector-pickup-addr').textContent = driver.activeBooking.pickupAddress || 'Pickup address';
-      $('inspector-dest-addr').textContent = driver.activeBooking.destinationAddress || driver.activeBooking.dropoffAddress || 'Destination address';
+      $('inspector-pickup-addr').textContent = driver.activeBooking.pickup?.address || 'Address unavailable';
+      $('inspector-dest-addr').textContent = driver.activeBooking.dropoff?.address || 'Address unavailable';
       $('inspector-trip-fare').textContent = driver.activeBooking.fare ? `R${driver.activeBooking.fare}` : '—';
     } else {
       tripCard.classList.add('is-hidden');
