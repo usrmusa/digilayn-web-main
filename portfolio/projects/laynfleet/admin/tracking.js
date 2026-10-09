@@ -215,6 +215,7 @@
           <span class="driver-status-tag ${status}">${status}</span>
         </div>
         <div class="popup-meta-line">🚘 ${escapeHtml(model)} (${escapeHtml(plate)})</div>
+        <div class="popup-meta-line">${escapeHtml(locationCaption(driver))}</div>
         <div class="popup-meta-line">⚡ ${speed} km/h · Heading ${cardinalDirection(driver.location.heading)} (${Math.round(driver.location.heading || 0)}°)</div>
         ${driver.activeBooking ? `
           <div class="popup-meta-line" style="color:var(--intrip); font-weight:700;">
@@ -231,12 +232,31 @@
   // ---------------------------------------------------------------------------
   // Data Ingestion: Pure Real Data (Firestore + RTDB)
   // ---------------------------------------------------------------------------
+  // Historical telemetry is display-only; it never establishes live presence.
+  function lastRecordedLocation(presence) {
+    const sessions = Object.values(presence?.sessions || {});
+    return sessions.filter((sample) =>
+      typeof sample?.lat === 'number' && Number.isFinite(sample.lat) && Math.abs(sample.lat) <= 90 &&
+      typeof sample?.lng === 'number' && Number.isFinite(sample.lng) && Math.abs(sample.lng) <= 180 &&
+      typeof sample?.locationUpdatedAt === 'number' && Number.isFinite(sample.locationUpdatedAt) &&
+      sample.locationUpdatedAt > 0 && sample.locationUpdatedAt <= Date.now()
+    ).sort((a, b) => b.locationUpdatedAt - a.locationUpdatedAt)[0];
+  }
+
+  function locationCaption(driver) {
+    if (!driver.hasGpsLock) return 'No recorded location';
+    const label = driver.computedStatus === 'offline' ? 'Offline · Last known location' : 'Location updated';
+    return `${label}: ${new Date(driver.location.updatedAt).toLocaleString()}`;
+  }
+
   function consolidateFleet() {
     const driversMap = new Map();
 
     state.rawFirestoreDrivers.forEach((fDoc) => {
       const uid = fDoc.uid || fDoc.id;
-      const rtdbEntry = state.rawRtdbLocations[uid] || {};
+      const rawPresence = state.rawRtdbLocations[uid];
+      const livePresence = window.LaynFleetEnvironment.presenceForDriver(rawPresence);
+      const rtdbEntry = lastRecordedLocation(rawPresence) || {};
       const user = state.userCache.get(uid) || fDoc.user || {};
 
       // Find active booking for this driver
@@ -253,7 +273,7 @@
       const ageMs = typeof updatedAt === 'number' ? Date.now() - updatedAt : Infinity;
       const isFresh = ageMs >= 0 && ageMs <= 60000;
       const isOnline = fDoc.approvalStatus === 'APPROVED' && fDoc.online === true &&
-        rtdbEntry.online === true && isFresh;
+        livePresence?.online === true && livePresence === rtdbEntry && isFresh;
 
       let computedStatus = 'offline';
       if (activeBk && isOnline) {
@@ -632,7 +652,7 @@
 
     $('inspector-speed').textContent = driver.hasGpsLock ? `${speed} km/h` : 'No GPS';
     $('inspector-heading').textContent = driver.hasGpsLock ? `${cardinalDirection(heading)} (${heading}°)` : '—';
-    $('inspector-coords').textContent = driver.hasGpsLock ? `${lat}, ${lng}` : 'No GPS broadcast';
+    $('inspector-coords').textContent = driver.hasGpsLock ? `${lat}, ${lng} · ${locationCaption(driver)}` : 'No recorded location';
     $('inspector-plate').textContent = plate;
     $('inspector-model').textContent = model;
     $('inspector-phone').textContent = phone;
@@ -725,8 +745,7 @@
       if (rtdb) {
         const locRef = rtdb.ref(window.LaynFleetEnvironment.locationsPath);
         locRef.on('value', (snap) => {
-          state.rawRtdbLocations = Object.fromEntries(Object.entries(snap.val() || {}).map(([uid, presence]) =>
-            [uid, window.LaynFleetEnvironment.presenceForDriver(presence)]));
+          state.rawRtdbLocations = snap.val() || {};
           consolidateFleet();
         });
       }
