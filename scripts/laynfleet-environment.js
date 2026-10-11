@@ -10,7 +10,7 @@
   global.LaynFleetEnvironment = Object.freeze({
     environment, isDev,
     async request(path, body) {
-      const user = global.firebase.auth().currentUser;
+      const user = global.AccountAccess?.currentUser;
       if (!user) throw new Error('Sign in required.');
       const token = await user.getIdToken();
       const response = await fetch(`https://api.digilayn.co.za/v2/${environment}${path}`, {

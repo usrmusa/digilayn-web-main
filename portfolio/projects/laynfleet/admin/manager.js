@@ -25,6 +25,7 @@
   if (!fleetEnv) throw new Error("Fleet environment is required");
   firebase.initializeApp(window.LAYNFLEET_FIREBASE_CONFIG);
   const auth = firebase.auth();
+  window.installAccountAccess();
   const db = firebase.firestore();
   const rtdb = typeof firebase.database === 'function' ? firebase.database() : null;
   const serverTimestamp = firebase.firestore.FieldValue.serverTimestamp;
@@ -1050,7 +1051,7 @@
   // ---------------------------------------------------------------------------
   // AUTH GATE
   // ---------------------------------------------------------------------------
-  auth.onAuthStateChanged(async (user) => {
+  AccountAccess.observe(async (user) => {
     hide($('boot-view'));
     if (!user) return showLogin();
 
@@ -1101,8 +1102,8 @@
 
     btn.disabled = true; btn.textContent = 'Signing in…';
     try {
-      await auth.signInWithEmailAndPassword(email, password);
-      // onAuthStateChanged takes over from here.
+      await AccountAccess.signIn(() => auth.signInWithEmailAndPassword(email, password));
+      // AccountAccess publishes the verified user from here.
     } catch (err) {
       console.error(err);
       const el = $('login-error');
@@ -1117,6 +1118,8 @@
 
   function friendlyAuthError(err) {
     switch (err && err.code) {
+      case 'auth/account-suspended': return AccountAccessCore.messages['auth/account-suspended'];
+      case 'auth/account-unverified': return AccountAccessCore.messages['auth/account-unverified'];
       case 'auth/invalid-credential':
       case 'auth/wrong-password':
       case 'auth/user-not-found': return 'Incorrect email or password.';
@@ -3323,7 +3326,7 @@
   async function loadPricingVoterProfiles(records) {
     const voterUids = new Set(records.flatMap((record) => Object.keys(record.votes || {})));
     await Promise.all([...voterUids].map((uid) => getUser(uid)));
-    if (auth.currentUser) renderPricing();
+    if (AccountAccess.currentUser) renderPricing();
   }
 
   function curveLabel(value) {

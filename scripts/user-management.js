@@ -1,9 +1,18 @@
-import { auth, functions, db } from "./firebase-config.js";
+import { accountAccess } from './account-access.js';
+import { AUTHORIZED_EMAIL, functions, db } from "./firebase-config.js";
 import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, Timestamp, writeBatch } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { httpsCallable } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-functions.js";
 
 const fleetEnv = window.LaynFleetEnvironment;
 if (!fleetEnv) throw new Error("Fleet environment is required");
+
+function requireManager() {
+  const user = accountAccess.currentUser;
+  if (!user || user.email?.toLowerCase() !== AUTHORIZED_EMAIL.toLowerCase()) {
+    throw new Error("Sign in with an active authorised account to continue.");
+  }
+  return user;
+}
 
 export function getTimestampMs(ts) {
   if (!ts) return 0;
@@ -38,6 +47,7 @@ class UserManagement {
   }
 
   async init(onUpdate, onError) {
+    requireManager();
     this.onUpdate = onUpdate;
     this.onError = onError;
     try {
@@ -48,6 +58,7 @@ class UserManagement {
   }
 
   async refresh() {
+    requireManager();
     try {
       const response = await this.getInventory({});
       const inventory = response.data || {};
@@ -178,11 +189,13 @@ class UserManagement {
   setFilter(key, value) { this.filters[key] = value; }
 
   async getDeletePreview(uid) {
+    requireManager();
     return (await this.previewDelete({ uid })).data;
   }
 
   async deleteUser(uid, confirmation, onProgress) {
-    if (auth.currentUser?.uid === uid) throw new Error("You cannot delete yourself.");
+    requireManager();
+    if (requireManager().uid === uid) throw new Error("You cannot delete yourself.");
     onProgress?.({ step: "requesting", percent: 25, message: "Validating credentials and sending delete request..." });
     const result = await this.deleteUserFully({ uid, confirmation });
     onProgress?.({ step: "refreshing", percent: 80, message: "Refreshing user inventory..." });
@@ -192,24 +205,28 @@ class UserManagement {
   }
 
   async deleteStorageObject(path, confirmation, skipRefresh = false) {
+    requireManager();
     const result = await this.deleteStorageObjectFully({ path, confirmation });
     if (!skipRefresh) await this.refresh();
     return result.data;
   }
 
   async deleteUsernameReservation(username, confirmation, skipRefresh = false) {
+    requireManager();
     const result = await this.deleteUsernameReservationFully({ username, confirmation });
     if (!skipRefresh) await this.refresh();
     return result.data;
   }
 
   async deleteOrphanDocument(path, confirmation, skipRefresh = false) {
+    requireManager();
     const result = await this.deleteOrphanDocumentFully({ path, confirmation });
     if (!skipRefresh) await this.refresh();
     return result.data;
   }
 
   async deleteOrphansBatch(items, onProgress, isAborted) {
+    requireManager();
     const results = { succeeded: [], failed: [] };
     const total = items.length;
 
@@ -284,6 +301,7 @@ class UserManagement {
   }
 
   async toggleUserSuspension(uid, isSuspended, reason = "") {
+    requireManager();
     const updateData = {
       suspended: !isSuspended,
       suspendedReason: !isSuspended ? (String(reason || "").trim() || "Suspended by manager") : "",
@@ -295,18 +313,21 @@ class UserManagement {
   }
 
   async toggleUserRole(uid, rolePath, currentStatus) {
+    requireManager();
     await updateDoc(doc(db, "users", uid), { [`roles.${rolePath}`]: !currentStatus, updatedAt: Timestamp.now() });
     await this.refresh();
     return { success: true };
   }
 
   async togglePoortjieRole(uid, roleKey, currentStatus) {
+    requireManager();
     await updateDoc(doc(db, "users", uid), { [`roles.poortjie.${roleKey}`]: !currentStatus, updatedAt: Timestamp.now() });
     await this.refresh();
     return { success: true };
   }
 
   async toggleLaynFleetDriver(uid, currentStatus) {
+    requireManager();
     await updateDoc(doc(db, "users", uid), { [`applications.${fleetEnv.membershipKey}.isDriver`]: !currentStatus, updatedAt: Timestamp.now() });
     await this.refresh();
     return { success: true };
@@ -319,6 +340,7 @@ class UserManagement {
   }
 
   async fetchLaynFleetDrivers() {
+    requireManager();
     const snapshot = await getDocs(collection(db, "laynfleet", fleetEnv.environment, "drivers"));
     const usersByUid = new Map(this.users.map((u) => [u.userId || u.uid, u]));
 
@@ -357,6 +379,7 @@ class UserManagement {
   }
 
   async fetchDogTowingDrivers() {
+    requireManager();
     if (fleetEnv.isDev) throw new Error("Dog Towing is production only; select Production");
     const snapshot = await getDocs(collection(db, "laynfleet", "dog-towing", "drivers"));
     const usersByUid = new Map(this.users.map((u) => [u.userId || u.uid, u]));
@@ -394,6 +417,7 @@ class UserManagement {
   }
 
   async fetchLaynFleetRiders() {
+    requireManager();
     const snapshot = await getDocs(collection(db, "laynfleet", fleetEnv.environment, "riders"));
     const usersByUid = new Map(this.users.map((u) => [u.userId || u.uid, u]));
 
@@ -423,10 +447,11 @@ class UserManagement {
   }
 
   async promoteLaynDriver(uid, vehicleData = {}) {
+    requireManager();
     const batch = writeBatch(db);
     const driverRef = doc(db, "laynfleet", fleetEnv.environment, "drivers", uid);
     const userRef = doc(db, "users", uid);
-    const managerEmail = auth.currentUser?.email || "usrmusa@gmail.com";
+    const managerEmail = requireManager().email;
 
     batch.set(driverRef, {
       approvalStatus: "APPROVED",
@@ -461,10 +486,11 @@ class UserManagement {
   }
 
   async demoteLaynDriver(uid, reason = "") {
+    requireManager();
     const batch = writeBatch(db);
     const driverRef = doc(db, "laynfleet", fleetEnv.environment, "drivers", uid);
     const userRef = doc(db, "users", uid);
-    const managerEmail = auth.currentUser?.email || "usrmusa@gmail.com";
+    const managerEmail = requireManager().email;
 
     batch.set(driverRef, {
       approvalStatus: "DEMOTED",
@@ -490,15 +516,17 @@ class UserManagement {
   }
 
   async reapproveLaynDriver(uid) {
+    requireManager();
     return this.promoteLaynDriver(uid);
   }
 
   async promoteDogTowingUser(uid, role = "DRIVER", vehicleData = {}) {
+    requireManager();
     if (fleetEnv.isDev) throw new Error("Dog Towing is production only; select Production");
     const batch = writeBatch(db);
     const driverRef = doc(db, "laynfleet", "dog-towing", "drivers", uid);
     const userRef = doc(db, "users", uid);
-    const managerEmail = auth.currentUser?.email || "usrmusa@gmail.com";
+    const managerEmail = requireManager().email;
     const isOwner = role === "OWNER";
 
     batch.set(driverRef, {
@@ -533,11 +561,12 @@ class UserManagement {
   }
 
   async demoteDogTowingUser(uid, newRole = "DRIVER", reason = "") {
+    requireManager();
     if (fleetEnv.isDev) throw new Error("Dog Towing is production only; select Production");
     const batch = writeBatch(db);
     const driverRef = doc(db, "laynfleet", "dog-towing", "drivers", uid);
     const userRef = doc(db, "users", uid);
-    const managerEmail = auth.currentUser?.email || "usrmusa@gmail.com";
+    const managerEmail = requireManager().email;
 
     if (newRole === "DRIVER") {
       batch.set(driverRef, {
@@ -585,11 +614,12 @@ class UserManagement {
   }
 
   async reapproveDogTowingDriver(uid) {
+    requireManager();
     if (fleetEnv.isDev) throw new Error("Dog Towing is production only; select Production");
     const batch = writeBatch(db);
     const driverRef = doc(db, "laynfleet", "dog-towing", "drivers", uid);
     const userRef = doc(db, "users", uid);
-    const managerEmail = auth.currentUser?.email || "usrmusa@gmail.com";
+    const managerEmail = requireManager().email;
 
     batch.set(driverRef, {
       approvalStatus: "APPROVED",

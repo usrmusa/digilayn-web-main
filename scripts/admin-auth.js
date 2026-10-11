@@ -1,6 +1,6 @@
+import { accountAccess } from './account-access.js';
 import { auth, AUTHORIZED_EMAIL } from "./firebase-config.js";
 import {
-  onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
@@ -8,7 +8,7 @@ import {
 /**
  * admin-auth.js — GLOBAL access gate for the entire /portfolio admin area.
  *
- * Only AUTHORIZED_EMAIL (usrmusa@gmail.com) may pass. Every portfolio page that
+ * Only a server-verified active AUTHORIZED_EMAIL (usrmusa@gmail.com) may pass. Every portfolio page that
  * needs protection imports initAdminAuth / loginAdmin / logoutAdmin from here,
  * so the rule is enforced in exactly one place for the whole site.
  *
@@ -31,7 +31,7 @@ function isAuthorized(user) {
 }
 
 /**
- * Global auth observer. Calls onAuthorized(user) only for AUTHORIZED_EMAIL.
+ * Global account observer. Calls onAuthorized(user) only after suspension verification and email authorisation.
  * Any other signed-in account is forcibly signed out and treated as
  * unauthorised. Optionally redirects unauthorised visitors.
  *
@@ -40,7 +40,7 @@ function isAuthorized(user) {
  * @param {string|null} [redirectPath] - if set, unauthorised users are sent here
  */
 export function initAdminAuth(onAuthorized, onUnauthorized, redirectPath = null) {
-  onAuthStateChanged(auth, async (user) => {
+  accountAccess.observe(async (user) => {
     if (isAuthorized(user)) {
       onAuthorized(user);
       return;
@@ -82,7 +82,7 @@ export async function loginAdmin(email, password) {
     throw new Error("This account is not authorised to access this area.");
   }
 
-  const credential = await signInWithEmailAndPassword(auth, normalized, password);
+  const credential = await accountAccess.signIn(() => signInWithEmailAndPassword(auth, normalized, password));
 
   // Defensive re-check in case the returned account differs unexpectedly.
   if (!isAuthorized(credential.user)) {

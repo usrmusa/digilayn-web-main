@@ -866,8 +866,9 @@
       return;
     }
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    window.installAccountAccess();
     loadGoogleMaps();
-    firebase.auth().onAuthStateChanged((user) => {
+    AccountAccess.observe((user) => {
       if (!user || user.email?.toLowerCase() !== global.MANAGER_EMAIL?.toLowerCase()) {
         unsubFirestore.forEach((unsubscribe) => unsubscribe());
         unsubFirestore = [];

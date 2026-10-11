@@ -5,7 +5,7 @@
  * backend the Android apps (LaynRider / LaynDriver) write to. Web API keys are
  * public identifiers (safe to expose); real access control lives in Firestore
  * security rules. Until those rules are locked down, the manager gate here is
- * enforced client-side by the signed-in email only (dev-grade — see manager.js).
+ * enforced client-side by the shared account gate and manager email (dev-grade — see manager.js).
  *
  * Firebase project settings are supplied by /scripts/firebase-settings.js.
  * The dashboard retains its own SDK initialization and manager metadata.
