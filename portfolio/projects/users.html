@@ -3149,7 +3149,7 @@
             try {
                 const preview = await userManager.getDeletePreview(user.uid);
                 if (userToDelete?.uid !== user.uid) return;
-                modalResources.textContent = `Auth: ${preview.auth ? 'yes' : 'no'} · Firestore user: ${preview.firestoreUser ? 'yes' : 'no'} · Fleet profiles (production + dev): ${preview.fleetProfiles.length} · Usernames: ${preview.usernames.length} · Storage objects: ${preview.storage.length}`;
+                modalResources.textContent = `Auth: ${preview.auth ? 'yes' : 'no'} · Firestore user: ${preview.firestoreUser ? 'yes' : 'no'} · Driver profile: ${preview.driverProfile ? 'yes' : 'no'} · Rider profile: ${preview.riderProfile ? 'yes' : 'no'} · Usernames: ${preview.usernames.length} · Storage objects: ${preview.storage.length}`;
                 deletePreviewReady = true;
                 checkConfirmation();
             } catch (error) {

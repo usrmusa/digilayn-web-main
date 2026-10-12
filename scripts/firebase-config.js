@@ -14,18 +14,10 @@ import { getStorage } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-s
  * Web API keys are PUBLIC identifiers — safe to expose. Real access control
  * lives in Firebase/Firestore security rules.
  *
- * TODO(security): access is currently gated CLIENT-SIDE only (see
- * admin-auth.js). We MUST add Firestore Security Rules + Cloud Function auth
- * checks that hard-block every read/write for any account other than
- * AUTHORIZED_EMAIL. Until those ship, treat this as dev-grade, not hardened.
+ * Portfolio login and global user-management callables authorize the manager
+ * UID on the backend. Direct Firestore operations still depend on rules.
  */
 const firebaseConfig = window.DIGILAYN_FIREBASE_CONFIG;
-
-/**
- * The ONLY account permitted to access the /portfolio admin area.
- * Keep this in sync with MANAGER_EMAIL in the LaynFleet admin config.
- */
-export const AUTHORIZED_EMAIL = "usrmusa@gmail.com";
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);

@@ -1,5 +1,6 @@
 import { accountAccess } from './account-access.js';
-import { AUTHORIZED_EMAIL, functions, db } from "./firebase-config.js";
+import { functions, db } from "./firebase-config.js";
+import { isVerifiedAdmin } from './admin-auth.js';
 import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, Timestamp, writeBatch } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { httpsCallable } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-functions.js";
 
@@ -8,7 +9,7 @@ if (!fleetEnv) throw new Error("Fleet environment is required");
 
 function requireManager() {
   const user = accountAccess.currentUser;
-  if (!user || user.email?.toLowerCase() !== AUTHORIZED_EMAIL.toLowerCase()) {
+  if (!isVerifiedAdmin(user)) {
     throw new Error("Sign in with an active authorised account to continue.");
   }
   return user;
@@ -198,6 +199,10 @@ class UserManagement {
     if (requireManager().uid === uid) throw new Error("You cannot delete yourself.");
     onProgress?.({ step: "requesting", percent: 25, message: "Validating credentials and sending delete request..." });
     const result = await this.deleteUserFully({ uid, confirmation });
+    if (result.data.success !== true) {
+      await this.refresh();
+      throw new Error((result.data.failures || []).map((failure) => `${failure.resource}: ${failure.error}`).join(' | ') || 'User deletion did not complete.');
+    }
     onProgress?.({ step: "refreshing", percent: 80, message: "Refreshing user inventory..." });
     await this.refresh();
     onProgress?.({ step: "done", percent: 100, message: "User deleted successfully." });

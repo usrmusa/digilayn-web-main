@@ -1,98 +1,79 @@
 import { accountAccess } from './account-access.js';
-import { auth, AUTHORIZED_EMAIL } from "./firebase-config.js";
-import {
-  signInWithEmailAndPassword,
-  signOut
-} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { auth, functions } from './firebase-config.js';
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
+import { httpsCallable } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-functions.js';
 
-/**
- * admin-auth.js — GLOBAL access gate for the entire /portfolio admin area.
- *
- * Only a server-verified active AUTHORIZED_EMAIL (usrmusa@gmail.com) may pass. Every portfolio page that
- * needs protection imports initAdminAuth / loginAdmin / logoutAdmin from here,
- * so the rule is enforced in exactly one place for the whole site.
- *
- * ⚠️ TODO(security): This is a CLIENT-SIDE gate ONLY. It hides the UI and signs
- * out unauthorised accounts, but it is NOT a real security boundary — a
- * determined user could still call Firestore / Cloud Functions directly with
- * any authenticated account. We MUST add Firestore Security Rules (and Cloud
- * Function auth checks) that hard-block every read/write for any account other
- * than AUTHORIZED_EMAIL before this can be considered secure. Until those rules
- * ship, treat this as dev-grade.
- */
+// The backend owns the UID allowlist; this state controls presentation only.
+const verifyAccess = httpsCallable(functions, 'verifyAdminAccessCallable');
+let verifiedAdminUid = null;
+let declining = false;
 
-/**
- * True only when the signed-in user is the single authorised account.
- * @param {import("https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js").User|null} user
- * @returns {boolean}
- */
-function isAuthorized(user) {
-  return !!user && (user.email || "").toLowerCase() === AUTHORIZED_EMAIL.toLowerCase();
+export function isVerifiedAdmin(user) {
+  return !!user && user.uid === verifiedAdminUid && auth.currentUser?.uid === user.uid;
 }
 
-/**
- * Global account observer. Calls onAuthorized(user) only after suspension verification and email authorisation.
- * Any other signed-in account is forcibly signed out and treated as
- * unauthorised. Optionally redirects unauthorised visitors.
- *
- * @param {(user: object) => void} onAuthorized
- * @param {(reason?: string) => void} onUnauthorized
- * @param {string|null} [redirectPath] - if set, unauthorised users are sent here
- */
+async function declineAccess() {
+  declining = true;
+  verifiedAdminUid = null;
+  try { await signOut(auth); }
+  finally { window.location.replace('https://digilayn.co.za/'); }
+}
+
+async function verifyAdmin(user) {
+  try {
+    const { data } = await verifyAccess({});
+    if (auth.currentUser?.uid !== user.uid || data.uid !== user.uid) return false;
+    verifiedAdminUid = data.uid;
+    return true;
+  } catch (error) {
+    if (auth.currentUser?.uid !== user.uid) return false;
+    verifiedAdminUid = null;
+    if (error.code === 'functions/permission-denied' || error.code === 'functions/unauthenticated') {
+      await declineAccess();
+      return false;
+    }
+    throw error;
+  }
+}
+
 export function initAdminAuth(onAuthorized, onUnauthorized, redirectPath = null) {
-  accountAccess.observe(async (user) => {
-    if (isAuthorized(user)) {
-      onAuthorized(user);
+  let stopAccountObserver = null;
+  let generation = 0;
+  return onAuthStateChanged(auth, async (user) => {
+    const currentGeneration = ++generation;
+    stopAccountObserver?.();
+    stopAccountObserver = null;
+    verifiedAdminUid = null;
+    if (declining) return;
+    if (!user) {
+      if (redirectPath) window.location.replace(redirectPath);
+      else onUnauthorized();
       return;
     }
-
-    let reason;
-    if (user) {
-      // Signed in with a NON-authorised account — reject hard.
-      console.warn("admin-auth.js: unauthorised account signed in — signing out:", user.email);
-      reason = "This account is not authorised to access this area.";
-      try {
-        await signOut(auth);
-      } catch (err) {
-        console.error("admin-auth.js: sign-out of unauthorised account failed", err);
-      }
+    onUnauthorized();
+    try {
+      if (!await verifyAdmin(user) || currentGeneration !== generation) return;
+      stopAccountObserver = accountAccess.observe((verifiedUser) => {
+        if (currentGeneration !== generation || declining) return;
+        if (isVerifiedAdmin(verifiedUser)) onAuthorized(verifiedUser);
+        else onUnauthorized();
+      });
+    } catch (error) {
+      if (currentGeneration === generation && !declining) onUnauthorized(error.message);
     }
-
-    if (redirectPath) {
-      window.location.href = redirectPath;
-      return;
-    }
-    onUnauthorized(reason);
   });
 }
 
-/**
- * Sign in and enforce the email allowlist. Rejects (and never leaves a session
- * open) for anything other than AUTHORIZED_EMAIL.
- *
- * @param {string} email
- * @param {string} password
- * @returns {Promise<object>} the authorised user
- */
 export async function loginAdmin(email, password) {
-  const normalized = (email || "").trim();
-
-  // Pre-check: never even attempt a sign-in for a non-authorised address.
-  if (normalized.toLowerCase() !== AUTHORIZED_EMAIL.toLowerCase()) {
-    throw new Error("This account is not authorised to access this area.");
-  }
-
-  const credential = await accountAccess.signIn(() => signInWithEmailAndPassword(auth, normalized, password));
-
-  // Defensive re-check in case the returned account differs unexpectedly.
-  if (!isAuthorized(credential.user)) {
-    await signOut(auth);
-    throw new Error("This account is not authorised to access this area.");
-  }
-
-  return credential.user;
+  const credential = await accountAccess.signIn(async () => {
+    const result = await signInWithEmailAndPassword(auth, (email || '').trim(), password);
+    if (!await verifyAdmin(result.user)) return null;
+    return result;
+  });
+  return credential?.user || null;
 }
 
 export async function logoutAdmin() {
+  verifiedAdminUid = null;
   await signOut(auth);
 }
