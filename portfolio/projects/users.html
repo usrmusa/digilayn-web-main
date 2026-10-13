@@ -17,6 +17,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg">
   <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
   <link rel="manifest" href="/favicon/site.webmanifest">
+    <link rel="stylesheet" href="../../styles/digilayn-components.css">
 </head>
 <body class="bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface min-h-screen">
 
@@ -39,7 +40,7 @@
                 <div class="flex items-center">
                     <div class="flex items-center text-digilayn-primary dark:text-digilayn-primary font-bold text-xl">
                         <span>User Management</span>
-                        <span id="userCountBadge" class="ml-3 px-2.5 py-0.5 bg-digilayn-primary-container dark:bg-digilayn-primary-container/30 text-digilayn-on-primary-container dark:text-digilayn-on-primary-container text-xs font-black rounded-full border border-digilayn-primary dark:border-digilayn-primary/50 hidden">0</span>
+                        <span id="userCountBadge" class="ml-3 px-2.5 py-0.5 bg-digilayn-primary-container dark:bg-digilayn-primary/10 text-digilayn-on-primary-container dark:text-digilayn-primary text-xs font-black rounded-full border border-digilayn-primary dark:border-digilayn-primary/50 hidden">0</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-4">
@@ -78,7 +79,7 @@
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mt-3" id="appTabsContainer">
                 <button type="button" class="app-tab-btn active p-4 rounded-2xl border text-left transition-all relative overflow-hidden bg-digilayn-surface-container-lowest dark:bg-digilayn-surface border-digilayn-primary ring-2 ring-digilayn-primary/20 shadow-sm cursor-pointer" data-app="all">
                     <div class="flex items-center justify-between mb-2">
-                        <div class="w-9 h-9 rounded-xl bg-digilayn-primary-container dark:bg-digilayn-primary-container/40 text-digilayn-on-primary-container dark:text-digilayn-on-primary-container flex items-center justify-center text-lg">
+                        <div class="w-9 h-9 rounded-xl bg-digilayn-primary-container dark:bg-digilayn-primary/10 text-digilayn-on-primary-container dark:text-digilayn-primary flex items-center justify-center text-lg">
                             <i class="fas fa-users"></i>
                         </div>
                         <span id="tabCountAll" class="px-2 py-0.5 rounded-full text-xs font-black bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant">0</span>
@@ -89,7 +90,7 @@
 
                 <button type="button" class="app-tab-btn p-4 rounded-2xl border text-left transition-all relative overflow-hidden bg-digilayn-surface-container-lowest dark:bg-digilayn-surface border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:border-digilayn-outline-variant dark:hover:border-digilayn-outline-variant cursor-pointer" data-app="layndriver">
                     <div class="flex items-center justify-between mb-2">
-                        <div class="w-9 h-9 rounded-xl bg-digilayn-success-container dark:bg-digilayn-success-container/40 text-digilayn-on-success-container dark:text-digilayn-on-success-container flex items-center justify-center text-lg">
+                        <div class="w-9 h-9 rounded-xl bg-digilayn-success-container dark:bg-digilayn-success/10 text-digilayn-on-success-container dark:text-digilayn-success flex items-center justify-center text-lg">
                             <i class="fas fa-car-side"></i>
                         </div>
                         <span id="tabCountDriver" class="px-2 py-0.5 rounded-full text-xs font-black bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant">0</span>
@@ -100,7 +101,7 @@
 
                 <button type="button" class="app-tab-btn p-4 rounded-2xl border text-left transition-all relative overflow-hidden bg-digilayn-surface-container-lowest dark:bg-digilayn-surface border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:border-digilayn-outline-variant dark:hover:border-digilayn-outline-variant cursor-pointer" data-app="laynassist">
                     <div class="flex items-center justify-between mb-2">
-                        <div class="w-9 h-9 rounded-xl bg-digilayn-warning-container dark:bg-digilayn-warning-container/40 text-digilayn-on-warning-container dark:text-digilayn-on-warning-container flex items-center justify-center text-lg">
+                        <div class="w-9 h-9 rounded-xl bg-digilayn-warning-container dark:bg-digilayn-warning/10 text-digilayn-on-warning-container dark:text-digilayn-warning flex items-center justify-center text-lg">
                             <i class="fas fa-truck-pickup"></i>
                         </div>
                         <span id="tabCountAssist" class="px-2 py-0.5 rounded-full text-xs font-black bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant">0</span>
@@ -111,7 +112,7 @@
 
                 <button type="button" class="app-tab-btn p-4 rounded-2xl border text-left transition-all relative overflow-hidden bg-digilayn-surface-container-lowest dark:bg-digilayn-surface border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:border-digilayn-outline-variant dark:hover:border-digilayn-outline-variant cursor-pointer" data-app="laynrider">
                     <div class="flex items-center justify-between mb-2">
-                        <div class="w-9 h-9 rounded-xl bg-digilayn-info-container dark:bg-digilayn-info-container/40 text-digilayn-on-info-container dark:text-digilayn-on-info-container flex items-center justify-center text-lg">
+                        <div class="w-9 h-9 rounded-xl bg-digilayn-info-container dark:bg-digilayn-info/10 text-digilayn-on-info-container dark:text-digilayn-info flex items-center justify-center text-lg">
                             <i class="fas fa-user"></i>
                         </div>
                         <span id="tabCountRider" class="px-2 py-0.5 rounded-full text-xs font-black bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant">0</span>
@@ -122,7 +123,7 @@
 
                 <button type="button" class="app-tab-btn p-4 rounded-2xl border text-left transition-all relative overflow-hidden bg-digilayn-surface-container-lowest dark:bg-digilayn-surface border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:border-digilayn-outline-variant dark:hover:border-digilayn-outline-variant col-span-2 sm:col-span-1 cursor-pointer" data-app="poortjie">
                     <div class="flex items-center justify-between mb-2">
-                        <div class="w-9 h-9 rounded-xl bg-digilayn-tertiary-container dark:bg-digilayn-tertiary-container/40 text-digilayn-on-tertiary-container dark:text-digilayn-on-tertiary-container flex items-center justify-center text-lg">
+                        <div class="w-9 h-9 rounded-xl bg-digilayn-tertiary-container dark:bg-digilayn-tertiary/10 text-digilayn-on-tertiary-container dark:text-digilayn-tertiary flex items-center justify-center text-lg">
                             <i class="fas fa-city"></i>
                         </div>
                         <span id="tabCountPoortjie" class="px-2 py-0.5 rounded-full text-xs font-black bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant">0</span>
@@ -238,7 +239,7 @@
 
         <!-- Loading State (Shimmer Skeleton Cards + Status Banner) -->
         <div id="loadingState" class="mb-8">
-            <div class="flex items-center justify-center gap-3 p-4 mb-6 rounded-2xl bg-digilayn-primary-container dark:bg-digilayn-primary-container/20 border border-digilayn-primary dark:border-digilayn-primary/40 text-digilayn-on-primary-container dark:text-digilayn-on-primary-container text-sm font-medium animate-pulse">
+            <div class="flex items-center justify-center gap-3 p-4 mb-6 rounded-2xl bg-digilayn-primary-container dark:bg-digilayn-primary/10 border border-digilayn-primary dark:border-digilayn-primary/40 text-digilayn-on-primary-container dark:text-digilayn-primary text-sm font-medium animate-pulse">
                 <i class="fas fa-circle-notch fa-spin text-digilayn-primary text-base"></i>
                 <span id="loadingMessage">Fetching global accounts, fleet records, and cloud storage inventory...</span>
             </div>
@@ -370,10 +371,10 @@
         </div>
 
         <!-- Error State -->
-        <div id="errorState" class="hidden col-span-full flex flex-col items-center justify-center py-20 text-digilayn-on-error-container bg-digilayn-error-container dark:bg-digilayn-error-container/10 rounded-2xl border border-digilayn-error dark:border-digilayn-error/20">
+        <div id="errorState" class="hidden col-span-full flex flex-col items-center justify-center py-20 text-digilayn-on-error-container bg-digilayn-error-container dark:bg-digilayn-error/10 rounded-2xl border border-digilayn-error dark:border-digilayn-error/20">
             <i class="fas fa-exclamation-triangle text-4xl mb-4"></i>
             <p id="errorMessage" class="mb-4">Failed to load users.</p>
-            <button id="retryBtn" class="px-6 py-2 bg-digilayn-error text-digilayn-on-error rounded-xl font-bold hover:bg-digilayn-error transition-colors">
+            <button id="retryBtn" class="px-6 py-2 bg-digilayn-error text-digilayn-on-error rounded-xl font-bold hover:bg-digilayn-error transition-colors digilayn-button">
                 Retry
             </button>
         </div>
@@ -384,12 +385,12 @@
                     <div>
                         <div class="flex items-center gap-3">
                             <h2 class="text-xl font-black">Unowned global data (Junk)</h2>
-                            <span id="orphanCountBadge" class="px-3 py-0.5 rounded-full bg-digilayn-error-container dark:bg-digilayn-error-container/30 text-digilayn-on-error-container text-xs font-black">0</span>
+                            <span id="orphanCountBadge" class="px-3 py-0.5 rounded-full bg-digilayn-error-container dark:bg-digilayn-error/10 text-digilayn-on-error-container text-xs font-black">0</span>
                         </div>
                         <p class="text-sm text-digilayn-on-surface-variant mt-1">Storage files, username reservations, and database records with no active owner UID across Digilayn, LaynFleet, and Poortjie.</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <button id="orphanDeleteSelectedBtn" disabled class="px-5 py-2.5 bg-digilayn-error hover:bg-digilayn-error disabled:opacity-40 disabled:cursor-not-allowed text-digilayn-on-error text-sm font-bold rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-digilayn-error/20">
+                        <button id="orphanDeleteSelectedBtn" disabled class="px-5 py-2.5 bg-digilayn-error hover:bg-digilayn-error disabled:opacity-40 disabled:cursor-not-allowed text-digilayn-on-error text-sm font-bold rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-digilayn-error/20 digilayn-button">
                             <i class="fas fa-trash-alt"></i>
                             <span>Delete Selected (<span id="orphanSelectedCount">0</span>)</span>
                         </button>
@@ -446,7 +447,7 @@
         <div class="relative bg-digilayn-surface-container-lowest dark:bg-digilayn-surface w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-digilayn-outline-variant dark:border-digilayn-outline-variant">
             <!-- Confirm View -->
             <div id="deleteModalConfirmView" class="p-8">
-                <div class="w-16 h-16 bg-digilayn-error-container dark:bg-digilayn-error-container/30 text-digilayn-on-error-container dark:text-digilayn-on-error-container rounded-2xl flex items-center justify-center mb-6 text-2xl">
+                <div class="w-16 h-16 bg-digilayn-error-container dark:bg-digilayn-error/10 text-digilayn-on-error-container dark:text-digilayn-error rounded-2xl flex items-center justify-center mb-6 text-2xl">
                     <i class="fas fa-trash-alt"></i>
                 </div>
 
@@ -470,7 +471,7 @@
                     </div>
                     <div class="flex justify-between">
                         <span class="text-digilayn-on-surface-variant">UID:</span>
-                        <span id="modalUid" class="font-mono text-xs opacity-50"></span>
+                        <span id="modalUid" class="font-mono text-xs opacity-70"></span>
                     </div>
                     <div id="modalResources" class="pt-3 mt-3 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant text-xs text-digilayn-on-surface-variant">Loading deletion preview…</div>
                 </div>
@@ -484,7 +485,7 @@
                 </div>
 
                 <div id="countdownArea" class="text-center mb-6">
-                    <p id="countdownText" class="text-sm font-medium text-digilayn-on-warning-container dark:text-digilayn-on-warning-container bg-digilayn-warning-container dark:bg-digilayn-warning-container/20 py-2 rounded-lg">
+                    <p id="countdownText" class="text-sm font-medium text-digilayn-on-warning-container dark:text-digilayn-warning bg-digilayn-warning-container dark:bg-digilayn-warning/10 py-2 rounded-lg">
                         Please read carefully. You can delete in 5 seconds.
                     </p>
                 </div>
@@ -493,7 +494,7 @@
                     <button id="cancelDeleteBtn" class="flex-1 py-3 bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low font-bold rounded-xl hover:bg-digilayn-surface-container-high dark:hover:bg-digilayn-surface-container-high transition-colors">
                         Cancel
                     </button>
-                    <button id="confirmDeleteBtn" disabled class="flex-1 py-3 bg-digilayn-error text-digilayn-on-error font-bold rounded-xl opacity-50 cursor-not-allowed transition-all">
+                    <button id="confirmDeleteBtn" disabled class="flex-1 py-3 bg-digilayn-error text-digilayn-on-error font-bold rounded-xl opacity-70 cursor-not-allowed transition-all digilayn-button">
                         Permanently Delete
                     </button>
                 </div>
@@ -501,7 +502,7 @@
 
             <!-- Progress View -->
             <div id="deleteModalProgressView" class="p-8 hidden">
-                <div id="userDeleteIconContainer" class="w-16 h-16 bg-digilayn-error-container dark:bg-digilayn-error-container/30 text-digilayn-on-error-container dark:text-digilayn-on-error-container rounded-2xl flex items-center justify-center mb-6 text-2xl">
+                <div id="userDeleteIconContainer" class="w-16 h-16 bg-digilayn-error-container dark:bg-digilayn-error/10 text-digilayn-on-error-container dark:text-digilayn-error rounded-2xl flex items-center justify-center mb-6 text-2xl">
                     <i id="userDeleteStatusIcon" class="fas fa-circle-notch fa-spin"></i>
                 </div>
 
@@ -530,7 +531,7 @@
                 </div>
 
                 <div id="userDeleteActionContainer" class="hidden">
-                    <button id="userDeleteDoneBtn" class="w-full py-3 bg-digilayn-surface dark:bg-digilayn-surface-container-lowest text-digilayn-on-primary dark:text-digilayn-on-surface font-bold rounded-xl transition-all">
+                    <button id="userDeleteDoneBtn" class="w-full py-3 bg-digilayn-surface dark:bg-digilayn-surface-container-lowest text-digilayn-on-surface dark:text-digilayn-on-surface font-bold rounded-xl transition-all">
                         Done
                     </button>
                 </div>
@@ -545,7 +546,7 @@
 
             <!-- 1. Confirmation View -->
             <div id="orphanBatchConfirmView" class="p-8">
-                <div class="w-16 h-16 bg-digilayn-error-container dark:bg-digilayn-error-container/30 text-digilayn-on-error-container dark:text-digilayn-on-error-container rounded-2xl flex items-center justify-center mb-6 text-2xl">
+                <div class="w-16 h-16 bg-digilayn-error-container dark:bg-digilayn-error/10 text-digilayn-on-error-container dark:text-digilayn-error rounded-2xl flex items-center justify-center mb-6 text-2xl">
                     <i class="fas fa-trash-alt"></i>
                 </div>
 
@@ -580,7 +581,7 @@
                     <button id="cancelOrphanBatchBtn" class="flex-1 py-3 bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low font-bold rounded-xl hover:bg-digilayn-surface-container-high dark:hover:bg-digilayn-surface-container-high transition-colors">
                         Cancel
                     </button>
-                    <button id="confirmOrphanBatchBtn" class="flex-1 py-3 bg-digilayn-error hover:bg-digilayn-error text-digilayn-on-error font-bold rounded-xl transition-all shadow-lg shadow-digilayn-error/20 flex items-center justify-center gap-2">
+                    <button id="confirmOrphanBatchBtn" class="flex-1 py-3 bg-digilayn-error hover:bg-digilayn-error text-digilayn-on-error font-bold rounded-xl transition-all shadow-lg shadow-digilayn-error/20 flex items-center justify-center gap-2 digilayn-button">
                         <i class="fas fa-trash-alt"></i>
                         <span>Confirm Delete</span>
                     </button>
@@ -591,7 +592,7 @@
             <div id="orphanBatchProgressView" class="p-8 hidden">
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center gap-3">
-                        <div id="orphanProgressIcon" class="w-12 h-12 bg-digilayn-error-container dark:bg-digilayn-error-container/30 text-digilayn-on-error-container dark:text-digilayn-on-error-container rounded-xl flex items-center justify-center text-xl">
+                        <div id="orphanProgressIcon" class="w-12 h-12 bg-digilayn-error-container dark:bg-digilayn-error/10 text-digilayn-on-error-container dark:text-digilayn-error rounded-xl flex items-center justify-center text-xl">
                             <i class="fas fa-circle-notch fa-spin"></i>
                         </div>
                         <div>
@@ -629,7 +630,7 @@
                     <button id="stopOrphanBatchBtn" class="w-full py-3 bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low font-bold rounded-xl hover:bg-digilayn-surface-container-high dark:hover:bg-digilayn-surface-container-high transition-colors text-sm">
                         Stop Remaining Deletions
                     </button>
-                    <button id="doneOrphanBatchBtn" class="w-full py-3 bg-digilayn-primary hover:bg-digilayn-primary text-digilayn-on-primary font-bold rounded-xl transition-all text-sm hidden">
+                    <button id="doneOrphanBatchBtn" class="w-full py-3 bg-digilayn-primary hover:bg-digilayn-primary text-digilayn-on-primary font-bold rounded-xl transition-all text-sm hidden digilayn-button">
                         Done
                     </button>
                 </div>
@@ -643,7 +644,7 @@
         <div class="absolute inset-0 bg-digilayn-surface-container-lowest/80 backdrop-blur-sm"></div>
         <div class="relative bg-digilayn-surface-container-lowest dark:bg-digilayn-surface w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-digilayn-outline-variant dark:border-digilayn-outline-variant">
             <div class="p-8">
-                <div id="suspendModalIcon" class="w-16 h-16 bg-digilayn-warning-container dark:bg-digilayn-warning-container/30 text-digilayn-on-warning-container dark:text-digilayn-on-warning-container rounded-2xl flex items-center justify-center mb-6 text-2xl">
+                <div id="suspendModalIcon" class="w-16 h-16 bg-digilayn-warning-container dark:bg-digilayn-warning/10 text-digilayn-on-warning-container dark:text-digilayn-warning rounded-2xl flex items-center justify-center mb-6 text-2xl">
                     <i class="fas fa-user-slash"></i>
                 </div>
 
@@ -702,7 +703,7 @@
                 </div>
 
                 <div id="suspendCountdownArea" class="text-center mb-6">
-                    <p id="suspendCountdownText" class="text-sm font-medium text-digilayn-on-warning-container dark:text-digilayn-on-warning-container bg-digilayn-warning-container dark:bg-digilayn-warning-container/20 py-2 rounded-lg">
+                    <p id="suspendCountdownText" class="text-sm font-medium text-digilayn-on-warning-container dark:text-digilayn-warning bg-digilayn-warning-container dark:bg-digilayn-warning/10 py-2 rounded-lg">
                         Please read carefully. You can proceed in 3 seconds.
                     </p>
                 </div>
@@ -711,7 +712,7 @@
                     <button id="cancelSuspendBtn" class="flex-1 py-3 bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low font-bold rounded-xl hover:bg-digilayn-surface-container-high dark:hover:bg-digilayn-surface-container-high transition-colors">
                         Cancel
                     </button>
-                    <button id="confirmSuspendBtn" disabled class="flex-1 py-3 bg-digilayn-warning text-digilayn-on-warning font-bold rounded-xl opacity-50 cursor-not-allowed transition-all">
+                    <button id="confirmSuspendBtn" disabled class="flex-1 py-3 bg-digilayn-warning text-digilayn-on-warning font-bold rounded-xl opacity-70 cursor-not-allowed transition-all digilayn-button">
                         Confirm
                     </button>
                 </div>
@@ -737,7 +738,7 @@
         <div class="relative bg-digilayn-surface-container-lowest dark:bg-digilayn-surface w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-digilayn-outline-variant dark:border-digilayn-outline-variant p-6 sm:p-8">
             <div class="flex items-center justify-between pb-4 border-b border-digilayn-outline-variant dark:border-digilayn-outline-variant mb-6">
                 <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-2xl bg-digilayn-success-container dark:bg-digilayn-success-container/30 text-digilayn-on-success-container flex items-center justify-center text-xl">
+                    <div class="w-12 h-12 rounded-2xl bg-digilayn-success-container dark:bg-digilayn-success/10 text-digilayn-on-success-container flex items-center justify-center text-xl">
                         <i class="fas fa-car-side"></i>
                     </div>
                     <div>
@@ -771,7 +772,7 @@
                         <span id="promoteDriverMatchBadge" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-high text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant">Registered</span>
                     </div>
                 </div>
-                <div id="promoteDriverNoUser" class="hidden text-xs text-digilayn-on-warning-container bg-digilayn-warning-container dark:bg-digilayn-warning-container/20 p-3 rounded-xl border border-digilayn-warning dark:border-digilayn-warning/40">
+                <div id="promoteDriverNoUser" class="hidden text-xs text-digilayn-on-warning-container bg-digilayn-warning-container dark:bg-digilayn-warning/10 p-3 rounded-xl border border-digilayn-warning dark:border-digilayn-warning/40">
                     No registered user found with this email. User must exist in the global directory first.
                 </div>
 
@@ -801,7 +802,7 @@
                     <button type="button" id="cancelPromoteDriverBtn" class="flex-1 py-2.5 rounded-xl bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low font-bold text-xs hover:bg-digilayn-surface-container-high dark:hover:bg-digilayn-surface-container-high transition">
                         Cancel
                     </button>
-                    <button type="button" id="confirmPromoteDriverBtn" disabled class="flex-1 py-2.5 rounded-xl bg-digilayn-success disabled:opacity-50 disabled:cursor-not-allowed text-digilayn-on-success font-bold text-xs hover:bg-digilayn-success transition shadow-md shadow-digilayn-success/20">
+                    <button type="button" id="confirmPromoteDriverBtn" disabled class="flex-1 py-2.5 rounded-xl bg-digilayn-success disabled:opacity-50 disabled:cursor-not-allowed text-digilayn-on-success font-bold text-xs hover:bg-digilayn-success transition shadow-md shadow-digilayn-success/20 digilayn-button">
                         Approve &amp; Promote
                     </button>
                 </div>
@@ -815,7 +816,7 @@
         <div class="relative bg-digilayn-surface-container-lowest dark:bg-digilayn-surface w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-digilayn-outline-variant dark:border-digilayn-outline-variant p-6 sm:p-8">
             <div class="flex items-center justify-between pb-4 border-b border-digilayn-outline-variant dark:border-digilayn-outline-variant mb-6">
                 <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-2xl bg-digilayn-warning-container dark:bg-digilayn-warning-container/30 text-digilayn-on-warning-container flex items-center justify-center text-xl">
+                    <div class="w-12 h-12 rounded-2xl bg-digilayn-warning-container dark:bg-digilayn-warning/10 text-digilayn-on-warning-container flex items-center justify-center text-xl">
                         <i class="fas fa-truck-pickup"></i>
                     </div>
                     <div>
@@ -849,14 +850,14 @@
                         <span id="promoteAssistMatchBadge" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-high text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant">Registered</span>
                     </div>
                 </div>
-                <div id="promoteAssistNoUser" class="hidden text-xs text-digilayn-on-warning-container bg-digilayn-warning-container dark:bg-digilayn-warning-container/20 p-3 rounded-xl border border-digilayn-warning dark:border-digilayn-warning/40">
+                <div id="promoteAssistNoUser" class="hidden text-xs text-digilayn-on-warning-container bg-digilayn-warning-container dark:bg-digilayn-warning/10 p-3 rounded-xl border border-digilayn-warning dark:border-digilayn-warning/40">
                     No registered user found with this email.
                 </div>
 
                 <div class="pt-2 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant space-y-3">
                     <p class="text-xs font-bold uppercase tracking-wider text-digilayn-on-surface-variant">Select Role</p>
                     <div class="grid grid-cols-2 gap-3">
-                        <label class="flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer border-digilayn-warning ring-2 ring-digilayn-warning/30 bg-digilayn-warning-container/20 dark:bg-digilayn-warning-container/20 assist-role-option" data-role="OWNER">
+                        <label class="flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer border-digilayn-warning ring-2 ring-digilayn-warning/30 bg-digilayn-warning-container/20 dark:bg-digilayn-warning/10 assist-role-option" data-role="OWNER">
                             <input type="radio" name="assistRoleRadio" value="OWNER" checked class="mt-1 text-digilayn-warning focus:ring-digilayn-warning">
                             <div>
                                 <h5 class="text-xs font-bold text-digilayn-on-surface dark:text-digilayn-on-surface flex items-center gap-1.5">
@@ -890,7 +891,7 @@
                     <button type="button" id="cancelPromoteAssistBtn" class="flex-1 py-2.5 rounded-xl bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low font-bold text-xs hover:bg-digilayn-surface-container-high dark:hover:bg-digilayn-surface-container-high transition">
                         Cancel
                     </button>
-                    <button type="button" id="confirmPromoteAssistBtn" disabled class="flex-1 py-2.5 rounded-xl bg-digilayn-warning disabled:opacity-50 disabled:cursor-not-allowed text-digilayn-on-warning font-bold text-xs hover:bg-digilayn-warning transition shadow-md shadow-digilayn-warning/20">
+                    <button type="button" id="confirmPromoteAssistBtn" disabled class="flex-1 py-2.5 rounded-xl bg-digilayn-warning disabled:opacity-50 disabled:cursor-not-allowed text-digilayn-on-warning font-bold text-xs hover:bg-digilayn-warning transition shadow-md shadow-digilayn-warning/20 digilayn-button">
                         Promote to LaynAssist
                     </button>
                 </div>
@@ -904,7 +905,7 @@
         <div class="relative bg-digilayn-surface-container-lowest dark:bg-digilayn-surface w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-digilayn-outline-variant dark:border-digilayn-outline-variant p-6 sm:p-8">
             <div class="flex items-center justify-between pb-4 border-b border-digilayn-outline-variant dark:border-digilayn-outline-variant mb-6">
                 <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-2xl bg-digilayn-tertiary-container dark:bg-digilayn-tertiary-container/30 text-digilayn-on-tertiary-container flex items-center justify-center text-xl">
+                    <div class="w-12 h-12 rounded-2xl bg-digilayn-tertiary-container dark:bg-digilayn-tertiary/10 text-digilayn-on-tertiary-container flex items-center justify-center text-xl">
                         <i class="fas fa-city"></i>
                     </div>
                     <div>
@@ -936,7 +937,7 @@
                         </div>
                     </div>
                 </div>
-                <div id="assignPoortjieNoUser" class="hidden text-xs text-digilayn-on-warning-container bg-digilayn-warning-container dark:bg-digilayn-warning-container/20 p-3 rounded-xl border border-digilayn-warning dark:border-digilayn-warning/40">
+                <div id="assignPoortjieNoUser" class="hidden text-xs text-digilayn-on-warning-container bg-digilayn-warning-container dark:bg-digilayn-warning/10 p-3 rounded-xl border border-digilayn-warning dark:border-digilayn-warning/40">
                     No registered user found with this email.
                 </div>
 
@@ -960,7 +961,7 @@
                     <button type="button" id="cancelAssignPoortjieBtn" class="flex-1 py-2.5 rounded-xl bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low font-bold text-xs hover:bg-digilayn-surface-container-high dark:hover:bg-digilayn-surface-container-high transition">
                         Cancel
                     </button>
-                    <button type="button" id="confirmAssignPoortjieBtn" disabled class="flex-1 py-2.5 rounded-xl bg-digilayn-tertiary disabled:opacity-50 disabled:cursor-not-allowed text-digilayn-on-tertiary font-bold text-xs hover:bg-digilayn-tertiary transition shadow-md shadow-digilayn-tertiary/20">
+                    <button type="button" id="confirmAssignPoortjieBtn" disabled class="flex-1 py-2.5 rounded-xl bg-digilayn-tertiary disabled:opacity-50 disabled:cursor-not-allowed text-digilayn-on-tertiary font-bold text-xs hover:bg-digilayn-tertiary transition shadow-md shadow-digilayn-tertiary/20 digilayn-button">
                         Save Roles
                     </button>
                 </div>
@@ -972,7 +973,7 @@
     <div id="demoteReasonModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
         <div class="absolute inset-0 bg-digilayn-surface-container-lowest/80 backdrop-blur-sm" id="demoteReasonBackdrop"></div>
         <div class="relative bg-digilayn-surface-container-lowest dark:bg-digilayn-surface w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-digilayn-outline-variant dark:border-digilayn-outline-variant p-6 sm:p-8">
-            <div class="w-14 h-14 rounded-2xl bg-digilayn-warning-container dark:bg-digilayn-warning-container/30 text-digilayn-on-warning-container flex items-center justify-center text-xl mb-4">
+            <div class="w-14 h-14 rounded-2xl bg-digilayn-warning-container dark:bg-digilayn-warning/10 text-digilayn-on-warning-container flex items-center justify-center text-xl mb-4">
                 <i class="fas fa-user-minus"></i>
             </div>
             <h3 id="demoteModalTitle" class="text-xl font-bold mb-1">Demote Driver</h3>
@@ -989,7 +990,7 @@
                 <button type="button" id="cancelDemoteBtn" class="flex-1 py-2.5 rounded-xl bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low font-bold text-xs hover:bg-digilayn-surface-container-high dark:hover:bg-digilayn-surface-container-high transition">
                     Cancel
                 </button>
-                <button type="button" id="confirmDemoteBtn" class="flex-1 py-2.5 rounded-xl bg-digilayn-warning text-digilayn-on-warning font-bold text-xs hover:bg-digilayn-warning transition shadow-md shadow-digilayn-warning/20">
+                <button type="button" id="confirmDemoteBtn" class="flex-1 py-2.5 rounded-xl bg-digilayn-warning text-digilayn-on-warning font-bold text-xs hover:bg-digilayn-warning transition shadow-md shadow-digilayn-warning/20 digilayn-button">
                     Confirm Demote
                 </button>
             </div>
@@ -1010,7 +1011,7 @@
                     <label class="block text-sm font-bold mb-2 opacity-70">Password</label>
                     <input type="password" id="password" autocomplete="new-password" class="w-full px-4 py-3 rounded-xl bg-digilayn-surface-container-low dark:bg-digilayn-surface border border-digilayn-outline-variant dark:border-digilayn-outline-variant focus:ring-2 focus:ring-digilayn-primary outline-none transition">
                 </div>
-                <button id="loginBtn" class="w-full py-4 bg-digilayn-primary text-digilayn-on-primary font-black rounded-xl hover:bg-digilayn-primary transition transform hover:scale-[1.02] active:scale-[0.98]">
+                <button id="loginBtn" class="w-full py-4 bg-digilayn-primary text-digilayn-on-primary font-black rounded-xl hover:bg-digilayn-primary transition transform hover:scale-[1.02] active:scale-[0.98] digilayn-button">
                     Sign In
                 </button>
             </div>
@@ -1302,7 +1303,7 @@
                     isSuspended: true,
                     isPendingDelete: false,
                     reason: rawReason,
-                    badgeHtml: `<span class="px-2.5 py-1 bg-digilayn-warning-container dark:bg-digilayn-warning-container/40 text-digilayn-on-warning-container dark:text-digilayn-on-warning-container border border-digilayn-warning dark:border-digilayn-warning text-[10px] font-bold uppercase rounded-lg inline-flex items-center gap-1.5" title="${escapeHtml(rawReason || 'Suspended by management')}"><i class="fas fa-user-slash text-digilayn-warning dark:text-digilayn-warning"></i><span>Suspended${rawReason ? `: ${escapeHtml(rawReason)}` : ''}</span></span>`
+                    badgeHtml: `<span class="px-2.5 py-1 bg-digilayn-warning-container dark:bg-digilayn-warning/10 text-digilayn-on-warning-container dark:text-digilayn-warning border border-digilayn-warning dark:border-digilayn-warning text-[10px] font-bold uppercase rounded-lg inline-flex items-center gap-1.5" title="${escapeHtml(rawReason || 'Suspended by management')}"><i class="fas fa-user-slash text-digilayn-warning dark:text-digilayn-warning"></i><span>Suspended${rawReason ? `: ${escapeHtml(rawReason)}` : ''}</span></span>`
                 };
             }
 
@@ -1319,7 +1320,7 @@
             if (isExpired) {
                 badgeHtml = `<span class="px-2.5 py-1 bg-digilayn-error text-digilayn-on-error text-[10px] font-extrabold uppercase rounded-lg shadow-sm inline-flex items-center gap-1.5 animate-pulse" title="30-day retention expired on ${targetDateStr}. Ready for permanent deletion."><i class="fas fa-exclamation-triangle"></i><span>⚠️ Deletion Overdue — Purge Ready</span></span>`;
             } else {
-                badgeHtml = `<span class="px-2.5 py-1 bg-digilayn-error-container dark:bg-digilayn-error-container/40 text-digilayn-on-error-container dark:text-digilayn-on-error-container border border-digilayn-error dark:border-digilayn-error text-[10px] font-bold uppercase rounded-lg inline-flex items-center gap-1.5" title="User requested deletion. Scheduled for permanent deletion on ${targetDateStr}"><i class="fas fa-hourglass-half text-digilayn-error"></i><span>🗑️ Delete in ${daysRemaining} ${daysRemaining === 1 ? 'day' : 'days'}</span></span>`;
+                badgeHtml = `<span class="px-2.5 py-1 bg-digilayn-error-container dark:bg-digilayn-error/10 text-digilayn-on-error-container dark:text-digilayn-error border border-digilayn-error dark:border-digilayn-error text-[10px] font-bold uppercase rounded-lg inline-flex items-center gap-1.5" title="User requested deletion. Scheduled for permanent deletion on ${targetDateStr}"><i class="fas fa-hourglass-half text-digilayn-error"></i><span>🗑️ Delete in ${daysRemaining} ${daysRemaining === 1 ? 'day' : 'days'}</span></span>`;
             }
 
             return {
@@ -1393,7 +1394,7 @@
                 const card = document.createElement('div');
                 card.className = `orphan-card bg-digilayn-surface-container-lowest dark:bg-digilayn-surface border rounded-2xl p-4 transition-all relative flex flex-col justify-between ${
                     isSelected
-                        ? 'border-digilayn-error ring-2 ring-digilayn-error/50 bg-digilayn-error-container/20 dark:bg-digilayn-error-container/20'
+                        ? 'border-digilayn-error ring-2 ring-digilayn-error/50 bg-digilayn-error-container/20 dark:bg-digilayn-error/10'
                         : (type === 'storage'
                             ? 'border-digilayn-error dark:border-digilayn-error/40 hover:border-digilayn-error'
                             : (type === 'username' ? 'border-digilayn-warning dark:border-digilayn-warning/40 hover:border-digilayn-warning' : 'border-digilayn-info dark:border-digilayn-info/40 hover:border-digilayn-info'))
@@ -1402,7 +1403,7 @@
                 if (type === 'storage') {
                     const preview = String(data.contentType || '').startsWith('image/')
                         ? `<img src="${data.downloadUrl}" class="w-12 h-12 rounded-xl object-cover bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low shrink-0">`
-                        : '<div class="w-12 h-12 rounded-xl bg-digilayn-error-container dark:bg-digilayn-error-container/30 text-digilayn-on-error-container flex items-center justify-center text-xl shrink-0"><i class="fas fa-file"></i></div>';
+                        : '<div class="w-12 h-12 rounded-xl bg-digilayn-error-container dark:bg-digilayn-error/10 text-digilayn-on-error-container flex items-center justify-center text-xl shrink-0"><i class="fas fa-file"></i></div>';
 
                     const ownerBadge = data.claimedOwnerUid
                         ? `<button type="button" class="copy-uid-btn px-1.5 py-0.5 rounded bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-[10px] font-mono text-digilayn-on-surface-variant hover:text-digilayn-error transition-colors truncate max-w-[150px] cursor-pointer flex items-center gap-1" data-uid="${data.claimedOwnerUid}" title="Click to copy UID"><i class="far fa-copy text-[9px]"></i><span>UID: ${data.claimedOwnerUid}</span></button>`
@@ -1415,7 +1416,7 @@
                                     ${preview}
                                     <div class="min-w-0">
                                         <div class="flex items-center gap-2 flex-wrap">
-                                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-digilayn-error-container dark:bg-digilayn-error-container/30 text-digilayn-on-error-container dark:text-digilayn-on-error-container">Unowned Storage File</span>
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-digilayn-error-container dark:bg-digilayn-error/10 text-digilayn-on-error-container dark:text-digilayn-error">Unowned Storage File</span>
                                             ${ownerBadge}
                                         </div>
                                         <p class="text-xs text-digilayn-on-surface-variant truncate mt-1">${data.contentType || 'Unknown type'} · ${formatBytes(data.size)}</p>
@@ -1426,7 +1427,7 @@
                             <p class="font-mono text-xs break-all text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant mb-3 bg-digilayn-surface dark:bg-digilayn-surface-container-low/60 p-2 rounded-lg"></p>
                         </div>
                         <div class="flex items-center justify-between pt-2 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant">
-                            <button class="single-delete-btn px-3 py-1.5 rounded-lg bg-digilayn-error-container hover:bg-digilayn-error text-digilayn-on-error-container hover:text-digilayn-on-primary dark:bg-digilayn-error-container/20 dark:hover:bg-digilayn-error dark:text-digilayn-on-error-container dark:hover:text-digilayn-on-primary transition-colors text-xs font-bold flex items-center gap-1.5">
+                            <button class="single-delete-btn px-3 py-1.5 rounded-lg bg-digilayn-error-container hover:bg-digilayn-error text-digilayn-on-error-container hover:text-digilayn-on-primary dark:bg-digilayn-error/10 dark:hover:bg-digilayn-error dark:text-digilayn-error dark:hover:text-digilayn-on-primary transition-colors text-xs font-bold flex items-center gap-1.5">
                                 <i class="fas fa-trash-alt text-[10px]"></i>
                                 <span>Delete</span>
                             </button>
@@ -1450,20 +1451,20 @@
                         <div>
                             <div class="flex items-start justify-between gap-3 mb-3">
                                 <div class="flex items-center gap-3 min-w-0">
-                                    <div class="w-12 h-12 rounded-xl bg-digilayn-warning-container dark:bg-digilayn-warning-container/30 text-digilayn-on-warning-container flex items-center justify-center text-xl shrink-0">
+                                    <div class="w-12 h-12 rounded-xl bg-digilayn-warning-container dark:bg-digilayn-warning/10 text-digilayn-on-warning-container flex items-center justify-center text-xl shrink-0">
                                         <i class="fas fa-at"></i>
                                     </div>
                                     <div class="min-w-0">
-                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-digilayn-warning-container dark:bg-digilayn-warning-container/30 text-digilayn-on-warning-container dark:text-digilayn-on-warning-container">Unowned Reservation</span>
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-digilayn-warning-container dark:bg-digilayn-warning/10 text-digilayn-on-warning-container dark:text-digilayn-warning">Unowned Reservation</span>
                                         <p class="text-xs text-digilayn-on-surface-variant truncate mt-1">Username without active account</p>
                                     </div>
                                 </div>
                                 <input type="checkbox" class="orphan-item-cb w-5 h-5 rounded text-digilayn-error focus:ring-digilayn-error cursor-pointer shrink-0 mt-1" ${isSelected ? 'checked' : ''} data-key="${key}">
                             </div>
-                            <p class="font-mono text-sm font-bold break-all text-digilayn-warning dark:text-digilayn-warning mb-3 bg-digilayn-warning-container/50 dark:bg-digilayn-warning-container/10 p-2 rounded-lg"></p>
+                            <p class="font-mono text-sm font-bold break-all text-digilayn-warning dark:text-digilayn-warning mb-3 bg-digilayn-warning-container/50 dark:bg-digilayn-warning/10 p-2 rounded-lg"></p>
                         </div>
                         <div class="flex items-center justify-between pt-2 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant">
-                            <button class="single-delete-btn px-3 py-1.5 rounded-lg bg-digilayn-error-container hover:bg-digilayn-error text-digilayn-on-error-container hover:text-digilayn-on-primary dark:bg-digilayn-error-container/20 dark:hover:bg-digilayn-error dark:text-digilayn-on-error-container dark:hover:text-digilayn-on-primary transition-colors text-xs font-bold flex items-center gap-1.5">
+                            <button class="single-delete-btn px-3 py-1.5 rounded-lg bg-digilayn-error-container hover:bg-digilayn-error text-digilayn-on-error-container hover:text-digilayn-on-primary dark:bg-digilayn-error/10 dark:hover:bg-digilayn-error dark:text-digilayn-error dark:hover:text-digilayn-on-primary transition-colors text-xs font-bold flex items-center gap-1.5">
                                 <i class="fas fa-trash-alt text-[10px]"></i>
                                 <span>Delete</span>
                             </button>
@@ -1484,19 +1485,19 @@
                     });
                 } else if (type === 'document') {
                     let catIcon = '<i class="fas fa-file-alt text-digilayn-info"></i>';
-                    let catColor = 'bg-digilayn-info-container dark:bg-digilayn-info-container/30 text-digilayn-on-info-container dark:text-digilayn-on-info-container';
+                    let catColor = 'bg-digilayn-info-container dark:bg-digilayn-info/10 text-digilayn-on-info-container dark:text-digilayn-info';
                     if (data.category === 'laynfleet') {
                         catIcon = '<i class="fas fa-car-side text-digilayn-info"></i>';
-                        catColor = 'bg-digilayn-info-container dark:bg-digilayn-info-container/30 text-digilayn-on-info-container dark:text-digilayn-on-info-container';
+                        catColor = 'bg-digilayn-info-container dark:bg-digilayn-info/10 text-digilayn-on-info-container dark:text-digilayn-info';
                     } else if (data.category === 'poortjie-market') {
                         catIcon = '<i class="fas fa-store text-digilayn-warning"></i>';
-                        catColor = 'bg-digilayn-warning-container dark:bg-digilayn-warning-container/30 text-digilayn-on-warning-container dark:text-digilayn-on-warning-container';
+                        catColor = 'bg-digilayn-warning-container dark:bg-digilayn-warning/10 text-digilayn-on-warning-container dark:text-digilayn-warning';
                     } else if (data.category === 'poortjie-business' || data.category === 'poortjie-services') {
                         catIcon = '<i class="fas fa-briefcase text-digilayn-success"></i>';
-                        catColor = 'bg-digilayn-success-container dark:bg-digilayn-success-container/30 text-digilayn-on-success-container dark:text-digilayn-on-success-container';
+                        catColor = 'bg-digilayn-success-container dark:bg-digilayn-success/10 text-digilayn-on-success-container dark:text-digilayn-success';
                     } else if (data.category === 'suggestions') {
                         catIcon = '<i class="fas fa-lightbulb text-digilayn-tertiary"></i>';
-                        catColor = 'bg-digilayn-tertiary-container dark:bg-digilayn-tertiary-container/30 text-digilayn-on-tertiary-container dark:text-digilayn-on-tertiary-container';
+                        catColor = 'bg-digilayn-tertiary-container dark:bg-digilayn-tertiary/10 text-digilayn-on-tertiary-container dark:text-digilayn-tertiary';
                     }
 
                     const uidBadge = data.claimedUid
@@ -1524,7 +1525,7 @@
                             <p class="font-mono text-xs break-all text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant mb-3 bg-digilayn-surface dark:bg-digilayn-surface-container-low/60 p-2 rounded-lg"></p>
                         </div>
                         <div class="flex items-center justify-between pt-2 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant">
-                            <button class="single-delete-btn px-3 py-1.5 rounded-lg bg-digilayn-error-container hover:bg-digilayn-error text-digilayn-on-error-container hover:text-digilayn-on-primary dark:bg-digilayn-error-container/20 dark:hover:bg-digilayn-error dark:text-digilayn-on-error-container dark:hover:text-digilayn-on-primary transition-colors text-xs font-bold flex items-center gap-1.5">
+                            <button class="single-delete-btn px-3 py-1.5 rounded-lg bg-digilayn-error-container hover:bg-digilayn-error text-digilayn-on-error-container hover:text-digilayn-on-primary dark:bg-digilayn-error/10 dark:hover:bg-digilayn-error dark:text-digilayn-error dark:hover:text-digilayn-on-primary transition-colors text-xs font-bold flex items-center gap-1.5">
                                 <i class="fas fa-trash-alt text-[10px]"></i>
                                 <span>Delete</span>
                             </button>
@@ -1631,7 +1632,7 @@
             orphanProgressPercent.textContent = '0%';
             orphanProgressTitle.textContent = `Deleting ${items.length} unowned items...`;
             orphanProgressSubtitle.textContent = 'Please do not close this window';
-            orphanProgressIcon.className = 'w-12 h-12 bg-digilayn-error-container dark:bg-digilayn-error-container/30 text-digilayn-on-error-container dark:text-digilayn-on-error-container rounded-xl flex items-center justify-center text-xl';
+            orphanProgressIcon.className = 'w-12 h-12 bg-digilayn-error-container dark:bg-digilayn-error/10 text-digilayn-on-error-container dark:text-digilayn-error rounded-xl flex items-center justify-center text-xl';
             orphanProgressIcon.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
             orphanProgressStep.textContent = `Starting deletion of ${items.length} items...`;
             orphanProgressStats.textContent = '0 succeeded · 0 failed';
@@ -1679,13 +1680,13 @@
 
                             if (failedCount > 0) {
                                 orphanProgressBar.className = 'bg-digilayn-warning h-full rounded-full transition-all duration-300';
-                                orphanProgressIcon.className = 'w-12 h-12 bg-digilayn-warning-container dark:bg-digilayn-warning-container/30 text-digilayn-on-warning-container dark:text-digilayn-on-warning-container rounded-xl flex items-center justify-center text-xl';
+                                orphanProgressIcon.className = 'w-12 h-12 bg-digilayn-warning-container dark:bg-digilayn-warning/10 text-digilayn-on-warning-container dark:text-digilayn-warning rounded-xl flex items-center justify-center text-xl';
                                 orphanProgressIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
                                 orphanProgressTitle.textContent = 'Deletion finished with warnings';
                                 orphanProgressSubtitle.textContent = `${succeededCount} items deleted, ${failedCount} failed`;
                             } else {
                                 orphanProgressBar.className = 'bg-digilayn-primary h-full rounded-full transition-all duration-300';
-                                orphanProgressIcon.className = 'w-12 h-12 bg-digilayn-primary-container dark:bg-digilayn-primary-container/30 text-digilayn-on-primary-container dark:text-digilayn-on-primary-container rounded-xl flex items-center justify-center text-xl';
+                                orphanProgressIcon.className = 'w-12 h-12 bg-digilayn-primary-container dark:bg-digilayn-primary/10 text-digilayn-on-primary-container dark:text-digilayn-primary rounded-xl flex items-center justify-center text-xl';
                                 orphanProgressIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
                                 orphanProgressTitle.textContent = 'Deletion completed';
                                 orphanProgressSubtitle.textContent = `All ${succeededCount} items deleted successfully`;
@@ -1705,7 +1706,7 @@
                 console.error("Batch delete execution error:", err);
                 orphanProgressTitle.textContent = "Batch deletion interrupted";
                 orphanProgressSubtitle.textContent = err.message || String(err);
-                orphanProgressIcon.className = 'w-12 h-12 bg-digilayn-error-container dark:bg-digilayn-error-container/30 text-digilayn-on-error-container dark:text-digilayn-on-error-container rounded-xl flex items-center justify-center text-xl';
+                orphanProgressIcon.className = 'w-12 h-12 bg-digilayn-error-container dark:bg-digilayn-error/10 text-digilayn-on-error-container dark:text-digilayn-error rounded-xl flex items-center justify-center text-xl';
                 orphanProgressIcon.innerHTML = '<i class="fas fa-times-circle"></i>';
                 stopOrphanBatchBtn.classList.add('hidden');
                 doneOrphanBatchBtn.classList.remove('hidden');
@@ -1960,7 +1961,7 @@
                 });
 
                 appToolbarRight.innerHTML = `
-                    <button id="openPromoteDriverBtn" type="button" class="w-full sm:w-auto px-4 py-2 bg-digilayn-success hover:bg-digilayn-success text-digilayn-on-success text-xs font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-md shadow-digilayn-success/20 cursor-pointer">
+                    <button id="openPromoteDriverBtn" type="button" class="w-full sm:w-auto px-4 py-2 bg-digilayn-success hover:bg-digilayn-success text-digilayn-on-success text-xs font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-md shadow-digilayn-success/20 cursor-pointer digilayn-button">
                         <i class="fas fa-plus"></i>
                         <span>Promote Driver by Email</span>
                     </button>
@@ -2000,7 +2001,7 @@
                 });
 
                 appToolbarRight.innerHTML = `
-                    <button id="openPromoteAssistBtn" type="button" class="w-full sm:w-auto px-4 py-2 bg-digilayn-warning hover:bg-digilayn-warning text-digilayn-on-warning text-xs font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-md shadow-digilayn-warning/20 cursor-pointer">
+                    <button id="openPromoteAssistBtn" type="button" class="w-full sm:w-auto px-4 py-2 bg-digilayn-warning hover:bg-digilayn-warning text-digilayn-on-warning text-xs font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-md shadow-digilayn-warning/20 cursor-pointer digilayn-button">
                         <i class="fas fa-truck-pickup"></i>
                         <span>Promote to LaynAssist by Email</span>
                     </button>
@@ -2077,7 +2078,7 @@
                 });
 
                 appToolbarRight.innerHTML = `
-                    <button id="openAssignPoortjieBtn" type="button" class="w-full sm:w-auto px-4 py-2 bg-digilayn-tertiary hover:bg-digilayn-tertiary text-digilayn-on-tertiary text-xs font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-md shadow-digilayn-tertiary/20 cursor-pointer">
+                    <button id="openAssignPoortjieBtn" type="button" class="w-full sm:w-auto px-4 py-2 bg-digilayn-tertiary hover:bg-digilayn-tertiary text-digilayn-on-tertiary text-xs font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-md shadow-digilayn-tertiary/20 cursor-pointer digilayn-button">
                         <i class="fas fa-plus"></i>
                         <span>Assign Role by Email</span>
                     </button>
@@ -2115,30 +2116,30 @@
                 const susp = getSuspensionInfo(user);
                 if (susp.isPendingDelete) {
                     if (susp.isExpired) {
-                        card.classList.add('border-digilayn-error', 'ring-2', 'ring-digilayn-error/40', 'bg-digilayn-error-container/20', 'dark:bg-digilayn-error-container/20');
+                        card.classList.add('border-digilayn-error', 'ring-2', 'ring-digilayn-error/40', 'bg-digilayn-error-container/20', 'dark:bg-digilayn-error/10');
                     } else {
-                        card.classList.add('border-digilayn-error/80', 'dark:border-digilayn-error/60', 'bg-digilayn-error-container/10', 'dark:bg-digilayn-error-container/10');
+                        card.classList.add('border-digilayn-error/80', 'dark:border-digilayn-error/60', 'bg-digilayn-error-container/10', 'dark:bg-digilayn-error/10');
                     }
                 }
 
                 const photoHtml = user.photoUrl
                     ? `<img src="${user.photoUrl}" class="profile-pic w-12 h-12 rounded-full object-cover bg-digilayn-surface-container-high cursor-zoom-in hover:ring-2 hover:ring-digilayn-primary transition-all" data-full="${user.photoUrl}" data-name="${user.displayName || 'User'}">`
-                    : `<div class="w-12 h-12 rounded-full bg-digilayn-primary-container dark:bg-digilayn-primary-container/30 text-digilayn-on-primary-container dark:text-digilayn-on-primary-container flex items-center justify-center font-bold text-xl">${(user.displayName || '?')[0].toUpperCase()}</div>`;
+                    : `<div class="w-12 h-12 rounded-full bg-digilayn-primary-container dark:bg-digilayn-primary/10 text-digilayn-on-primary-container dark:text-digilayn-primary flex items-center justify-center font-bold text-xl">${(user.displayName || '?')[0].toUpperCase()}</div>`;
 
                 let appBadges = [];
                 if (user.applications?.[window.LaynFleetEnvironment.membershipKey]?.isDriver) {
-                    appBadges.push(`<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-digilayn-success-container text-digilayn-on-success-container dark:bg-digilayn-success-container/40 dark:text-digilayn-on-success-container flex items-center gap-1"><i class="fas fa-car-side"></i>LaynDriver</span>`);
+                    appBadges.push(`<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-digilayn-success-container text-digilayn-on-success-container dark:bg-digilayn-success/10 dark:text-digilayn-success flex items-center gap-1"><i class="fas fa-car-side"></i>LaynDriver</span>`);
                 }
                 if (user.applications?.laynAssist?.isOwner) {
-                    appBadges.push(`<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-digilayn-warning-container text-digilayn-on-warning-container dark:bg-digilayn-warning-container/40 dark:text-digilayn-on-warning-container flex items-center gap-1"><i class="fas fa-crown"></i>Assist Owner</span>`);
+                    appBadges.push(`<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-digilayn-warning-container text-digilayn-on-warning-container dark:bg-digilayn-warning/10 dark:text-digilayn-warning flex items-center gap-1"><i class="fas fa-crown"></i>Assist Owner</span>`);
                 } else if (user.applications?.laynAssist?.isDriver) {
-                    appBadges.push(`<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-digilayn-info-container text-digilayn-on-info-container dark:bg-digilayn-info-container/40 dark:text-digilayn-on-info-container flex items-center gap-1"><i class="fas fa-truck"></i>Assist Tow</span>`);
+                    appBadges.push(`<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-digilayn-info-container text-digilayn-on-info-container dark:bg-digilayn-info/10 dark:text-digilayn-info flex items-center gap-1"><i class="fas fa-truck"></i>Assist Tow</span>`);
                 }
                 if (user.roles?.poortjie?.isAdmin) {
-                    appBadges.push(`<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-digilayn-tertiary-container text-digilayn-on-tertiary-container dark:bg-digilayn-tertiary-container/40 dark:text-digilayn-on-tertiary-container flex items-center gap-1"><i class="fas fa-city"></i>Admin</span>`);
+                    appBadges.push(`<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-digilayn-tertiary-container text-digilayn-on-tertiary-container dark:bg-digilayn-tertiary/10 dark:text-digilayn-tertiary flex items-center gap-1"><i class="fas fa-city"></i>Admin</span>`);
                 }
                 if (user.roles?.poortjie?.isTaxiRankAdmin) {
-                    appBadges.push(`<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-digilayn-tertiary-container text-digilayn-on-tertiary-container dark:bg-digilayn-tertiary-container/40 dark:text-digilayn-on-tertiary-container flex items-center gap-1"><i class="fas fa-taxi"></i>Taxi Rank</span>`);
+                    appBadges.push(`<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-digilayn-tertiary-container text-digilayn-on-tertiary-container dark:bg-digilayn-tertiary/10 dark:text-digilayn-tertiary flex items-center gap-1"><i class="fas fa-taxi"></i>Taxi Rank</span>`);
                 }
                 if (user.roles?.poortjie?.listForSupport) {
                     appBadges.push(`<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-digilayn-info-container text-digilayn-on-info-container dark:text-digilayn-on-info-container flex items-center gap-1"><i class="fas fa-headset"></i>Support</span>`);
@@ -2178,18 +2179,18 @@
                             </div>
                             <div class="pt-2 flex flex-wrap items-center gap-1.5">
                                 ${susp.badgeHtml || ''}
-                                ${user.integrity !== 'complete' ? `<span class="px-2 py-0.5 bg-digilayn-error-container dark:bg-digilayn-error-container/30 text-digilayn-on-error-container text-[10px] font-bold uppercase rounded">${user.integrity}</span>` : '<span class="px-2 py-0.5 bg-digilayn-primary-container dark:bg-digilayn-primary-container/30 text-digilayn-on-primary-container text-[10px] font-bold uppercase rounded">Auth + Firestore</span>'}
+                                ${user.integrity !== 'complete' ? `<span class="px-2 py-0.5 bg-digilayn-error-container dark:bg-digilayn-error/10 text-digilayn-on-error-container text-[10px] font-bold uppercase rounded">${user.integrity}</span>` : '<span class="px-2 py-0.5 bg-digilayn-primary-container dark:bg-digilayn-primary/10 text-digilayn-on-primary-container text-[10px] font-bold uppercase rounded">Auth + Firestore</span>'}
                                 <span class="px-2 py-0.5 bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface-variant text-[10px] font-bold rounded">${user.storageObjects.length} files</span>
                                 <span class="px-2 py-0.5 bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface-variant text-[10px] font-bold rounded">${user.providers.join(', ') || 'Password'}</span>
                             </div>
 
                             ${susp.isPendingDelete && susp.isExpired ? `
-                                <div class="mt-3 p-2.5 bg-digilayn-error-container dark:bg-digilayn-error-container/40 border border-digilayn-error dark:border-digilayn-error rounded-xl flex items-center justify-between gap-2">
+                                <div class="mt-3 p-2.5 bg-digilayn-error-container dark:bg-digilayn-error/10 border border-digilayn-error dark:border-digilayn-error rounded-xl flex items-center justify-between gap-2">
                                     <div class="text-[11px] font-semibold text-digilayn-on-error-container dark:text-digilayn-error flex items-center gap-1.5">
                                         <i class="fas fa-clock text-digilayn-error"></i>
                                         <span>Grace period ended. Ready to permanently purge.</span>
                                     </div>
-                                    <button class="purge-now-btn px-2.5 py-1 bg-digilayn-error hover:bg-digilayn-error text-digilayn-on-error rounded-lg text-xs font-bold transition-all shrink-0 shadow-sm" data-uid="${user.userId}" data-username="${user.username || ''}" data-email="${user.email || ''}" data-displayname="${user.displayName || ''}">
+                                    <button class="purge-now-btn px-2.5 py-1 bg-digilayn-error hover:bg-digilayn-error text-digilayn-on-error rounded-lg text-xs font-bold transition-all shrink-0 shadow-sm digilayn-button" data-uid="${user.userId}" data-username="${user.username || ''}" data-email="${user.email || ''}" data-displayname="${user.displayName || ''}">
                                         Delete Now
                                     </button>
                                 </div>
@@ -2206,7 +2207,7 @@
                     </div>
 
                     <div class="mt-4 pt-3 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant text-[10px] text-digilayn-on-surface-variant flex items-center justify-between">
-                        <button type="button" class="copy-uid-btn font-mono opacity-60 hover:opacity-100 hover:text-digilayn-primary dark:hover:text-digilayn-primary transition-all flex items-center gap-1.5 cursor-pointer truncate max-w-[180px] p-1 -ml-1 rounded hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-low" data-uid="${user.userId}" title="Click to copy UID">
+                        <button type="button" class="copy-uid-btn font-mono opacity-70 hover:opacity-100 hover:text-digilayn-primary dark:hover:text-digilayn-primary transition-all flex items-center gap-1.5 cursor-pointer truncate max-w-[180px] p-1 -ml-1 rounded hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-low" data-uid="${user.userId}" title="Click to copy UID">
                             <i class="far fa-copy text-[10px]"></i>
                             <span class="truncate">UID: ${user.userId}</span>
                         </button>
@@ -2280,17 +2281,17 @@
 
                 const photoHtml = u.photoUrl
                     ? `<img src="${u.photoUrl}" class="profile-pic w-12 h-12 rounded-full object-cover bg-digilayn-surface-container-high cursor-zoom-in hover:ring-2 hover:ring-digilayn-success transition-all" data-full="${u.photoUrl}" data-name="${u.displayName || 'Driver'}">`
-                    : `<div class="w-12 h-12 rounded-full bg-digilayn-success-container dark:bg-digilayn-success-container/30 text-digilayn-on-success-container dark:text-digilayn-on-success-container flex items-center justify-center font-bold text-xl">${(u.displayName || 'D')[0].toUpperCase()}</div>`;
+                    : `<div class="w-12 h-12 rounded-full bg-digilayn-success-container dark:bg-digilayn-success/10 text-digilayn-on-success-container dark:text-digilayn-success flex items-center justify-center font-bold text-xl">${(u.displayName || 'D')[0].toUpperCase()}</div>`;
 
                 const onlinePill = driver.online
-                    ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-digilayn-primary-container text-digilayn-on-primary-container dark:bg-digilayn-primary-container/40 dark:text-digilayn-on-primary-container flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-digilayn-primary animate-pulse"></span>Online</span>`
+                    ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-digilayn-primary-container text-digilayn-on-primary-container dark:bg-digilayn-primary/10 dark:text-digilayn-primary flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-digilayn-primary animate-pulse"></span>Online</span>`
                     : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface-variant flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-digilayn-surface-container-highest"></span>Offline</span>`;
 
-                let statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-digilayn-warning-container dark:bg-digilayn-warning-container/30 text-digilayn-on-warning-container dark:text-digilayn-on-warning-container">⌛ Pending</span>`;
+                let statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-digilayn-warning-container dark:bg-digilayn-warning/10 text-digilayn-on-warning-container dark:text-digilayn-warning">⌛ Pending</span>`;
                 if (isApproved) {
-                    statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-digilayn-success-container dark:bg-digilayn-success-container/30 text-digilayn-on-success-container dark:text-digilayn-on-success-container">✓ Approved</span>`;
+                    statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-digilayn-success-container dark:bg-digilayn-success/10 text-digilayn-on-success-container dark:text-digilayn-success">✓ Approved</span>`;
                 } else if (isDemoted) {
-                    statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-digilayn-error-container dark:bg-digilayn-error-container/30 text-digilayn-on-error-container dark:text-digilayn-on-error-container">✕ Demoted</span>`;
+                    statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-digilayn-error-container dark:bg-digilayn-error/10 text-digilayn-on-error-container dark:text-digilayn-error">✕ Demoted</span>`;
                 }
 
                 const vehicle = driver.vehicle || {};
@@ -2344,14 +2345,14 @@
                             </div>
 
                             ${isDemoted ? `
-                                <div class="mt-2 p-2.5 rounded-xl bg-digilayn-error-container dark:bg-digilayn-error-container/30 border border-digilayn-error dark:border-digilayn-error/40 text-[11px] text-digilayn-on-error-container dark:text-digilayn-on-error-container">
+                                <div class="mt-2 p-2.5 rounded-xl bg-digilayn-error-container dark:bg-digilayn-error/10 border border-digilayn-error dark:border-digilayn-error/40 text-[11px] text-digilayn-on-error-container dark:text-digilayn-error">
                                     <p class="font-bold">Demotion reason:</p>
                                     <p class="italic break-words">"${driver.demoteReason || 'Demoted by manager'}"</p>
                                     <p class="text-[10px] text-digilayn-error mt-1">${formatDate(driver.demotedAt)} · by ${driver.demotedBy || 'manager'}</p>
                                 </div>
                             ` : ''}
                             <div class="pt-2 text-[10px] text-digilayn-on-surface-variant flex items-center justify-between">
-                                <button type="button" class="copy-uid-btn font-mono opacity-60 hover:opacity-100 hover:text-digilayn-success dark:hover:text-digilayn-success transition-all flex items-center gap-1.5 cursor-pointer truncate max-w-[180px] p-1 -ml-1 rounded hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-low" data-uid="${driver.uid}" title="Click to copy UID">
+                                <button type="button" class="copy-uid-btn font-mono opacity-70 hover:opacity-100 hover:text-digilayn-success dark:hover:text-digilayn-success transition-all flex items-center gap-1.5 cursor-pointer truncate max-w-[180px] p-1 -ml-1 rounded hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-low" data-uid="${driver.uid}" title="Click to copy UID">
                                     <i class="far fa-copy text-[10px]"></i>
                                     <span class="truncate">UID: ${driver.uid}</span>
                                 </button>
@@ -2363,12 +2364,12 @@
                     <!-- Actions Footer -->
                     <div class="pt-4 mt-4 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant flex items-center gap-2">
                         ${isApproved ? `
-                            <button class="demote-driver-btn flex-1 py-2 bg-digilayn-warning-container hover:bg-digilayn-warning text-digilayn-on-warning-container hover:text-digilayn-on-primary dark:bg-digilayn-warning-container/20 dark:hover:bg-digilayn-warning dark:text-digilayn-on-warning-container dark:hover:text-digilayn-on-primary font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer" data-uid="${driver.uid}" data-name="${u.displayName || driver.uid}">
+                            <button class="demote-driver-btn flex-1 py-2 bg-digilayn-warning-container hover:bg-digilayn-warning text-digilayn-on-warning-container hover:text-digilayn-on-primary dark:bg-digilayn-warning/10 dark:hover:bg-digilayn-warning dark:text-digilayn-warning dark:hover:text-digilayn-on-primary font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer" data-uid="${driver.uid}" data-name="${u.displayName || driver.uid}">
                                 <i class="fas fa-user-minus"></i>
                                 <span>Demote Driver</span>
                             </button>
                         ` : `
-                            <button class="reapprove-driver-btn flex-1 py-2 bg-digilayn-success hover:bg-digilayn-success text-digilayn-on-success font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm shadow-digilayn-success/20 cursor-pointer" data-uid="${driver.uid}" data-name="${u.displayName || driver.uid}">
+                            <button class="reapprove-driver-btn flex-1 py-2 bg-digilayn-success hover:bg-digilayn-success text-digilayn-on-success font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm shadow-digilayn-success/20 cursor-pointer digilayn-button" data-uid="${driver.uid}" data-name="${u.displayName || driver.uid}">
                                 <i class="fas fa-check-circle"></i>
                                 <span>${isDemoted ? 'Re-instate / Approve' : 'Approve Driver'}</span>
                             </button>
@@ -2404,7 +2405,7 @@
                 card.querySelector('.reapprove-driver-btn')?.addEventListener('click', async (e) => {
                     const btn = e.currentTarget;
                     btn.disabled = true;
-                    btn.classList.add('opacity-50');
+                    btn.classList.add('opacity-70');
                     try {
                         await userManager.promoteLaynDriver(driver.uid, driver.vehicle || {});
                         setStatus(`Driver ${driver.uid} approved successfully!`);
@@ -2414,7 +2415,7 @@
                         console.error("Re-approval failed:", err);
                         setStatus(`Approval failed: ${err.message}`, true);
                         btn.disabled = false;
-                        btn.classList.remove('opacity-50');
+                        btn.classList.remove('opacity-70');
                     }
                 });
 
@@ -2448,15 +2449,15 @@
 
                 const photoHtml = u.photoUrl
                     ? `<img src="${u.photoUrl}" class="profile-pic w-12 h-12 rounded-full object-cover bg-digilayn-surface-container-high cursor-zoom-in hover:ring-2 hover:ring-digilayn-warning transition-all" data-full="${u.photoUrl}" data-name="${u.displayName || 'Assist Member'}">`
-                    : `<div class="w-12 h-12 rounded-full bg-digilayn-warning-container dark:bg-digilayn-warning-container/30 text-digilayn-on-warning-container dark:text-digilayn-on-warning-container flex items-center justify-center font-bold text-xl">${(u.displayName || 'A')[0].toUpperCase()}</div>`;
+                    : `<div class="w-12 h-12 rounded-full bg-digilayn-warning-container dark:bg-digilayn-warning/10 text-digilayn-on-warning-container dark:text-digilayn-warning flex items-center justify-center font-bold text-xl">${(u.displayName || 'A')[0].toUpperCase()}</div>`;
 
                 const rolePill = isOwner
-                    ? `<span class="px-2.5 py-1 rounded-lg text-xs font-black bg-digilayn-warning-container dark:bg-digilayn-warning-container/40 text-digilayn-on-warning-container dark:text-digilayn-on-warning-container border border-digilayn-warning dark:border-digilayn-warning/50 flex items-center gap-1.5"><i class="fas fa-crown text-digilayn-warning"></i> FLEET OWNER</span>`
-                    : `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-digilayn-info-container dark:bg-digilayn-info-container/40 text-digilayn-on-info-container dark:text-digilayn-on-info-container border border-digilayn-info dark:border-digilayn-info flex items-center gap-1.5"><i class="fas fa-truck text-digilayn-info"></i> TOW DRIVER</span>`;
+                    ? `<span class="px-2.5 py-1 rounded-lg text-xs font-black bg-digilayn-warning-container dark:bg-digilayn-warning/10 text-digilayn-on-warning-container dark:text-digilayn-warning border border-digilayn-warning dark:border-digilayn-warning/50 flex items-center gap-1.5"><i class="fas fa-crown text-digilayn-warning"></i> FLEET OWNER</span>`
+                    : `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-digilayn-info-container dark:bg-digilayn-info/10 text-digilayn-on-info-container dark:text-digilayn-info border border-digilayn-info dark:border-digilayn-info flex items-center gap-1.5"><i class="fas fa-truck text-digilayn-info"></i> TOW DRIVER</span>`;
 
                 const statusPill = isRevoked
-                    ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-digilayn-error-container dark:bg-digilayn-error-container/30 text-digilayn-on-error-container dark:text-digilayn-on-error-container">✕ Revoked</span>`
-                    : `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-digilayn-success-container dark:bg-digilayn-success-container/30 text-digilayn-on-success-container dark:text-digilayn-on-success-container">✓ Active</span>`;
+                    ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-digilayn-error-container dark:bg-digilayn-error/10 text-digilayn-on-error-container dark:text-digilayn-error">✕ Revoked</span>`
+                    : `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-digilayn-success-container dark:bg-digilayn-success/10 text-digilayn-on-success-container dark:text-digilayn-success">✓ Active</span>`;
 
                 const vehicle = driver.vehicle || {};
                 const vehicleText = [vehicle.make, vehicle.plate ? `(${vehicle.plate})` : ''].filter(Boolean).join(' ');
@@ -2511,7 +2512,7 @@
                             ` : ''}
 
                             <div class="pt-2 text-[10px] text-digilayn-on-surface-variant flex items-center justify-between">
-                                <button type="button" class="copy-uid-btn font-mono opacity-60 hover:opacity-100 hover:text-digilayn-warning dark:hover:text-digilayn-warning transition-all flex items-center gap-1.5 cursor-pointer truncate max-w-[180px] p-1 -ml-1 rounded hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-low" data-uid="${driver.uid}" title="Click to copy UID">
+                                <button type="button" class="copy-uid-btn font-mono opacity-70 hover:opacity-100 hover:text-digilayn-warning dark:hover:text-digilayn-warning transition-all flex items-center gap-1.5 cursor-pointer truncate max-w-[180px] p-1 -ml-1 rounded hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-low" data-uid="${driver.uid}" title="Click to copy UID">
                                     <i class="far fa-copy text-[10px]"></i>
                                     <span class="truncate">UID: ${driver.uid}</span>
                                 </button>
@@ -2519,7 +2520,7 @@
                             </div>
 
                             ${isRevoked ? `
-                                <div class="p-2.5 rounded-xl bg-digilayn-error-container dark:bg-digilayn-error-container/30 border border-digilayn-error dark:border-digilayn-error/40 text-[11px] text-digilayn-on-error-container dark:text-digilayn-on-error-container">
+                                <div class="p-2.5 rounded-xl bg-digilayn-error-container dark:bg-digilayn-error/10 border border-digilayn-error dark:border-digilayn-error/40 text-[11px] text-digilayn-on-error-container dark:text-digilayn-error">
                                     <p class="font-bold">Revocation reason:</p>
                                     <p class="italic break-words">"${driver.demoteReason || 'Access revoked'}"</p>
                                     <p class="text-[10px] text-digilayn-error mt-1">${formatDate(driver.demotedAt)}</p>
@@ -2531,26 +2532,26 @@
                     <!-- Actions Footer -->
                     <div class="pt-4 mt-4 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant flex items-center gap-2">
                         ${isOwner ? `
-                            <button class="assist-demote-to-driver-btn flex-1 py-2 bg-digilayn-info-container hover:bg-digilayn-info text-digilayn-on-info-container hover:text-digilayn-on-primary dark:bg-digilayn-info-container/20 dark:hover:bg-digilayn-info dark:text-digilayn-on-info-container text-xs font-bold rounded-xl transition flex items-center justify-center gap-1 cursor-pointer" data-uid="${driver.uid}" data-name="${u.displayName || driver.uid}">
+                            <button class="assist-demote-to-driver-btn flex-1 py-2 bg-digilayn-info-container hover:bg-digilayn-info text-digilayn-on-info-container hover:text-digilayn-on-primary dark:bg-digilayn-info/10 dark:hover:bg-digilayn-info dark:text-digilayn-info text-xs font-bold rounded-xl transition flex items-center justify-center gap-1 cursor-pointer" data-uid="${driver.uid}" data-name="${u.displayName || driver.uid}">
                                 <i class="fas fa-arrow-down"></i>
                                 <span>Demote to Driver</span>
                             </button>
-                            <button class="assist-revoke-btn flex-1 py-2 bg-digilayn-error-container hover:bg-digilayn-error text-digilayn-on-error-container hover:text-digilayn-on-primary dark:bg-digilayn-error-container/20 dark:hover:bg-digilayn-error dark:text-digilayn-on-error-container text-xs font-bold rounded-xl transition flex items-center justify-center gap-1 cursor-pointer" data-uid="${driver.uid}" data-name="${u.displayName || driver.uid}">
+                            <button class="assist-revoke-btn flex-1 py-2 bg-digilayn-error-container hover:bg-digilayn-error text-digilayn-on-error-container hover:text-digilayn-on-primary dark:bg-digilayn-error/10 dark:hover:bg-digilayn-error dark:text-digilayn-error text-xs font-bold rounded-xl transition flex items-center justify-center gap-1 cursor-pointer" data-uid="${driver.uid}" data-name="${u.displayName || driver.uid}">
                                 <i class="fas fa-ban"></i>
                                 <span>Revoke</span>
                             </button>
                         ` : `
-                            <button class="assist-promote-to-owner-btn flex-1 py-2 bg-digilayn-warning hover:bg-digilayn-warning text-digilayn-on-warning text-xs font-bold rounded-xl transition flex items-center justify-center gap-1 shadow-sm shadow-digilayn-warning/20 cursor-pointer" data-uid="${driver.uid}" data-name="${u.displayName || driver.uid}">
+                            <button class="assist-promote-to-owner-btn flex-1 py-2 bg-digilayn-warning hover:bg-digilayn-warning text-digilayn-on-warning text-xs font-bold rounded-xl transition flex items-center justify-center gap-1 shadow-sm shadow-digilayn-warning/20 cursor-pointer digilayn-button" data-uid="${driver.uid}" data-name="${u.displayName || driver.uid}">
                                 <i class="fas fa-crown"></i>
                                 <span>Promote to Owner</span>
                             </button>
                             ${isRevoked ? `
-                                <button class="assist-reapprove-btn flex-1 py-2 bg-digilayn-success hover:bg-digilayn-success text-digilayn-on-success text-xs font-bold rounded-xl transition flex items-center justify-center gap-1 shadow-sm shadow-digilayn-success/20 cursor-pointer" data-uid="${driver.uid}">
+                                <button class="assist-reapprove-btn flex-1 py-2 bg-digilayn-success hover:bg-digilayn-success text-digilayn-on-success text-xs font-bold rounded-xl transition flex items-center justify-center gap-1 shadow-sm shadow-digilayn-success/20 cursor-pointer digilayn-button" data-uid="${driver.uid}">
                                     <i class="fas fa-check"></i>
                                     <span>Re-approve</span>
                                 </button>
                             ` : `
-                                <button class="assist-revoke-btn flex-1 py-2 bg-digilayn-error-container hover:bg-digilayn-error text-digilayn-on-error-container hover:text-digilayn-on-primary dark:bg-digilayn-error-container/20 dark:hover:bg-digilayn-error dark:text-digilayn-on-error-container text-xs font-bold rounded-xl transition flex items-center justify-center gap-1 cursor-pointer" data-uid="${driver.uid}" data-name="${u.displayName || driver.uid}">
+                                <button class="assist-revoke-btn flex-1 py-2 bg-digilayn-error-container hover:bg-digilayn-error text-digilayn-on-error-container hover:text-digilayn-on-primary dark:bg-digilayn-error/10 dark:hover:bg-digilayn-error dark:text-digilayn-error text-xs font-bold rounded-xl transition flex items-center justify-center gap-1 cursor-pointer" data-uid="${driver.uid}" data-name="${u.displayName || driver.uid}">
                                     <i class="fas fa-user-minus"></i>
                                     <span>Revoke</span>
                                 </button>
@@ -2596,7 +2597,7 @@
                 card.querySelector('.assist-promote-to-owner-btn')?.addEventListener('click', async (e) => {
                     const btn = e.currentTarget;
                     btn.disabled = true;
-                    btn.classList.add('opacity-50');
+                    btn.classList.add('opacity-70');
                     try {
                         await userManager.promoteDogTowingUser(driver.uid, 'OWNER', driver.vehicle || {});
                         setStatus(`Promoted ${u.displayName || driver.uid} to LaynAssist Fleet Owner!`);
@@ -2606,14 +2607,14 @@
                         console.error("Promote to owner failed:", err);
                         setStatus(`Promotion failed: ${err.message}`, true);
                         btn.disabled = false;
-                        btn.classList.remove('opacity-50');
+                        btn.classList.remove('opacity-70');
                     }
                 });
 
                 card.querySelector('.assist-reapprove-btn')?.addEventListener('click', async (e) => {
                     const btn = e.currentTarget;
                     btn.disabled = true;
-                    btn.classList.add('opacity-50');
+                    btn.classList.add('opacity-70');
                     try {
                         await userManager.reapproveDogTowingDriver(driver.uid);
                         setStatus(`Re-approved Dog Towing driver ${u.displayName || driver.uid}!`);
@@ -2623,7 +2624,7 @@
                         console.error("Re-approval failed:", err);
                         setStatus(`Re-approval failed: ${err.message}`, true);
                         btn.disabled = false;
-                        btn.classList.remove('opacity-50');
+                        btn.classList.remove('opacity-70');
                     }
                 });
 
@@ -2655,7 +2656,7 @@
 
                 const photoHtml = u.photoUrl
                     ? `<img src="${u.photoUrl}" class="profile-pic w-12 h-12 rounded-full object-cover bg-digilayn-surface-container-high cursor-zoom-in hover:ring-2 hover:ring-digilayn-info transition-all" data-full="${u.photoUrl}" data-name="${u.displayName || 'Rider'}">`
-                    : `<div class="w-12 h-12 rounded-full bg-digilayn-info-container dark:bg-digilayn-info-container/30 text-digilayn-on-info-container dark:text-digilayn-on-info-container flex items-center justify-center font-bold text-xl">${(u.displayName || 'R')[0].toUpperCase()}</div>`;
+                    : `<div class="w-12 h-12 rounded-full bg-digilayn-info-container dark:bg-digilayn-info/10 text-digilayn-on-info-container dark:text-digilayn-info flex items-center justify-center font-bold text-xl">${(u.displayName || 'R')[0].toUpperCase()}</div>`;
 
                 const card = document.createElement('div');
                 card.className = "bg-digilayn-surface-container-lowest dark:bg-digilayn-surface rounded-2xl p-6 shadow-sm border border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:shadow-md transition-shadow relative overflow-hidden flex flex-col justify-between";
@@ -2688,7 +2689,7 @@
                             </div>
 
                             <div class="pt-2 flex flex-wrap items-center gap-1.5">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-digilayn-info-container text-digilayn-on-info-container dark:bg-digilayn-info-container/40 dark:text-digilayn-on-info-container">${rider.tripsCount || 0} rides completed</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-digilayn-info-container text-digilayn-on-info-container dark:bg-digilayn-info/10 dark:text-digilayn-info">${rider.tripsCount || 0} rides completed</span>
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-warning">${rider.ratingAvg ? `⭐ ${Number(rider.ratingAvg).toFixed(1)} (${rider.ratingCount || 0})` : '⭐ New Passenger'}</span>
                                 ${getSuspensionInfo({ suspended: u.suspended, suspendedReason: u.suspendedReason, updatedAt: u.updatedAt, createdAt: u.createdAt || rider.joinedAt }).badgeHtml || ''}
                             </div>
@@ -2700,7 +2701,7 @@
                     </div>
 
                     <div class="pt-4 mt-4 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant flex items-center justify-between text-xs text-digilayn-on-surface-variant">
-                        <button type="button" class="copy-uid-btn font-mono text-[10px] opacity-60 hover:opacity-100 hover:text-digilayn-info dark:hover:text-digilayn-info transition-all flex items-center gap-1.5 cursor-pointer truncate max-w-[180px] p-1 -ml-1 rounded hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-low" data-uid="${rider.uid}" title="Click to copy UID">
+                        <button type="button" class="copy-uid-btn font-mono text-[10px] opacity-70 hover:opacity-100 hover:text-digilayn-info dark:hover:text-digilayn-info transition-all flex items-center gap-1.5 cursor-pointer truncate max-w-[180px] p-1 -ml-1 rounded hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-low" data-uid="${rider.uid}" title="Click to copy UID">
                             <i class="far fa-copy text-[10px]"></i>
                             <span class="truncate">UID: ${rider.uid}</span>
                         </button>
@@ -2758,7 +2759,7 @@
 
                 const photoHtml = user.photoUrl
                     ? `<img src="${user.photoUrl}" class="profile-pic w-12 h-12 rounded-full object-cover bg-digilayn-surface-container-high cursor-zoom-in hover:ring-2 hover:ring-digilayn-tertiary transition-all" data-full="${user.photoUrl}" data-name="${user.displayName || 'User'}">`
-                    : `<div class="w-12 h-12 rounded-full bg-digilayn-tertiary-container dark:bg-digilayn-tertiary-container/30 text-digilayn-on-tertiary-container dark:text-digilayn-on-tertiary-container flex items-center justify-center font-bold text-xl">${(user.displayName || 'P')[0].toUpperCase()}</div>`;
+                    : `<div class="w-12 h-12 rounded-full bg-digilayn-tertiary-container dark:bg-digilayn-tertiary/10 text-digilayn-on-tertiary-container dark:text-digilayn-tertiary flex items-center justify-center font-bold text-xl">${(user.displayName || 'P')[0].toUpperCase()}</div>`;
 
                 const card = document.createElement('div');
                 card.className = "bg-digilayn-surface-container-lowest dark:bg-digilayn-surface rounded-2xl p-6 shadow-sm border border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:shadow-md transition-shadow relative overflow-hidden flex flex-col justify-between";
@@ -2798,15 +2799,15 @@
                             <div class="pt-3 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant">
                                 <p class="text-[10px] uppercase font-black tracking-widest text-digilayn-on-surface-variant mb-2">Assign / Revoke Roles</p>
                                 <div class="flex flex-wrap gap-2">
-                                    <button class="poortjie-toggle-btn px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${isAdmin ? 'bg-digilayn-tertiary text-digilayn-on-tertiary shadow-sm shadow-digilayn-tertiary/20' : 'bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface-variant hover:text-digilayn-on-surface-variant dark:hover:text-digilayn-on-surface'}" data-uid="${user.userId}" data-role="isAdmin" data-current="${isAdmin}">
+                                    <button class="poortjie-toggle-btn px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${isAdmin ? 'bg-digilayn-tertiary text-digilayn-on-tertiary shadow-sm shadow-digilayn-tertiary/20' : 'bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface-variant hover:text-digilayn-on-surface-variant dark:hover:text-digilayn-on-surface'} digilayn-button" data-uid="${user.userId}" data-role="isAdmin" data-current="${isAdmin}">
                                         <i class="fas fa-shield-alt"></i>
                                         <span>${isAdmin ? '✓ Admin' : 'Admin'}</span>
                                     </button>
-                                    <button class="poortjie-toggle-btn px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${isTaxiRankAdmin ? 'bg-digilayn-tertiary text-digilayn-on-tertiary shadow-sm shadow-digilayn-tertiary/20' : 'bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface-variant hover:text-digilayn-on-surface-variant dark:hover:text-digilayn-on-surface'}" data-uid="${user.userId}" data-role="isTaxiRankAdmin" data-current="${isTaxiRankAdmin}">
+                                    <button class="poortjie-toggle-btn px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${isTaxiRankAdmin ? 'bg-digilayn-tertiary text-digilayn-on-tertiary shadow-sm shadow-digilayn-tertiary/20' : 'bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface-variant hover:text-digilayn-on-surface-variant dark:hover:text-digilayn-on-surface'} digilayn-button" data-uid="${user.userId}" data-role="isTaxiRankAdmin" data-current="${isTaxiRankAdmin}">
                                         <i class="fas fa-taxi"></i>
                                         <span>${isTaxiRankAdmin ? '✓ Taxi Rank' : 'Taxi Rank'}</span>
                                     </button>
-                                    <button class="poortjie-toggle-btn px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${listForSupport ? 'bg-digilayn-info text-digilayn-on-info shadow-sm shadow-digilayn-info/20' : 'bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface-variant hover:text-digilayn-on-surface-variant dark:hover:text-digilayn-on-surface'}" data-uid="${user.userId}" data-role="listForSupport" data-current="${listForSupport}">
+                                    <button class="poortjie-toggle-btn px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${listForSupport ? 'bg-digilayn-info text-digilayn-on-info shadow-sm shadow-digilayn-info/20' : 'bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface-variant hover:text-digilayn-on-surface-variant dark:hover:text-digilayn-on-surface'} digilayn-button" data-uid="${user.userId}" data-role="listForSupport" data-current="${listForSupport}">
                                         <i class="fas fa-headset"></i>
                                         <span>${listForSupport ? '✓ Support' : 'Support'}</span>
                                     </button>
@@ -2816,7 +2817,7 @@
                     </div>
 
                     <div class="pt-4 mt-4 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant flex items-center justify-between text-xs text-digilayn-on-surface-variant">
-                        <button type="button" class="copy-uid-btn font-mono text-[10px] opacity-60 hover:opacity-100 hover:text-digilayn-tertiary dark:hover:text-digilayn-tertiary transition-all flex items-center gap-1.5 cursor-pointer truncate max-w-[180px] p-1 -ml-1 rounded hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-low" data-uid="${user.userId}" title="Click to copy UID">
+                        <button type="button" class="copy-uid-btn font-mono text-[10px] opacity-70 hover:opacity-100 hover:text-digilayn-tertiary dark:hover:text-digilayn-tertiary transition-all flex items-center gap-1.5 cursor-pointer truncate max-w-[180px] p-1 -ml-1 rounded hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-low" data-uid="${user.userId}" title="Click to copy UID">
                             <i class="far fa-copy text-[10px]"></i>
                             <span class="truncate">UID: ${user.userId}</span>
                         </button>
@@ -2848,7 +2849,7 @@
                         const currentStatus = target.dataset.current === 'true';
 
                         target.disabled = true;
-                        target.classList.add('opacity-50');
+                        target.classList.add('opacity-70');
 
                         try {
                             await userManager.togglePoortjieRole(uid, roleKey, currentStatus);
@@ -2858,7 +2859,7 @@
                             console.error("Poortjie role toggle failed:", err);
                             setStatus(`Failed to update Poortjie role: ${err.message}`, true);
                             target.disabled = false;
-                            target.classList.remove('opacity-50');
+                            target.classList.remove('opacity-70');
                         }
                     });
                 });
@@ -2988,10 +2989,10 @@
             suspendModalEmail.textContent = user.email || 'No Email';
             suspendConfirmEmailHint.textContent = `(${user.email})`;
 
-            suspendModalIcon.className = `w-16 h-16 rounded-2xl flex items-center justify-center mb-6 text-2xl ${isSuspended ? 'bg-digilayn-primary-container dark:bg-digilayn-primary-container/30 text-digilayn-on-primary-container dark:text-digilayn-on-primary-container' : 'bg-digilayn-warning-container dark:bg-digilayn-warning-container/30 text-digilayn-on-warning-container dark:text-digilayn-on-warning-container'}`;
+            suspendModalIcon.className = `w-16 h-16 rounded-2xl flex items-center justify-center mb-6 text-2xl ${isSuspended ? 'bg-digilayn-primary-container dark:bg-digilayn-primary/10 text-digilayn-on-primary-container dark:text-digilayn-primary' : 'bg-digilayn-warning-container dark:bg-digilayn-warning/10 text-digilayn-on-warning-container dark:text-digilayn-warning'}`;
             suspendModalIcon.innerHTML = `<i class="fas ${isSuspended ? 'fa-user-check' : 'fa-user-slash'}"></i>`;
 
-            confirmSuspendBtn.className = `flex-1 py-3 text-digilayn-on-primary font-bold rounded-xl opacity-50 cursor-not-allowed transition-all ${isSuspended ? 'bg-digilayn-primary' : 'bg-digilayn-warning'}`;
+            confirmSuspendBtn.className = `flex-1 py-3 text-digilayn-on-primary font-bold rounded-xl opacity-70 cursor-not-allowed transition-all ${isSuspended ? 'bg-digilayn-primary' : 'bg-digilayn-warning'}`;
             confirmSuspendBtn.textContent = isSuspended ? 'Unsuspend User' : 'Suspend User';
 
             suspendConfirmInput.value = '';
@@ -3028,12 +3029,12 @@
         function updateSuspendCountdown() {
             if (suspendCountdown > 0) {
                 suspendCountdownText.textContent = `Please read carefully. You can proceed in ${suspendCountdown} seconds.`;
-                suspendCountdownText.className = "text-sm font-medium text-digilayn-on-warning-container dark:text-digilayn-on-warning-container bg-digilayn-warning-container dark:bg-digilayn-warning-container/20 py-2 rounded-lg";
+                suspendCountdownText.className = "text-sm font-medium text-digilayn-on-warning-container dark:text-digilayn-warning bg-digilayn-warning-container dark:bg-digilayn-warning/10 py-2 rounded-lg";
             } else {
                 suspendCountdownText.textContent = userToSuspend?.isSuspended
                     ? "Confirm the email below to restore access."
                     : "Select or enter a reason, then confirm email below.";
-                suspendCountdownText.className = "text-sm font-bold text-digilayn-on-primary-container dark:text-digilayn-on-primary-container bg-digilayn-primary-container dark:bg-digilayn-primary-container/20 py-2 rounded-lg";
+                suspendCountdownText.className = "text-sm font-bold text-digilayn-on-primary-container dark:text-digilayn-primary bg-digilayn-primary-container dark:bg-digilayn-primary/10 py-2 rounded-lg";
             }
             checkSuspendConfirmation();
         }
@@ -3044,10 +3045,10 @@
             const emailMatch = suspendConfirmInput.value.trim().toLowerCase() === (userToSuspend?.email || '').toLowerCase();
             if (suspendCountdown <= 0 && emailMatch && reasonFilled) {
                 confirmSuspendBtn.disabled = false;
-                confirmSuspendBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                confirmSuspendBtn.classList.remove('opacity-70', 'cursor-not-allowed');
             } else {
                 confirmSuspendBtn.disabled = true;
-                confirmSuspendBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                confirmSuspendBtn.classList.add('opacity-70', 'cursor-not-allowed');
             }
         }
 
@@ -3118,7 +3119,7 @@
             userDeleteActionContainer.classList.add('hidden');
             userDeleteProgressBar.style.width = '0%';
             userDeleteProgressBar.className = 'bg-digilayn-error h-full rounded-full transition-all duration-500';
-            userDeleteIconContainer.className = 'w-16 h-16 bg-digilayn-error-container dark:bg-digilayn-error-container/30 text-digilayn-on-error-container dark:text-digilayn-on-error-container rounded-2xl flex items-center justify-center mb-6 text-2xl';
+            userDeleteIconContainer.className = 'w-16 h-16 bg-digilayn-error-container dark:bg-digilayn-error/10 text-digilayn-on-error-container dark:text-digilayn-error rounded-2xl flex items-center justify-center mb-6 text-2xl';
             userDeleteStatusIcon.className = 'fas fa-circle-notch fa-spin';
             userDeleteProgressTitle.textContent = 'Deleting user account...';
             userDeleteStep1.className = 'flex items-center gap-3 text-digilayn-on-surface-variant';
@@ -3138,7 +3139,7 @@
 
             deleteConfirmInput.value = '';
             confirmDeleteBtn.disabled = true;
-            confirmDeleteBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            confirmDeleteBtn.classList.add('opacity-70', 'cursor-not-allowed');
 
             deleteModal.classList.remove('hidden');
 
@@ -3168,10 +3169,10 @@
         function updateCountdown() {
             if (countdown > 0) {
                 countdownText.textContent = `Please read carefully. You can delete in ${countdown} seconds.`;
-                countdownText.className = "text-sm font-medium text-digilayn-on-warning-container dark:text-digilayn-on-warning-container bg-digilayn-warning-container dark:bg-digilayn-warning-container/20 py-2 rounded-lg";
+                countdownText.className = "text-sm font-medium text-digilayn-on-warning-container dark:text-digilayn-warning bg-digilayn-warning-container dark:bg-digilayn-warning/10 py-2 rounded-lg";
             } else {
                 countdownText.textContent = "This action is permanent.";
-                countdownText.className = "text-sm font-bold text-digilayn-on-error-container dark:text-digilayn-on-error-container bg-digilayn-error-container dark:bg-digilayn-error-container/20 py-2 rounded-lg";
+                countdownText.className = "text-sm font-bold text-digilayn-on-error-container dark:text-digilayn-error bg-digilayn-error-container dark:bg-digilayn-error/10 py-2 rounded-lg";
             }
             checkConfirmation();
         }
@@ -3180,10 +3181,10 @@
             const uidMatch = deleteConfirmInput.value.trim() === (userToDelete?.uid || '');
             if (countdown <= 0 && uidMatch && deletePreviewReady) {
                 confirmDeleteBtn.disabled = false;
-                confirmDeleteBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                confirmDeleteBtn.classList.remove('opacity-70', 'cursor-not-allowed');
             } else {
                 confirmDeleteBtn.disabled = true;
-                confirmDeleteBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                confirmDeleteBtn.classList.add('opacity-70', 'cursor-not-allowed');
             }
         }
 
@@ -3279,7 +3280,7 @@
                     userDeleteStep3.className = 'flex items-center gap-3 text-digilayn-primary dark:text-digilayn-primary font-medium';
                     userDeleteStep3.innerHTML = '<i class="fas fa-check-circle w-5 text-center text-digilayn-primary"></i><span>System directory and inventory updated</span>';
 
-                    userDeleteIconContainer.className = 'w-16 h-16 bg-digilayn-primary-container dark:bg-digilayn-primary-container/30 text-digilayn-on-primary-container dark:text-digilayn-on-primary-container rounded-2xl flex items-center justify-center mb-6 text-2xl';
+                    userDeleteIconContainer.className = 'w-16 h-16 bg-digilayn-primary-container dark:bg-digilayn-primary/10 text-digilayn-on-primary-container dark:text-digilayn-primary rounded-2xl flex items-center justify-center mb-6 text-2xl';
                     userDeleteStatusIcon.className = 'fas fa-check-circle';
                     userDeleteProgressTitle.textContent = 'User permanently deleted';
                     userDeleteActionContainer.classList.remove('hidden');
@@ -3302,7 +3303,7 @@
                 console.error("Delete failed:", error);
                 userDeleteProgressBar.style.width = '100%';
                 userDeleteProgressBar.className = 'bg-digilayn-error h-full rounded-full';
-                userDeleteIconContainer.className = 'w-16 h-16 bg-digilayn-error-container dark:bg-digilayn-error-container/30 text-digilayn-on-error-container dark:text-digilayn-on-error-container rounded-2xl flex items-center justify-center mb-6 text-2xl';
+                userDeleteIconContainer.className = 'w-16 h-16 bg-digilayn-error-container dark:bg-digilayn-error/10 text-digilayn-on-error-container dark:text-digilayn-error rounded-2xl flex items-center justify-center mb-6 text-2xl';
                 userDeleteStatusIcon.className = 'fas fa-exclamation-triangle';
                 userDeleteProgressTitle.textContent = 'User deletion failed';
                 userDeleteStep2.className = 'flex items-center gap-3 text-digilayn-error font-medium';
@@ -3382,11 +3383,11 @@
             if (success) {
                 const originalHtml = copyEmailsBtn.innerHTML;
                 copyEmailsBtn.innerHTML = `<i class="fas fa-check text-digilayn-primary"></i><span>Copied ${emails.length} Emails!</span>`;
-                copyEmailsBtn.classList.add('border-digilayn-primary', 'bg-digilayn-primary-container', 'dark:bg-digilayn-primary-container/30');
+                copyEmailsBtn.classList.add('border-digilayn-primary', 'bg-digilayn-primary-container', 'dark:bg-digilayn-primary/10');
                 setStatus(`Copied ${emails.length} email(s) to clipboard: ${formatted.slice(0, 80)}${formatted.length > 80 ? '...' : ''}`, false);
                 setTimeout(() => {
                     copyEmailsBtn.innerHTML = originalHtml;
-                    copyEmailsBtn.classList.remove('border-digilayn-primary', 'bg-digilayn-primary-container', 'dark:bg-digilayn-primary-container/30');
+                    copyEmailsBtn.classList.remove('border-digilayn-primary', 'bg-digilayn-primary-container', 'dark:bg-digilayn-primary/10');
                     updateEmailCopyButtons();
                 }, 2500);
             } else {
@@ -3583,10 +3584,10 @@
             const selected = document.querySelector('input[name="assistRoleRadio"]:checked')?.value || 'OWNER';
             assistRoleOptions.forEach(opt => {
                 if (opt.dataset.role === selected) {
-                    opt.classList.add('border-digilayn-warning', 'ring-2', 'ring-digilayn-warning/30', 'bg-digilayn-warning-container/20', 'dark:bg-digilayn-warning-container/20');
+                    opt.classList.add('border-digilayn-warning', 'ring-2', 'ring-digilayn-warning/30', 'bg-digilayn-warning-container/20', 'dark:bg-digilayn-warning/10');
                     opt.classList.remove('border-digilayn-outline-variant', 'dark:border-digilayn-outline-variant');
                 } else {
-                    opt.classList.remove('border-digilayn-warning', 'ring-2', 'ring-digilayn-warning/30', 'bg-digilayn-warning-container/20', 'dark:bg-digilayn-warning-container/20');
+                    opt.classList.remove('border-digilayn-warning', 'ring-2', 'ring-digilayn-warning/30', 'bg-digilayn-warning-container/20', 'dark:bg-digilayn-warning/10');
                     opt.classList.add('border-digilayn-outline-variant', 'dark:border-digilayn-outline-variant');
                 }
             });

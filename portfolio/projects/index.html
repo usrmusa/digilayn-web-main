@@ -16,6 +16,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
   <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
   <link rel="manifest" href="/favicon/site.webmanifest" />
+    <link rel="stylesheet" href="../../styles/digilayn-components.css">
 </head>
 <body class="bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface min-h-screen antialiased flex flex-col justify-between">
 
@@ -53,8 +54,8 @@
           <label class="block text-xs font-bold uppercase tracking-wider text-digilayn-on-surface-variant mb-1.5" for="loginPassword">Password</label>
           <input type="password" id="loginPassword" autocomplete="current-password" class="w-full px-4 py-3 rounded-xl bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low border border-digilayn-outline-variant dark:border-digilayn-outline-variant focus:ring-2 focus:ring-digilayn-primary outline-none text-sm transition" placeholder="••••••••" />
         </div>
-        <p id="loginError" class="hidden text-xs text-digilayn-on-error-container font-semibold bg-digilayn-error-container dark:bg-digilayn-error-container/40 p-3 rounded-xl border border-digilayn-error dark:border-digilayn-error/50"></p>
-        <button id="loginSubmitBtn" type="button" class="w-full py-3.5 bg-digilayn-primary hover:bg-digilayn-primary text-digilayn-on-primary font-bold text-sm rounded-xl transition shadow-lg shadow-digilayn-primary/20 cursor-pointer">
+        <p id="loginError" class="hidden text-xs text-digilayn-on-error-container font-semibold bg-digilayn-error-container dark:bg-digilayn-error/10 p-3 rounded-xl border border-digilayn-error dark:border-digilayn-error/50"></p>
+        <button id="loginSubmitBtn" type="button" class="w-full py-3.5 bg-digilayn-primary hover:bg-digilayn-primary text-digilayn-on-primary font-bold text-sm rounded-xl transition shadow-lg shadow-digilayn-primary/20 cursor-pointer digilayn-button">
           Sign In
         </button>
       </div>
@@ -71,7 +72,7 @@
           </div>
           <div>
             <span class="font-black text-digilayn-on-surface dark:text-digilayn-on-surface text-base">Digilayn</span>
-            <span class="text-xs text-digilayn-on-primary-container dark:text-digilayn-on-primary-container font-bold ml-1.5 px-2 py-0.5 rounded-full bg-digilayn-primary-container dark:bg-digilayn-primary-container/60 border border-digilayn-primary dark:border-digilayn-primary">Manager Console</span>
+            <span class="text-xs text-digilayn-on-primary-container dark:text-digilayn-primary font-bold ml-1.5 px-2 py-0.5 rounded-full bg-digilayn-primary-container dark:bg-digilayn-primary/10 border border-digilayn-primary dark:border-digilayn-primary">Manager Console</span>
           </div>
         </div>
 
@@ -124,10 +125,10 @@
         <div class="bg-digilayn-surface-container-lowest dark:bg-digilayn-surface rounded-3xl p-6 sm:p-7 border border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:border-digilayn-primary dark:hover:border-digilayn-primary transition-all hover:shadow-xl flex flex-col justify-between group">
           <div>
             <div class="flex items-start justify-between mb-4">
-              <div class="w-14 h-14 rounded-2xl bg-digilayn-primary-container dark:bg-digilayn-primary-container/60 text-digilayn-on-primary-container dark:text-digilayn-on-primary-container flex items-center justify-center text-2xl font-bold group-hover:scale-105 transition-transform">
+              <div class="w-14 h-14 rounded-2xl bg-digilayn-primary-container dark:bg-digilayn-primary/10 text-digilayn-on-primary-container dark:text-digilayn-primary flex items-center justify-center text-2xl font-bold group-hover:scale-105 transition-transform">
                 <i class="fas fa-users"></i>
               </div>
-              <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-digilayn-primary-container dark:bg-digilayn-primary-container/40 text-digilayn-on-primary-container dark:text-digilayn-on-primary-container border border-digilayn-primary dark:border-digilayn-primary">
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-digilayn-primary-container dark:bg-digilayn-primary/10 text-digilayn-on-primary-container dark:text-digilayn-primary border border-digilayn-primary dark:border-digilayn-primary">
                 Shared Data · Global
               </span>
             </div>
@@ -157,7 +158,7 @@
             </div>
           </div>
 
-          <a href="users.html" class="w-full py-3.5 px-4 rounded-xl bg-digilayn-primary hover:bg-digilayn-primary text-digilayn-on-primary font-bold text-xs transition flex items-center justify-between shadow-md shadow-digilayn-primary/20">
+          <a href="users.html" class="w-full py-3.5 px-4 rounded-xl bg-digilayn-primary hover:bg-digilayn-primary text-digilayn-on-primary font-bold text-xs transition flex items-center justify-between shadow-md shadow-digilayn-primary/20 digilayn-button">
             <span>Manage Users</span>
             <i class="fas fa-arrow-right text-[11px]"></i>
           </a>
@@ -167,10 +168,10 @@
         <div class="bg-digilayn-surface-container-lowest dark:bg-digilayn-surface rounded-3xl p-6 sm:p-7 border border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:border-digilayn-info dark:hover:border-digilayn-info transition-all hover:shadow-xl flex flex-col justify-between group">
           <div>
             <div class="flex items-start justify-between mb-4">
-              <div class="w-14 h-14 rounded-2xl bg-digilayn-info-container dark:bg-digilayn-info-container/60 text-digilayn-on-info-container dark:text-digilayn-on-info-container flex items-center justify-center text-2xl font-bold group-hover:scale-105 transition-transform">
+              <div class="w-14 h-14 rounded-2xl bg-digilayn-info-container dark:bg-digilayn-info/10 text-digilayn-on-info-container dark:text-digilayn-info flex items-center justify-center text-2xl font-bold group-hover:scale-105 transition-transform">
                 <i class="fas fa-car-side"></i>
               </div>
-              <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-digilayn-info-container dark:bg-digilayn-info-container/40 text-digilayn-on-info-container dark:text-digilayn-on-info-container border border-digilayn-info dark:border-digilayn-info">
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-digilayn-info-container dark:bg-digilayn-info/10 text-digilayn-on-info-container dark:text-digilayn-info border border-digilayn-info dark:border-digilayn-info">
                 Poortjie Fleet
               </span>
             </div>
@@ -201,7 +202,7 @@
           </div>
 
           <div class="space-y-2">
-            <a href="laynfleet/admin/index.html" class="w-full py-3 px-4 rounded-xl bg-digilayn-info hover:bg-digilayn-info text-digilayn-on-info font-bold text-xs transition flex items-center justify-between shadow-md shadow-digilayn-info/20">
+            <a href="laynfleet/admin/index.html" class="w-full py-3 px-4 rounded-xl bg-digilayn-info hover:bg-digilayn-info text-digilayn-on-info font-bold text-xs transition flex items-center justify-between shadow-md shadow-digilayn-info/20 digilayn-button">
               <span>LaynFleet Console</span>
               <i class="fas fa-arrow-right text-[11px]"></i>
             </a>
@@ -218,10 +219,10 @@
 
           <div>
             <div class="flex items-start justify-between mb-4">
-              <div class="w-14 h-14 rounded-2xl bg-digilayn-tertiary-container dark:bg-digilayn-tertiary-container/60 text-digilayn-on-tertiary-container dark:text-digilayn-on-tertiary-container flex items-center justify-center text-2xl font-bold opacity-80">
+              <div class="w-14 h-14 rounded-2xl bg-digilayn-tertiary-container dark:bg-digilayn-tertiary/10 text-digilayn-on-tertiary-container dark:text-digilayn-tertiary flex items-center justify-center text-2xl font-bold opacity-80">
                 <i class="fas fa-city"></i>
               </div>
-              <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-digilayn-warning-container dark:bg-digilayn-warning-container/40 text-digilayn-on-warning-container dark:text-digilayn-on-warning-container border border-digilayn-warning dark:border-digilayn-warning/60">
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-digilayn-warning-container dark:bg-digilayn-warning/10 text-digilayn-on-warning-container dark:text-digilayn-warning border border-digilayn-warning dark:border-digilayn-warning/60">
                 Coming Soon
               </span>
             </div>

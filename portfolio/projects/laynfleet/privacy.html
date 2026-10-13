@@ -16,6 +16,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg">
   <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
   <link rel="manifest" href="/favicon/site.webmanifest">
+    <link rel="stylesheet" href="../../../styles/digilayn-components.css">
 </head>
 
 <body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface transition-colors duration-300 min-h-screen flex flex-col justify-between">
@@ -53,7 +54,7 @@
 
     <!-- Role Filter Tabs -->
     <div class="mt-8 flex flex-wrap gap-3">
-        <button id="tab-btn-all" onclick="filterRole('all')" class="role-tab-btn active px-5 py-2.5 rounded-xl font-bold text-sm bg-digilayn-primary text-digilayn-on-primary shadow-md transition">
+        <button id="tab-btn-all" onclick="filterRole('all')" class="role-tab-btn active px-5 py-2.5 rounded-xl font-bold text-sm bg-digilayn-primary text-digilayn-on-primary shadow-md transition digilayn-button">
             Full Policy
         </button>
         <button id="tab-btn-rider" onclick="filterRole('rider')" class="role-tab-btn px-5 py-2.5 rounded-xl font-bold text-sm bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low hover:bg-digilayn-surface-container-high dark:hover:bg-digilayn-surface-container-high transition">
@@ -96,7 +97,7 @@
     </div>
 
     <!-- Community & Own-Risk Disclosure -->
-    <div class="card p-6 sm:p-8 rounded-3xl border-l-4 border-l-digilayn-warning bg-digilayn-warning-container dark:bg-digilayn-warning-container/10" data-section-role="all">
+    <div class="card p-6 sm:p-8 rounded-3xl border-l-4 border-l-digilayn-warning bg-digilayn-warning-container dark:bg-digilayn-warning/10" data-section-role="all">
         <h2 class="text-xl font-bold mb-3 flex items-center gap-2">
             <span>⚠️</span> A Community Platform &mdash; Used at Your Own Risk
         </h2>
@@ -167,19 +168,19 @@
         <h2 class="text-2xl font-bold">2. How Your Information Is Used</h2>
         <p class="text-sm sm:text-base opacity-90">We process data solely to operate and improve the LaynFleet transport ecosystem:</p>
         <div class="grid sm:grid-cols-2 gap-4 pt-2">
-            <div class="p-4 rounded-2xl bg-digilayn-primary-container dark:bg-digilayn-primary-container/10 border border-digilayn-primary dark:border-digilayn-primary/30">
+            <div class="p-4 rounded-2xl bg-digilayn-primary-container dark:bg-digilayn-primary/10 border border-digilayn-primary dark:border-digilayn-primary/30">
                 <h4 class="font-bold mb-1">📍 Trip Dispatch & Routing</h4>
                 <p class="text-xs opacity-80">Connecting riders with available drivers, rendering map routes, and displaying live vehicle arrival updates.</p>
             </div>
-            <div class="p-4 rounded-2xl bg-digilayn-primary-container dark:bg-digilayn-primary-container/10 border border-digilayn-primary dark:border-digilayn-primary/30">
+            <div class="p-4 rounded-2xl bg-digilayn-primary-container dark:bg-digilayn-primary/10 border border-digilayn-primary dark:border-digilayn-primary/30">
                 <h4 class="font-bold mb-1">🛡️ Safety & Mutual Trust</h4>
                 <p class="text-xs opacity-80">Displaying driver and vehicle details to the rider, and showing the rider's name and photo to the matched driver, so both parties can recognise each other at pickup. We do not verify the real identity of any user.</p>
             </div>
-            <div class="p-4 rounded-2xl bg-digilayn-primary-container dark:bg-digilayn-primary-container/10 border border-digilayn-primary dark:border-digilayn-primary/30">
+            <div class="p-4 rounded-2xl bg-digilayn-primary-container dark:bg-digilayn-primary/10 border border-digilayn-primary dark:border-digilayn-primary/30">
                 <h4 class="font-bold mb-1">🏷️ Fair Pricing & Governance</h4>
                 <p class="text-xs opacity-80">Calculating distance-based trip estimates and recording driver pricing votes.</p>
             </div>
-            <div class="p-4 rounded-2xl bg-digilayn-primary-container dark:bg-digilayn-primary-container/10 border border-digilayn-primary dark:border-digilayn-primary/30">
+            <div class="p-4 rounded-2xl bg-digilayn-primary-container dark:bg-digilayn-primary/10 border border-digilayn-primary dark:border-digilayn-primary/30">
                 <h4 class="font-bold mb-1">🔧 Support & Debugging</h4>
                 <p class="text-xs opacity-80">Investigating booking issues, resolving ride disputes, and fixing application crashes.</p>
             </div>

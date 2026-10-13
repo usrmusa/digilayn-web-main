@@ -45,6 +45,7 @@ def outputs():
     scheme_json = json.dumps(schemes, separators=(',', ':'))
     assets = {
         'styles/digilayn-theme.css': HEADER + palette + '\n\n' + (SOURCE / 'theme.css').read_text(),
+        'styles/digilayn-components.css': HEADER + (SOURCE / 'components.css').read_text(),
         'scripts/theme.js': HEADER + (SOURCE / 'theme.js').read_text().replace('/* PALETTE_SCHEMES */ {}', scheme_json),
         'scripts/digilayn-tailwind.js': HEADER + (SOURCE / 'tailwind.js').read_text(),
     }
@@ -84,6 +85,25 @@ def check_consumers():
                     values = [value for value in values if value not in google_logo]
                 if values or utility.search(line):
                     issues.append(f'{path.relative_to(WORKSPACE)}:{number}: local colour definition')
+            text = path.read_text()
+            styles = text if path.suffix == '.css' else '\n'.join(
+                re.findall(r'<style[^>]*>(.*?)</style>', text, re.S))
+            for block in re.finditer(r'\{([^{}]*)\}', styles):
+                background = re.search(r'background(?:-color)?\s*:\s*var\(--digilayn-'
+                                       r'(primary|secondary|tertiary|success|error|warning|info)(-container)?\)', block[1])
+                foreground = re.search(r'(?<![-\w])color\s*:\s*var\(--digilayn-([\w-]+)\)', block[1])
+                if background and foreground:
+                    expected = 'on-' + background[1] + (background[2] or '')
+                    if foreground[1] != expected:
+                        issues.append(f'{path.relative_to(WORKSPACE)}: use {expected} on {background[1]}{background[2] or ""}')
+            for attribute in re.finditer(r'class\s*=\s*[\'\"]([^\'\"]*)[\'\"]', text):
+                background = re.search(r'(?<![:\w-])bg-digilayn-'
+                                       r'(primary|secondary|tertiary|success|error|warning|info)(-container)?(?![\w/-])', attribute[1])
+                foreground = re.search(r'(?<![:\w-])text-digilayn-([\w-]+)', attribute[1])
+                if background and foreground:
+                    expected = 'on-' + background[1] + (background[2] or '')
+                    if foreground[1] != expected:
+                        issues.append(f'{path.relative_to(WORKSPACE)}: filled utility needs text-digilayn-{expected}')
     return issues
 
 
