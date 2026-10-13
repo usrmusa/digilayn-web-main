@@ -1,7 +1,7 @@
 /**
  * tracking.js — Live Driver Location Monitoring Operations Center
  * Digilayn / LaynFleet Fleet Telemetry & Live Map System
- * 
+ *
  * 100% REAL DATA ONLY:
  * - Realtime Database: `driverLocations/{uid}` (live GPS coordinates, heading, speed, online presence)
  * - Firestore: `laynfleet/main/drivers/{uid}` (driver application & vehicle details)
@@ -30,7 +30,7 @@
     rawRtdbLocations: {},
     rawActiveBookings: [],
     userCache: new Map(),
-    
+
     // UI Filters
     search: '',
     statusFilter: 'all', // 'all', 'online', 'intrip', 'idle', 'offline'
@@ -58,12 +58,12 @@
   // ---------------------------------------------------------------------------
   // Google Maps styles
   // ---------------------------------------------------------------------------
-  const DARK_MAP_STYLES = [
-    { elementType: 'geometry', stylers: [{ color: '#17202d' }] },
-    { elementType: 'labels.text.fill', stylers: [{ color: '#a8b5c5' }] },
-    { elementType: 'labels.text.stroke', stylers: [{ color: '#17202d' }] },
-    { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#34455a' }] },
-    { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0c1522' }] },
+  const darkMapStyles = () => [
+    { elementType: 'geometry', stylers: [{ color: window.DigilaynTheme.getColor('surface-container-low', 'dark') }] },
+    { elementType: 'labels.text.fill', stylers: [{ color: window.DigilaynTheme.getColor('on-surface-variant', 'dark') }] },
+    { elementType: 'labels.text.stroke', stylers: [{ color: window.DigilaynTheme.getColor('surface-container-low', 'dark') }] },
+    { featureType: 'road', elementType: 'geometry', stylers: [{ color: window.DigilaynTheme.getColor('surface-container-highest', 'dark') }] },
+    { featureType: 'water', elementType: 'geometry', stylers: [{ color: window.DigilaynTheme.getColor('surface-container-lowest', 'dark') }] },
     { featureType: 'poi', stylers: [{ visibility: 'off' }] }
   ];
 
@@ -148,6 +148,7 @@
       if (state.activeMapStyle === 'dark' || state.activeMapStyle === 'light') {
         setMapStyle(darkNow ? 'dark' : 'light');
       }
+      syncMapLayers();
     });
   }
 
@@ -157,7 +158,7 @@
     if (map) {
       map.setOptions({
         mapTypeId: styleKey === 'voyager' ? 'terrain' : styleKey === 'satellite' ? 'hybrid' : 'roadmap',
-        styles: styleKey === 'dark' ? DARK_MAP_STYLES : []
+        styles: styleKey === 'dark' ? darkMapStyles() : []
       });
     }
 
@@ -176,7 +177,7 @@
       map,
       position: { lat: driver.location.lat, lng: driver.location.lng },
       title: name,
-      label: { text: initials(name), color: '#fff', fontWeight: '700' },
+      label: { text: initials(name), color: markerLabelColor(status), fontWeight: '700' },
       icon: markerIcon(status),
       zIndex: status === 'intrip' ? 1000 : status === 'online' ? 500 : 100
     });
@@ -189,14 +190,19 @@
     return marker;
   }
 
+  function markerLabelColor(status) {
+    const roles = { intrip: 'on-info', online: 'on-success', idle: 'on-warning', offline: 'surface' };
+    return window.DigilaynTheme.getColor(roles[status] || roles.offline);
+  }
+
   function markerIcon(status) {
-    const colors = { intrip: '#3b82f6', online: '#22c55e', idle: '#f59e0b', offline: '#64748b' };
+    const colors = { intrip: window.DigilaynTheme.getColor('info'), online: window.DigilaynTheme.getColor('success'), idle: window.DigilaynTheme.getColor('warning'), offline: window.DigilaynTheme.getColor('on-surface-variant') };
     return {
       path: google.maps.SymbolPath.CIRCLE,
       scale: 19,
       fillColor: colors[status] || colors.offline,
       fillOpacity: 1,
-      strokeColor: '#fff',
+      strokeColor: window.DigilaynTheme.getColor('surface-container-lowest'),
       strokeWeight: 2
     };
   }
@@ -218,7 +224,7 @@
         <div class="popup-meta-line">${escapeHtml(locationCaption(driver))}</div>
         <div class="popup-meta-line">⚡ ${speed} km/h · Heading ${cardinalDirection(driver.location.heading)} (${Math.round(driver.location.heading || 0)}°)</div>
         ${driver.activeBooking ? `
-          <div class="popup-meta-line" style="color:var(--intrip); font-weight:700;">
+          <div class="popup-meta-line" style="color:var(--digilayn-info); font-weight:700;">
             📍 On Trip #${escapeHtml(driver.activeBooking.id.slice(-6))} · ${escapeHtml(driver.activeBooking.dropoff?.address || 'Address unavailable')}
           </div>
         ` : ''}
@@ -420,12 +426,12 @@
                   <span>${escapeHtml(name)}</span>
                   ${d.ratingAvg ? `<span class="driver-rating-badge">★ ${Number(d.ratingAvg).toFixed(1)}</span>` : ''}
                 </div>
-                <div class="driver-vehicle-text">🚘 ${escapeHtml(vLine)} · <strong style="color:var(--text);">${escapeHtml(plate)}</strong></div>
+                <div class="driver-vehicle-text">🚘 ${escapeHtml(vLine)} · <strong style="color:var(--digilayn-on-surface);">${escapeHtml(plate)}</strong></div>
               </div>
             </div>
             <div class="driver-metric-pill">
               <span class="driver-status-tag ${status}">${statusLabel}</span>
-              ${d.hasGpsLock ? `<span class="driver-speed-val">${speed} km/h</span>` : '<span class="driver-speed-val" style="color:var(--text-faint);">No GPS</span>'}
+              ${d.hasGpsLock ? `<span class="driver-speed-val">${speed} km/h</span>` : '<span class="driver-speed-val" style="color:var(--digilayn-on-surface-variant);">No GPS</span>'}
             </div>
           </div>
 
@@ -434,13 +440,13 @@
               <div class="trip-snippet-route">
                 <span class="trip-dot pickup"></span>
                 <span>${escapeHtml(d.activeBooking.pickup?.address || 'Address unavailable')}</span>
-                <span style="color:var(--text-faint);">➔</span>
+                <span style="color:var(--digilayn-on-surface-variant);">➔</span>
                 <span class="trip-dot dropoff"></span>
                 <span>${escapeHtml(d.activeBooking.dropoff?.address || 'Address unavailable')}</span>
               </div>
               <div class="trip-snippet-meta">
                 <span>Trip #${escapeHtml(d.activeBooking.id.slice(-6))}</span>
-                <span style="font-weight:700; color:var(--text);">${d.activeBooking.fare ? 'R' + d.activeBooking.fare : 'Active'}</span>
+                <span style="font-weight:700; color:var(--digilayn-on-surface);">${d.activeBooking.fare ? 'R' + d.activeBooking.fare : 'Active'}</span>
               </div>
             </div>
           ` : ''}
@@ -501,7 +507,7 @@
         const name = driver.user?.displayName || driver.vehicle?.plate || 'Driver';
         marker.setPosition(position);
         marker.setTitle(name);
-        marker.setLabel({ text: initials(name), color: '#fff', fontWeight: '700' });
+        marker.setLabel({ text: initials(name), color: markerLabelColor(driver.computedStatus), fontWeight: '700' });
         marker.setIcon(markerIcon(driver.computedStatus));
         marker.setZIndex(driver.computedStatus === 'intrip' ? 1000 : driver.computedStatus === 'online' ? 500 : 100);
       }
@@ -552,12 +558,12 @@
         overlays.push(new google.maps.Polyline({
           map,
           path: [{ lat: driver.location.lat, lng: driver.location.lng }, end],
-          strokeColor: '#3b82f6', strokeWeight: 4, strokeOpacity: 0.85
+          strokeColor: window.DigilaynTheme.getColor('info'), strokeWeight: 4, strokeOpacity: 0.85
         }));
         overlays.push(new google.maps.Circle({
           map, center: end, radius: 18,
-          fillColor: '#ef4444', fillOpacity: 1,
-          strokeColor: '#fff', strokeWeight: 2
+          fillColor: window.DigilaynTheme.getColor('error'), fillOpacity: 1,
+          strokeColor: window.DigilaynTheme.getColor('surface-container-lowest'), strokeWeight: 2
         }));
       }
     }
@@ -567,7 +573,7 @@
       if (history.length > 1) {
         overlays.push(new google.maps.Polyline({
           map, path: history,
-          strokeColor: '#22c55e', strokeWeight: 3, strokeOpacity: 0.5
+          strokeColor: window.DigilaynTheme.getColor('primary'), strokeWeight: 3, strokeOpacity: 0.5
         }));
       }
     }

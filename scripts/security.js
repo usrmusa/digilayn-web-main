@@ -18,12 +18,12 @@ https://digilayn.co.za
 
     console.log(
         "%c" + fingerprint,
-        "color:#22c55e;font-weight:bold;"
+        `color:${window.DigilaynTheme.getColor("primary")};font-weight:bold;`
     );
 
     console.log(
         "%cCuriosity is good. Building is better 🙂",
-        "color:#22c55e;font-style:italic;"
+        `color:${window.DigilaynTheme.getColor("primary")};font-style:italic;`
     );
 
     document.addEventListener("keydown", function (e) {

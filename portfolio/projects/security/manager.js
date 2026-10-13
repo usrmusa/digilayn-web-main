@@ -46,7 +46,6 @@
     if (pkg === 'com.digilayn.layndriver') button.setAttribute('data-app-tab', fleetEnv.driverPackage);
   });
 
-
   // ---------------------------------------------------------------------------
   // Tiny DOM helpers
   // ---------------------------------------------------------------------------
@@ -616,7 +615,7 @@
             ${suspendedBadge}
             ${playStoreBadge}
           </div>
-          <div style="font-size: 13px; color: var(--text-dim); display: flex; gap: 8px; flex-wrap: wrap;">
+          <div style="font-size: 13px; color: var(--digilayn-on-surface-variant); display: flex; gap: 8px; flex-wrap: wrap;">
             <span>✉️ ${escapeHtml(email)}</span>
             <span>📞 ${escapeHtml(phone || 'No phone')}</span>
           </div>
@@ -669,12 +668,12 @@
       <div class="detail-section">
         <div class="detail-section-title">
           <span>Contact Numbers &amp; Permanent Removal</span>
-          <span style="font-size: 10px; text-transform: none; color: var(--danger);">Irreversible deletion</span>
+          <span style="font-size: 10px; text-transform: none; color: var(--digilayn-error);">Irreversible deletion</span>
         </div>
         <div class="driver-detail-contact-row">
           <div>
-            <div style="font-size: 11px; color: var(--text-faint); margin-bottom: 2px;">Registered Mobile Phone</div>
-            <div style="font-size: 14px; font-weight: 600; color: var(--text);">
+            <div style="font-size: 11px; color: var(--digilayn-on-surface-variant); margin-bottom: 2px;">Registered Mobile Phone</div>
+            <div style="font-size: 14px; font-weight: 600; color: var(--digilayn-on-surface);">
               ${phone ? `📞 ${escapeHtml(phone)}` : '<span class="cell-dim">No phone number recorded</span>'}
             </div>
           </div>
@@ -689,14 +688,14 @@
       <div class="detail-section">
         <div class="detail-section-title">
           <span>Profile Picture &amp; Cloud Storage</span>
-          <span style="font-size: 10px; text-transform: none; color: var(--danger);">Permanent delete</span>
+          <span style="font-size: 10px; text-transform: none; color: var(--digilayn-error);">Permanent delete</span>
         </div>
         ${photoUrl ? `
           <div class="driver-photo-manage-card">
             <img class="driver-photo-manage-thumb" src="${escapeHtml(photoUrl)}" alt="Driver photo" />
             <div>
               <div style="font-size: 13px; font-weight: 600;">Active Profile Picture</div>
-              <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">Stored in Cloud Storage / driver record</div>
+              <div style="font-size: 11px; color: var(--digilayn-on-surface-variant); margin-top: 2px;">Stored in Cloud Storage / driver record</div>
             </div>
             <div class="driver-photo-manage-actions">
               <button class="btn btn-ghost btn-xs" id="btn-view-photo-direct" type="button">
@@ -707,7 +706,7 @@
               </button>
             </div>
           </div>` : `
-          <div style="padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-dim); font-size: 13px;">
+          <div style="padding: 12px; background: var(--digilayn-surface); border: 1px solid var(--digilayn-outline-variant); border-radius: var(--radius-sm); color: var(--digilayn-on-surface-variant); font-size: 13px;">
             No profile picture uploaded.
           </div>`}
       </div>
@@ -716,14 +715,14 @@
       <div class="detail-section">
         <div class="detail-section-title">
           <span>Driver Licence Document</span>
-          <span style="font-size: 10px; text-transform: none; color: var(--danger);">Permanent delete</span>
+          <span style="font-size: 10px; text-transform: none; color: var(--digilayn-error);">Permanent delete</span>
         </div>
         ${licenceUrl ? `
           <div class="driver-photo-manage-card">
             <img class="driver-photo-manage-thumb doc-thumb" src="${escapeHtml(licenceUrl)}" alt="Licence document" />
             <div>
               <div style="font-size: 13px; font-weight: 600;">Driver Licence Photo</div>
-              <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">Stored in driver-docs / driver record</div>
+              <div style="font-size: 11px; color: var(--digilayn-on-surface-variant); margin-top: 2px;">Stored in driver-docs / driver record</div>
             </div>
             <div class="driver-photo-manage-actions">
               <button class="btn btn-ghost btn-xs" id="btn-view-licence-direct" type="button">
@@ -734,7 +733,7 @@
               </button>
             </div>
           </div>` : `
-          <div style="padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-dim); font-size: 13px;">
+          <div style="padding: 12px; background: var(--digilayn-surface); border: 1px solid var(--digilayn-outline-variant); border-radius: var(--radius-sm); color: var(--digilayn-on-surface-variant); font-size: 13px;">
             No licence photo on file.
           </div>`}
       </div>
@@ -743,7 +742,7 @@
       <div class="detail-section">
         <div class="detail-section-title">
           <span>🚘 Vehicle Details (Editable)</span>
-          <span style="font-size: 11px; text-transform: none; color: var(--brand);">Instant fleet sync</span>
+          <span style="font-size: 11px; text-transform: none; color: var(--digilayn-primary);">Instant fleet sync</span>
         </div>
         <form id="driver-vehicle-form" onsubmit="return false;">
           <div class="vehicle-form-grid">
@@ -1979,8 +1978,8 @@
           </div>
           ${b.cancelReason ? `
             <div class="detail-item detail-item-full">
-              <span class="detail-item-label" style="color:var(--danger);">Cancellation Reason</span>
-              <span class="detail-item-value" style="color:#fca5a5;">${escapeHtml(b.cancelReason)}</span>
+              <span class="detail-item-label" style="color:var(--digilayn-error);">Cancellation Reason</span>
+              <span class="detail-item-value" style="color:var(--digilayn-error);">${escapeHtml(b.cancelReason)}</span>
             </div>` : ''}
         </div>
       </div>
@@ -2797,7 +2796,7 @@
       </div>
 
       <!-- MODERATION CONTROLS -->
-      <div class="detail-section" style="background:var(--bg-elevated);">
+      <div class="detail-section" style="background:var(--digilayn-surface-container-lowest);">
         <div class="detail-section-title"><span>Moderation Actions</span></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
           <button class="btn btn-ghost btn-sm" id="modal-btn-toggle-flag" type="button">
@@ -2962,7 +2961,7 @@
             <button class="btn btn-ghost btn-sm btn-block" id="btn-copy-phone" type="button" ${rawPhone ? '' : 'disabled'}>
               📋 Copy Phone Number
             </button>
-            <hr style="border:0;border-top:1px solid var(--border);margin:4px 0;" />
+            <hr style="border:0;border-top:1px solid var(--digilayn-outline-variant);margin:4px 0;" />
             <a class="btn btn-ghost btn-block" href="mailto:${escapeHtml(email)}?subject=${encodeURIComponent(`LaynFleet Support: Feedback regarding your ride (${bookingId})`)}&body=${encodeURIComponent(templates.low_rating)}" style="text-align:center;text-decoration:none;display:block;" ${email ? '' : 'disabled'}>
               ✉️ Send Email (${escapeHtml(email || 'No Email')})
             </a>
@@ -3331,7 +3330,7 @@
           const progressPct = Math.min(100, Math.round((yesVotes / requiredYes) * 100));
 
           return `
-            <div class="card card-proposal" style="padding: 16px; border-left: 4px solid var(--brand);">
+            <div class="card card-proposal" style="padding: 16px; border-left: 4px solid var(--digilayn-primary);">
               <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                 <div>
                   <h4 style="margin: 0; font-size: 16px;">${escapeHtml(vTypeObj.label)} Pricing Proposal</h4>
@@ -3340,26 +3339,26 @@
                 <span class="status-badge status-badge-pending">ACTIVE VOTING</span>
               </div>
 
-              <div style="display: flex; gap: 24px; margin: 12px 0; background: var(--panel-2); padding: 12px; border-radius: var(--radius-sm);">
+              <div style="display: flex; gap: 24px; margin: 12px 0; background: var(--digilayn-surface-container-high); padding: 12px; border-radius: var(--radius-sm);">
                 <div>
                   <span class="muted" style="font-size: 11px; text-transform: uppercase;">Proposed Rate</span>
-                  <div style="font-size: 16px; font-weight: 800; color: var(--brand);">R${Number(prop.proposedRatePerKm).toFixed(2)}/km · Min R${Number(prop.proposedMinimumFare).toFixed(2)}</div>
+                  <div style="font-size: 16px; font-weight: 800; color: var(--digilayn-primary);">R${Number(prop.proposedRatePerKm).toFixed(2)}/km · Min R${Number(prop.proposedMinimumFare).toFixed(2)}</div>
                 </div>
                 <div>
                   <span class="muted" style="font-size: 11px; text-transform: uppercase;">Current Rate</span>
-                  <div style="font-size: 14px; color: var(--text-dim);">R${Number(prop.currentRatePerKm).toFixed(2)}/km · Min R${Number(prop.currentMinimumFare).toFixed(2)}</div>
+                  <div style="font-size: 14px; color: var(--digilayn-on-surface-variant);">R${Number(prop.currentRatePerKm).toFixed(2)}/km · Min R${Number(prop.currentMinimumFare).toFixed(2)}</div>
                 </div>
               </div>
 
-              ${prop.reason ? `<p style="font-size: 13px; font-style: italic; margin: 8px 0; color: var(--text-dim);">"${escapeHtml(prop.reason)}"</p>` : ''}
+              ${prop.reason ? `<p style="font-size: 13px; font-style: italic; margin: 8px 0; color: var(--digilayn-on-surface-variant);">"${escapeHtml(prop.reason)}"</p>` : ''}
 
               <div style="margin-top: 12px;">
                 <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
                   <span><strong>${yesVotes} YES</strong> · ${noVotes} NO</span>
                   <span class="muted">${requiredYes} YES votes needed for 60% Quorum (${totalDrivers} eligible drivers)</span>
                 </div>
-                <div style="height: 8px; background: var(--border); border-radius: 4px; overflow: hidden;">
-                  <div style="height: 100%; width: ${progressPct}%; background: var(--brand); border-radius: 4px;"></div>
+                <div style="height: 8px; background: var(--digilayn-outline-variant); border-radius: 4px; overflow: hidden;">
+                  <div style="height: 100%; width: ${progressPct}%; background: var(--digilayn-primary); border-radius: 4px;"></div>
                 </div>
               </div>
             </div>
@@ -3466,16 +3465,16 @@
     if (statGlobalEl && statLastUpdatedEl) {
       const activeCount = [riderMaint, driverMaint].filter(Boolean).length;
       if (activeCount === 2) {
-        statGlobalEl.innerHTML = '<span style="color: var(--danger, #ef4444);">Full Fleet Locked</span>';
+        statGlobalEl.innerHTML = '<span style="color: var(--digilayn-error);">Full Fleet Locked</span>';
         statLastUpdatedEl.textContent = 'All apps in maintenance';
       } else if (activeCount > 0) {
-        statGlobalEl.innerHTML = '<span style="color: var(--warn, #f59e0b);">Partial Maintenance</span>';
+        statGlobalEl.innerHTML = '<span style="color: var(--digilayn-warning);">Partial Maintenance</span>';
         const locked = [];
         if (riderMaint) locked.push('Rider');
         if (driverMaint) locked.push('Driver');
         statLastUpdatedEl.textContent = `${locked.join(' & ')} locked`;
       } else {
-        statGlobalEl.innerHTML = '<span style="color: var(--success, #22c55e);">All Systems Live</span>';
+        statGlobalEl.innerHTML = '<span style="color: var(--digilayn-success);">All Systems Live</span>';
         statLastUpdatedEl.textContent = 'Ready for rides & tows';
       }
     }
@@ -3498,8 +3497,8 @@
       navBadge.classList.toggle('is-hidden', !hasActiveAlert);
       if (hasActiveAlert) {
         navBadge.textContent = '!';
-        navBadge.style.background = 'var(--danger, #ef4444)';
-        navBadge.style.color = '#fff';
+        navBadge.style.background = 'var(--digilayn-error)';
+        navBadge.style.color = 'var(--digilayn-on-error)';
       }
     }
 

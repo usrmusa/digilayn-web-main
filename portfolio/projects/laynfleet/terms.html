@@ -1,19 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="../../../styles/digilayn-theme.css">
+    <script src="../../../scripts/theme.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms & Conditions | LaynFleet (LaynRider & LaynDriver)</title>
     <meta name="author" content="Digilayn">
     <meta name="description" content="Terms and Conditions of Service for LaynFleet, LaynRider, and LaynDriver applications.">
-
-    <meta name="theme-color" content="#22c55e">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class'
-        }
-    </script>
+    <script src="../../../scripts/digilayn-tailwind.js"></script>
     <link rel="stylesheet" href="../../../../styles/main.css">
   <link rel="icon" href="/favicon/favicon.ico">
   <link rel="icon" type="image/png" sizes="96x96" href="/favicon/favicon-96x96.png">
@@ -22,19 +18,19 @@
   <link rel="manifest" href="/favicon/site.webmanifest">
 </head>
 
-<body class="font-sans antialiased bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors duration-300 min-h-screen flex flex-col justify-between">
+<body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface transition-colors duration-300 min-h-screen flex flex-col justify-between">
 
 <!-- Top Navigation -->
 <nav class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center p-6 pointer-events-none">
-    <a href="/" class="pointer-events-auto text-sm font-black tracking-wide px-4 py-2 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow border border-slate-200 dark:border-slate-700 hover:text-green-500 transition">
+    <a href="/" class="pointer-events-auto text-sm font-black tracking-wide px-4 py-2 rounded-full bg-digilayn-surface-container-lowest/80 dark:bg-digilayn-surface-container-low/80 backdrop-blur-md shadow border border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:text-digilayn-primary transition">
         digilayn
     </a>
 
     <div class="flex items-center gap-3 pointer-events-auto">
-        <a href="/portfolio/projects/laynfleet/privacy" class="text-sm font-bold px-4 py-2 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow border border-slate-200 dark:border-slate-700 hover:text-green-500 transition">
+        <a href="/portfolio/projects/laynfleet/privacy" class="text-sm font-bold px-4 py-2 rounded-full bg-digilayn-surface-container-lowest/80 dark:bg-digilayn-surface-container-low/80 backdrop-blur-md shadow border border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:text-digilayn-primary transition">
             Privacy Policy
         </a>
-        <button id="theme-toggle" class="p-3 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md rounded-full shadow-lg border border-slate-200 dark:border-slate-700 transition-transform hover:scale-110 active:scale-95" aria-label="Toggle Theme">
+        <button id="theme-toggle" class="p-3 bg-digilayn-surface-container-lowest/80 dark:bg-digilayn-surface-container-low/80 backdrop-blur-md rounded-full shadow-lg border border-digilayn-outline-variant dark:border-digilayn-outline-variant transition-transform hover:scale-110 active:scale-95" aria-label="Toggle Theme">
             <span id="theme-icon" class="text-xl"></span>
         </button>
     </div>
@@ -42,7 +38,7 @@
 
 <!-- Main Header -->
 <header class="max-w-4xl mx-auto pt-28 pb-8 px-6">
-    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 text-xs font-black uppercase tracking-wider mb-4 border border-green-500/20">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-digilayn-primary/10 text-digilayn-primary dark:text-digilayn-primary text-xs font-black uppercase tracking-wider mb-4 border border-digilayn-primary/20">
         LaynFleet Terms of Service
     </div>
     <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">
@@ -51,19 +47,19 @@
     <p class="text-lg opacity-85 leading-relaxed">
         These terms govern the use of the <strong>LaynFleet</strong> platform, including the <strong>LaynRider</strong> passenger app and the <strong>LaynDriver</strong> partner app. Please select your role to view terms tailored to you.
     </p>
-    <p class="text-xs text-slate-500 dark:text-slate-400 mt-3">
+    <p class="text-xs text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant mt-3">
         Last updated: October 5, 2026 &bull; Published by Digilayn Technologies.
     </p>
 
     <!-- Role Filter Tabs -->
     <div class="mt-8 flex flex-wrap gap-3">
-        <button id="tab-btn-all" onclick="filterTermsRole('all')" class="role-tab-btn active px-5 py-2.5 rounded-xl font-bold text-sm bg-green-600 text-white shadow-md transition">
+        <button id="tab-btn-all" onclick="filterTermsRole('all')" class="role-tab-btn active px-5 py-2.5 rounded-xl font-bold text-sm bg-digilayn-primary text-digilayn-on-primary shadow-md transition">
             Full Agreement
         </button>
-        <button id="tab-btn-rider" onclick="filterTermsRole('rider')" class="role-tab-btn px-5 py-2.5 rounded-xl font-bold text-sm bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+        <button id="tab-btn-rider" onclick="filterTermsRole('rider')" class="role-tab-btn px-5 py-2.5 rounded-xl font-bold text-sm bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low hover:bg-digilayn-surface-container-high dark:hover:bg-digilayn-surface-container-high transition">
             🧑 Rider Terms (LaynRider)
         </button>
-        <button id="tab-btn-driver" onclick="filterTermsRole('driver')" class="role-tab-btn px-5 py-2.5 rounded-xl font-bold text-sm bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+        <button id="tab-btn-driver" onclick="filterTermsRole('driver')" class="role-tab-btn px-5 py-2.5 rounded-xl font-bold text-sm bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low hover:bg-digilayn-surface-container-high dark:hover:bg-digilayn-surface-container-high transition">
             🚗 Driver Terms (LaynDriver)
         </button>
     </div>
@@ -72,29 +68,29 @@
 <main class="max-w-4xl mx-auto px-6 space-y-8 pb-20">
 
     <!-- Overview Highlights Box -->
-    <div class="card p-6 sm:p-8 rounded-3xl border-l-4 border-l-green-500">
+    <div class="card p-6 sm:p-8 rounded-3xl border-l-4 border-l-digilayn-primary">
         <h2 class="text-xl font-bold mb-3 flex items-center gap-2">
             <span>⚖️</span> Core Principles
         </h2>
         <ul class="space-y-2 text-sm sm:text-base opacity-90">
             <li class="flex items-start gap-2">
-                <span class="text-green-500 font-bold">✓</span>
+                <span class="text-digilayn-primary font-bold">✓</span>
                 <span><strong>Technology Platform:</strong> Digilayn provides the dispatch, routing, and communication software connecting independent drivers with riders.</span>
             </li>
             <li class="flex items-start gap-2">
-                <span class="text-green-500 font-bold">✓</span>
+                <span class="text-digilayn-primary font-bold">✓</span>
                 <span><strong>18+ Only:</strong> You must be at least 18 years old to create an account or use LaynFleet.</span>
             </li>
             <li class="flex items-start gap-2">
-                <span class="text-green-500 font-bold">✓</span>
+                <span class="text-digilayn-primary font-bold">✓</span>
                 <span><strong>Fares &amp; Direct Payment:</strong> Riders agree to the displayed fare before booking and pay drivers directly upon trip completion. Return trips may incur the disclosed excess-waiting charge if the agreed waiting time is exceeded.</span>
             </li>
             <li class="flex items-start gap-2">
-                <span class="text-green-500 font-bold">✓</span>
+                <span class="text-digilayn-primary font-bold">✓</span>
                 <span><strong>Zero Harassment:</strong> We enforce strict standards of safety, mutual respect, and non-discrimination.</span>
             </li>
             <li class="flex items-start gap-2">
-                <span class="text-amber-500 font-bold">⚠</span>
+                <span class="text-digilayn-warning font-bold">⚠</span>
                 <span><strong>Community Platform &amp; Assumption of Risk:</strong> LaynFleet is a connection tool built for the <strong>Poortjie community</strong>, where riders and drivers largely know one another. Digilayn <strong>does not verify the real identity</strong> of any user. Riders and drivers use the platform <strong>entirely at their own risk</strong> and should only accept or offer rides to and from people they personally know and trust.</span>
             </li>
         </ul>
@@ -103,7 +99,7 @@
     <!-- RIDER TERMS -->
     <section class="space-y-6" data-terms-section="rider">
         <div class="flex items-center gap-3">
-            <span class="px-3 py-1 rounded-full text-xs font-black bg-blue-500/10 text-blue-600 dark:text-blue-400 uppercase">Rider Agreement</span>
+            <span class="px-3 py-1 rounded-full text-xs font-black bg-digilayn-info/10 text-digilayn-info dark:text-digilayn-info uppercase">Rider Agreement</span>
             <h2 class="text-2xl font-bold">Terms for LaynRider Users</h2>
         </div>
 
@@ -161,7 +157,7 @@
     <!-- DRIVER TERMS -->
     <section class="space-y-6" data-terms-section="driver">
         <div class="flex items-center gap-3">
-            <span class="px-3 py-1 rounded-full text-xs font-black bg-amber-500/10 text-amber-600 dark:text-amber-400 uppercase">Driver Agreement</span>
+            <span class="px-3 py-1 rounded-full text-xs font-black bg-digilayn-warning/10 text-digilayn-warning dark:text-digilayn-warning uppercase">Driver Agreement</span>
             <h2 class="text-2xl font-bold">Terms for LaynDriver Partners</h2>
         </div>
 
@@ -210,7 +206,7 @@
         <div>
             <h3 class="text-lg font-bold mb-2">1. Account Deletion</h3>
             <p class="text-sm opacity-90 leading-relaxed">
-                Riders can sign in at the public <a href="/portfolio/projects/laynfleet/account-deletion" class="text-green-500 font-bold underline">account-deletion page</a> to inspect and immediately permanently delete their LaynRider account and associated data. Drivers can use the same page to request manager-assisted profile/account deletion by email, or submit a request in the app. Driver booking records remain unchanged after profile deletion; see the <a href="/portfolio/projects/laynfleet/privacy">Privacy Policy</a> for retained data and current retention details.
+                Riders can sign in at the public <a href="/portfolio/projects/laynfleet/account-deletion" class="text-digilayn-primary font-bold underline">account-deletion page</a> to inspect and immediately permanently delete their LaynRider account and associated data. Drivers can use the same page to request manager-assisted profile/account deletion by email, or submit a request in the app. Driver booking records remain unchanged after profile deletion; see the <a href="/portfolio/projects/laynfleet/privacy">Privacy Policy</a> for retained data and current retention details.
             </p>
         </div>
 
@@ -224,7 +220,7 @@
         <div>
             <h3 class="text-lg font-bold mb-2">3. Contact &amp; Dispute Resolution</h3>
             <p class="text-sm opacity-90 leading-relaxed">
-                For questions, operational disputes, or support, please contact us at <a href="mailto:digilayn@gmail.com" class="text-green-500 font-bold hover:underline">digilayn@gmail.com</a> or via WhatsApp at <a href="https://wa.me/27815532209" target="_blank" class="text-green-500 font-bold hover:underline">+27 81 553 2209</a>.
+                For questions, operational disputes, or support, please contact us at <a href="mailto:digilayn@gmail.com" class="text-digilayn-primary font-bold hover:underline">digilayn@gmail.com</a> or via WhatsApp at <a href="https://wa.me/27815532209" target="_blank" class="text-digilayn-primary font-bold hover:underline">+27 81 553 2209</a>.
             </p>
         </div>
     </section>
@@ -232,30 +228,29 @@
 </main>
 
 <!-- Footer -->
-<footer class="text-center py-10 border-t border-slate-100 dark:border-slate-800 text-sm opacity-80">
+<footer class="text-center py-10 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant text-sm opacity-80">
     <div class="flex flex-wrap justify-center gap-4 mb-3">
-        <a href="/portfolio/projects/laynfleet/terms" class="text-green-500 font-bold">Terms &amp; Conditions</a>
+        <a href="/portfolio/projects/laynfleet/terms" class="text-digilayn-primary font-bold">Terms &amp; Conditions</a>
         <span>&bull;</span>
-        <a href="/portfolio/projects/laynfleet/privacy" class="hover:text-green-500 font-bold transition">Privacy Policy</a>
+        <a href="/portfolio/projects/laynfleet/privacy" class="hover:text-digilayn-primary font-bold transition">Privacy Policy</a>
         <span>&bull;</span>
-        <a href="/portfolio" class="hover:text-green-500 transition">Portfolio</a>
+        <a href="/portfolio" class="hover:text-digilayn-primary transition">Portfolio</a>
     </div>
     <p>&copy; 2026 Digilayn. All rights reserved.</p>
 </footer>
 
-<script src="../../../../scripts/theme.js"></script>
 <script>
     function filterTermsRole(role) {
         const buttons = document.querySelectorAll('.role-tab-btn');
         buttons.forEach(btn => {
-            btn.classList.remove('bg-green-600', 'text-white', 'shadow-md');
-            btn.classList.add('bg-slate-100', 'dark:bg-slate-800');
+            btn.classList.remove('bg-digilayn-primary', 'text-digilayn-on-primary', 'shadow-md');
+            btn.classList.add('bg-digilayn-surface-container-low', 'dark:bg-digilayn-surface-container-low');
         });
 
         const activeBtn = document.getElementById('tab-btn-' + role);
         if (activeBtn) {
-            activeBtn.classList.add('bg-green-600', 'text-white', 'shadow-md');
-            activeBtn.classList.remove('bg-slate-100', 'dark:bg-slate-800');
+            activeBtn.classList.add('bg-digilayn-primary', 'text-digilayn-on-primary', 'shadow-md');
+            activeBtn.classList.remove('bg-digilayn-surface-container-low', 'dark:bg-digilayn-surface-container-low');
         }
 
         const sections = document.querySelectorAll('[data-terms-section]');

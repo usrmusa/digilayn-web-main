@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="../../../../styles/digilayn-theme.css">
+    <script src="../../../../scripts/theme.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
@@ -13,8 +15,6 @@
   <!-- Shared site theme handler: sets the `dark` class on <html> from the user
        toggle + localStorage (system fallback), keeping dark/light consistent
        with the rest of the Digilayn site. Loaded in <head> to avoid a flash. -->
-  <script src="../../../../scripts/theme.js"></script>
-
   <link rel="stylesheet" href="manager.css" />
   <link rel="stylesheet" href="/styles/laynfleet-environment.css">
   <link rel="icon" href="/favicon/favicon.ico">
@@ -116,7 +116,7 @@
           <div class="stat-card" style="cursor:pointer;" data-goto="drivers" data-goto-tab="APPROVED" title="View approved fleet drivers">
             <span class="stat-label">Approved drivers</span>
             <strong id="stat-approved" class="stat-value">—</strong>
-            <span class="stat-hint" id="stat-online-hint" style="color:var(--brand);">— online now</span>
+            <span class="stat-hint" id="stat-online-hint" style="color:var(--digilayn-primary);">— online now</span>
           </div>
           <div class="stat-card" style="cursor:pointer;" data-goto="riders" title="View registered riders">
             <span class="stat-label">Riders</span>
@@ -575,13 +575,13 @@
                 <label class="field">
                   <span class="field-label">Minimum Required Version Code (Integer)</span>
                   <input id="input-app-min-version" type="number" min="1" step="1" class="field-input" placeholder="1" required />
-                  <span class="field-help" style="color: var(--text-faint); font-size: 11px; margin-top: 4px;">Apps running a version code below this will be blocked with an upgrade prompt.</span>
+                  <span class="field-help" style="color: var(--digilayn-on-surface-variant); font-size: 11px; margin-top: 4px;">Apps running a version code below this will be blocked with an upgrade prompt.</span>
                 </label>
 
                 <label class="field">
                   <span class="field-label">Store Download / Upgrade URL</span>
                   <input id="input-app-store-url" type="url" class="field-input" placeholder="https://play.google.com/store/apps/details?id=..." />
-                  <span class="field-help" style="color: var(--text-faint); font-size: 11px; margin-top: 4px;">Destination link opened when users tap 'Update Now'.</span>
+                  <span class="field-help" style="color: var(--digilayn-on-surface-variant); font-size: 11px; margin-top: 4px;">Destination link opened when users tap 'Update Now'.</span>
                 </label>
               </div>
             </div>
@@ -609,7 +609,7 @@
             <h3>⚠️ Fleet Emergency Kill Switches</h3>
             <span class="panel-badge panel-badge-danger">High Impact</span>
           </div>
-          <p style="color: var(--text-dim); margin-bottom: 16px; font-size: 13px;">
+          <p style="color: var(--digilayn-on-surface-variant); margin-bottom: 16px; font-size: 13px;">
             Emergency controls apply to apps in the selected fleet environment.
           </p>
           <div class="emergency-actions-grid">
@@ -749,7 +749,7 @@
     <div class="modal modal-warning-card">
       <div class="modal-header">
         <div class="modal-header-text">
-          <h3 class="modal-title" style="color: var(--danger);">⚠️ Permanently Delete Licence</h3>
+          <h3 class="modal-title" style="color: var(--digilayn-error);">⚠️ Permanently Delete Licence</h3>
           <p class="modal-subtitle">Irreversible action — permanent removal</p>
         </div>
         <button id="delete-licence-close" class="btn-icon" type="button" aria-label="Close">✕</button>
@@ -777,7 +777,7 @@
     <div class="modal modal-warning-card">
       <div class="modal-header">
         <div class="modal-header-text">
-          <h3 id="delete-permanent-title" class="modal-title" style="color: var(--danger);">⚠️ Permanently Delete Item</h3>
+          <h3 id="delete-permanent-title" class="modal-title" style="color: var(--digilayn-error);">⚠️ Permanently Delete Item</h3>
           <p id="delete-permanent-subtitle" class="modal-subtitle">Irreversible action — permanent removal</p>
         </div>
         <button id="delete-permanent-close" class="btn-icon" type="button" aria-label="Close">✕</button>

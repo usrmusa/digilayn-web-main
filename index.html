@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="styles/digilayn-theme.css">
+    <script src="scripts/theme.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>digilayn | Custom Business Software</title>
@@ -23,14 +25,8 @@
     <meta name="twitter:image" content="https://digilayn.co.za/img/social-preview-logo.png">
 
     <meta name="description" content="digilayn builds custom mobile apps, dashboards, portals, and operational software for growing businesses.">
-    
-<meta name="theme-color" content="#22c55e">
 <script src="https://cdn.tailwindcss.com"></script>
-<script>
-    tailwind.config = {
-        darkMode: 'class'
-    }
-</script>
+    <script src="scripts/digilayn-tailwind.js"></script>
 <link rel="stylesheet" href="styles/main.css">
 
   <link rel="icon" href="/favicon/favicon.ico">
@@ -40,7 +36,7 @@
   <link rel="manifest" href="/favicon/site.webmanifest">
 </head>
 
-<body class="font-sans antialiased bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors duration-300">
+<body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface transition-colors duration-300">
 
 <nav class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center p-6 pointer-events-none">
     <div class="flex items-center gap-3">
@@ -48,23 +44,22 @@
     </div>
 
     <div class="flex items-center gap-3 pointer-events-auto">
-        <a href="#how-it-works" class="text-sm font-bold px-4 py-2 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow border border-slate-200 dark:border-slate-700 hover:text-green-500 transition">
+        <a href="#how-it-works" class="text-sm font-bold px-4 py-2 rounded-full bg-digilayn-surface-container-lowest/80 dark:bg-digilayn-surface-container-low/80 backdrop-blur-md shadow border border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:text-digilayn-primary transition">
             How it works
         </a>
-        <a href="portfolio" class="hidden sm:inline-flex text-sm font-bold px-4 py-2 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow border border-slate-200 dark:border-slate-700 hover:text-green-500 transition">
+        <a href="portfolio" class="hidden sm:inline-flex text-sm font-bold px-4 py-2 rounded-full bg-digilayn-surface-container-lowest/80 dark:bg-digilayn-surface-container-low/80 backdrop-blur-md shadow border border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:text-digilayn-primary transition">
             Portfolio
         </a>
-        <a href="mgijima" class="hidden sm:inline-flex text-sm font-bold px-4 py-2 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow border border-slate-200 dark:border-slate-700 hover:text-green-500 transition">
+        <a href="mgijima" class="hidden sm:inline-flex text-sm font-bold px-4 py-2 rounded-full bg-digilayn-surface-container-lowest/80 dark:bg-digilayn-surface-container-low/80 backdrop-blur-md shadow border border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:text-digilayn-primary transition">
             Founder
         </a>
     </div>
 </nav>
 
-
 <header class="max-w-6xl mx-auto pt-28 pb-16 px-6">
     <div class="grid lg:grid-cols-2 gap-12 items-center">
         <div>
-            <p class="text-sm font-black uppercase tracking-[0.3em] text-green-500 mb-4">Custom Software for Growing Businesses</p>
+            <p class="text-sm font-black uppercase tracking-[0.3em] text-digilayn-primary mb-4">Custom Software for Growing Businesses</p>
             <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-6">
                 Turning manual business operations into digital systems
             </h1>
@@ -73,32 +68,32 @@
             </p>
 
             <div class="flex flex-wrap gap-4">
-                <a href="https://wa.me/27815532209" target="_blank" class="px-8 py-4 bg-green-600 text-white font-black rounded-xl hover:bg-green-700 transition transform hover:scale-105">
+                <a href="https://wa.me/27815532209" target="_blank" class="px-8 py-4 bg-digilayn-primary text-digilayn-on-primary font-black rounded-xl hover:bg-digilayn-primary transition transform hover:scale-105">
                     Book Discovery on WhatsApp
                 </a>
-                <a href="mailto:digilayn@gmail.com" class="px-8 py-4 border border-green-500 text-green-600 dark:text-green-400 font-black rounded-xl hover:bg-green-50 dark:hover:bg-green-900/20 transition">
+                <a href="mailto:digilayn@gmail.com" class="px-8 py-4 border border-digilayn-primary text-digilayn-primary dark:text-digilayn-primary font-black rounded-xl hover:bg-digilayn-primary-container dark:hover:bg-digilayn-primary-container/20 transition">
                     Email Digilayn
                 </a>
             </div>
         </div>
 
-        <div class="card p-8 rounded-3xl border border-green-500/20 shadow-xl">
+        <div class="card p-8 rounded-3xl border border-digilayn-primary/20 shadow-xl">
             <h2 class="text-2xl font-bold mb-6">What Digilayn helps with</h2>
             <div class="space-y-5">
                 <div class="flex gap-4">
-                    <span class="mt-1 h-3 w-3 rounded-full bg-green-500 shrink-0"></span>
+                    <span class="mt-1 h-3 w-3 rounded-full bg-digilayn-primary shrink-0"></span>
                     <p class="opacity-90">Digitising business workflows that are currently handled manually.</p>
                 </div>
                 <div class="flex gap-4">
-                    <span class="mt-1 h-3 w-3 rounded-full bg-green-500 shrink-0"></span>
+                    <span class="mt-1 h-3 w-3 rounded-full bg-digilayn-primary shrink-0"></span>
                     <p class="opacity-90">Building Android apps, admin dashboards, booking portals, and customer-facing systems.</p>
                 </div>
                 <div class="flex gap-4">
-                    <span class="mt-1 h-3 w-3 rounded-full bg-green-500 shrink-0"></span>
+                    <span class="mt-1 h-3 w-3 rounded-full bg-digilayn-primary shrink-0"></span>
                     <p class="opacity-90">Creating systems around the way your business already works, not forcing generic templates.</p>
                 </div>
                 <div class="flex gap-4">
-                    <span class="mt-1 h-3 w-3 rounded-full bg-green-500 shrink-0"></span>
+                    <span class="mt-1 h-3 w-3 rounded-full bg-digilayn-primary shrink-0"></span>
                     <p class="opacity-90">Starting with discovery, then shaping a realistic MVP, prototype, or full build.</p>
                 </div>
             </div>
@@ -109,7 +104,7 @@
 <main class="max-w-6xl mx-auto px-6 space-y-24 pb-24">
 
     <section>
-        <div class="bg-green-50 dark:bg-slate-800/50 rounded-3xl p-8 md:p-12 border border-green-100 dark:border-green-900/30">
+        <div class="bg-digilayn-primary-container dark:bg-digilayn-surface-container-low/50 rounded-3xl p-8 md:p-12 border border-digilayn-primary dark:border-digilayn-primary/30">
             <h2 class="text-3xl font-bold mb-6">Built for real businesses, not imaginary perfect ones</h2>
             <p class="text-lg opacity-90 leading-relaxed mb-6">
                 Most growing businesses already have a working operation. The problem is usually that everything lives across phone calls, WhatsApp messages, notebooks, spreadsheets, and memory.
@@ -122,7 +117,7 @@
 
     <section id="services">
         <h2 class="text-3xl font-bold mb-12 flex items-center gap-4">
-            <span class="w-12 h-1 bg-green-500"></span> What I Build
+            <span class="w-12 h-1 bg-digilayn-primary"></span> What I Build
         </h2>
 
         <div class="grid md:grid-cols-3 gap-8">
@@ -151,7 +146,7 @@
 
     <section>
         <h2 class="text-3xl font-bold mb-12 flex items-center gap-4">
-            <span class="w-12 h-1 bg-green-500"></span> Good Fit Projects
+            <span class="w-12 h-1 bg-digilayn-primary"></span> Good Fit Projects
         </h2>
 
         <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -176,7 +171,7 @@
 
     <section id="how-it-works">
         <h2 class="text-3xl font-bold mb-12 flex items-center gap-4">
-            <span class="w-12 h-1 bg-green-500"></span> How It Works
+            <span class="w-12 h-1 bg-digilayn-primary"></span> How It Works
         </h2>
 
         <div class="grid md:grid-cols-2 gap-8">
@@ -209,12 +204,12 @@
 
     <section id="showcase">
         <h2 class="text-3xl font-bold mb-12 flex items-center gap-4">
-            <span class="w-12 h-1 bg-green-500"></span> Public Build Showcase
+            <span class="w-12 h-1 bg-digilayn-primary"></span> Public Build Showcase
         </h2>
 
         <div class="grid md:grid-cols-2 gap-10">
             <div class="card overflow-hidden rounded-3xl">
-                <div class="bg-slate-200 dark:bg-slate-800 h-48 flex items-center justify-center p-6 text-center">
+                <div class="bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low h-48 flex items-center justify-center p-6 text-center">
                     <div>
                         <p class="text-sm font-mono opacity-60 mb-2">PUBLIC WEB PROJECT</p>
                         <h3 class="text-2xl font-bold">Poortjie Info</h3>
@@ -224,36 +219,36 @@
                     <p class="mb-6 opacity-80 leading-relaxed">
                         A lightweight web project showing clean structure, fast loading, and simple digital presence for a local community/business context.
                     </p>
-                    <a href="https://poortjie.info" target="_blank" class="text-green-500 font-bold hover:underline">Visit Site</a>
+                    <a href="https://poortjie.info" target="_blank" class="text-digilayn-primary font-bold hover:underline">Visit Site</a>
                 </div>
             </div>
 
-            <div class="card overflow-hidden rounded-3xl border-l-4 border-l-green-500">
+            <div class="card overflow-hidden rounded-3xl border-l-4 border-l-digilayn-primary">
                 <div class="p-8">
                     <div class="flex items-center gap-2 mb-2">
-                        <span class="text-xs font-black uppercase bg-green-500 text-white px-3 py-0.5 rounded-full">LaynRider on Google Play</span>
+                        <span class="text-xs font-black uppercase bg-digilayn-primary text-digilayn-on-primary px-3 py-0.5 rounded-full">LaynRider on Google Play</span>
                     </div>
                     <h3 class="text-2xl font-bold mb-4">LaynFleet (LaynRider &amp; LaynDriver)</h3>
                     <p class="mb-4 opacity-80 leading-relaxed">
                         LaynFleet is Digilayn’s full ride-hailing &amp; local transport platform, pairing passengers with drivers through live GPS radar, upfront fares, democratic driver pricing, and instant dispatch.
                     </p>
-                    <div class="p-3 mb-6 rounded-xl bg-green-500/10 border border-green-500/30 text-xs">
-                        <p class="font-bold text-green-700 dark:text-green-400">📱 LaynRider Is Live on Google Play</p>
+                    <div class="p-3 mb-6 rounded-xl bg-digilayn-primary/10 border border-digilayn-primary/30 text-xs">
+                        <p class="font-bold text-digilayn-primary dark:text-digilayn-primary">📱 LaynRider Is Live on Google Play</p>
                         <p class="opacity-90 mt-0.5">Get the official LaynRider app for Android 10 and newer, with updates delivered through Google Play.</p>
                     </div>
 
                     <div class="flex flex-wrap gap-3 mb-6">
-                        <a href="https://play.google.com/store/apps/details?id=com.digilayn.laynrider" target="_blank" class="px-5 py-2.5 bg-green-600 text-white rounded-full text-xs font-black hover:bg-green-700 transition shadow-md">
+                        <a href="https://play.google.com/store/apps/details?id=com.digilayn.laynrider" target="_blank" class="px-5 py-2.5 bg-digilayn-primary text-digilayn-on-primary rounded-full text-xs font-black hover:bg-digilayn-primary transition shadow-md">
                             📲 Get LaynRider on Google Play
                         </a>
-                        <a href="/portfolio/projects/laynfleet/privacy" class="px-5 py-2.5 border border-slate-300 dark:border-slate-700 rounded-full text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                        <a href="/portfolio/projects/laynfleet/privacy" class="px-5 py-2.5 border border-digilayn-outline-variant dark:border-digilayn-outline-variant rounded-full text-xs font-bold hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-low transition">
                             Privacy &amp; Terms
                         </a>
                     </div>
 
-                    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 p-4 rounded-xl">
-                        <p class="text-sm font-bold text-blue-800 dark:text-blue-400">Hosted on Poortjie.info</p>
-                        <p class="text-xs mt-1 text-blue-800 dark:text-blue-400">
+                    <div class="bg-digilayn-info-container dark:bg-digilayn-info-container/20 border border-digilayn-info dark:border-digilayn-info/50 p-4 rounded-xl">
+                        <p class="text-sm font-bold text-digilayn-on-info-container dark:text-digilayn-info">Hosted on Poortjie.info</p>
+                        <p class="text-xs mt-1 text-digilayn-on-info-container dark:text-digilayn-info">
                             Get LaynRider from Google Play or try web ride booking live at <a href="https://poortjie.info/laynfleet/laynrider/index.html" target="_blank" class="underline font-bold">poortjie.info/laynfleet</a>.
                         </p>
                     </div>
@@ -262,37 +257,35 @@
         </div>
     </section>
 
-    <section class="text-center py-12 bg-slate-50 dark:bg-slate-800/40 rounded-3xl border border-slate-200 dark:border-slate-700">
+    <section class="text-center py-12 bg-digilayn-surface dark:bg-digilayn-surface-container-low/40 rounded-3xl border border-digilayn-outline-variant dark:border-digilayn-outline-variant">
         <h2 class="text-3xl font-bold mb-4">Need a custom system for your business?</h2>
         <p class="opacity-80 mb-8 max-w-2xl mx-auto leading-relaxed">
             Start with a discovery call. No pressure, no fake promises — just a clear discussion about whether software can solve your operational problem.
         </p>
         <div class="flex flex-wrap justify-center gap-4">
-            <a href="https://wa.me/27815532209" target="_blank" class="px-10 py-4 bg-green-600 text-white font-black rounded-xl hover:bg-green-700 transition transform hover:scale-105">
+            <a href="https://wa.me/27815532209" target="_blank" class="px-10 py-4 bg-digilayn-primary text-digilayn-on-primary font-black rounded-xl hover:bg-digilayn-primary transition transform hover:scale-105">
                 WhatsApp Digilayn
             </a>
-            <a href="mailto:digilayn@gmail.com" class="px-10 py-4 border border-green-500 text-green-600 dark:text-green-400 font-black rounded-xl hover:bg-green-50 dark:hover:bg-green-900/20 transition">
+            <a href="mailto:digilayn@gmail.com" class="px-10 py-4 border border-digilayn-primary text-digilayn-primary dark:text-digilayn-primary font-black rounded-xl hover:bg-digilayn-primary-container dark:hover:bg-digilayn-primary-container/20 transition">
                 Email Digilayn
             </a>
-            <a href="mgijima" class="px-10 py-4 border border-slate-400 text-slate-700 dark:text-slate-300 font-black rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+            <a href="mgijima" class="px-10 py-4 border border-digilayn-outline-variant text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant font-black rounded-xl hover:bg-digilayn-surface dark:hover:bg-digilayn-surface-container-low transition">
                 Meet the Builder
             </a>
         </div>
     </section>
 </main>
 
-
-<footer class="text-center py-12 border-t border-gray-100 dark:border-slate-800 opacity-80 text-sm">
+<footer class="text-center py-12 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant opacity-80 text-sm">
     <div class="flex flex-wrap justify-center gap-4 mb-3 text-xs">
-        <a href="/portfolio/projects/laynfleet/privacy" class="hover:text-green-500 transition">Privacy Policy</a>
+        <a href="/portfolio/projects/laynfleet/privacy" class="hover:text-digilayn-primary transition">Privacy Policy</a>
         <span>&bull;</span>
-        <a href="/portfolio/projects/laynfleet/terms" class="hover:text-green-500 transition">Terms &amp; Conditions</a>
+        <a href="/portfolio/projects/laynfleet/terms" class="hover:text-digilayn-primary transition">Terms &amp; Conditions</a>
     </div>
     <p>&copy; 2026 digilayn. All rights reserved.</p>
-    <p class="mt-2">Built by <a href="https://linkedin.com/in/mgijima" target="_blank" class="hover:text-green-500 underline transition">Musa Mgijima</a>.</p>
+    <p class="mt-2">Built by <a href="https://linkedin.com/in/mgijima" target="_blank" class="hover:text-digilayn-primary underline transition">Musa Mgijima</a>.</p>
 </footer>
 
-<script src="scripts/theme.js"></script>
 <script src="scripts/security.js"></script>
 
 </body>

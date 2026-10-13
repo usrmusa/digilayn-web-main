@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
+    <link rel="stylesheet" href="../../../../styles/digilayn-theme.css">
+    <script src="../../../../scripts/theme.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LaynFleet Live Radar — Driver Location Monitor</title>
   <meta name="description" content="Real-time live driver tracking, GPS telemetry, route monitoring, and dispatch radar for LaynFleet." />
-  <meta name="theme-color" content="#22c55e" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
 
   <!-- Digilayn Theme Handler -->
-  <script src="../../../../scripts/theme.js"></script>
-
   <!-- Live Tracking Custom Styles -->
   <link rel="stylesheet" href="tracking.css" />
   <link rel="stylesheet" href="/styles/laynfleet-environment.css">
@@ -52,19 +51,19 @@
         <div class="kpi-divider"></div>
         <div class="kpi-chip" data-filter-kpi="online">
           <span class="kpi-dot online"></span>
-          <span>Online:</span> <strong id="kpi-online-val" class="kpi-val" style="color:var(--online);">0</strong>
+          <span>Online:</span> <strong id="kpi-online-val" class="kpi-val" style="color:var(--digilayn-success);">0</strong>
         </div>
         <div class="kpi-chip" data-filter-kpi="intrip">
           <span class="kpi-dot intrip"></span>
-          <span>In Trip:</span> <strong id="kpi-intrip-val" class="kpi-val" style="color:var(--intrip);">0</strong>
+          <span>In Trip:</span> <strong id="kpi-intrip-val" class="kpi-val" style="color:var(--digilayn-info);">0</strong>
         </div>
         <div class="kpi-chip" data-filter-kpi="idle">
           <span class="kpi-dot idle"></span>
-          <span>Idle:</span> <strong id="kpi-idle-val" class="kpi-val" style="color:var(--idle);">0</strong>
+          <span>Idle:</span> <strong id="kpi-idle-val" class="kpi-val" style="color:var(--digilayn-warning);">0</strong>
         </div>
         <div class="kpi-chip" data-filter-kpi="offline">
           <span class="kpi-dot offline"></span>
-          <span>Offline:</span> <strong id="kpi-offline-val" class="kpi-val" style="color:var(--offline);">0</strong>
+          <span>Offline:</span> <strong id="kpi-offline-val" class="kpi-val" style="color:var(--digilayn-on-surface-variant);">0</strong>
         </div>
       </div>
 
@@ -118,7 +117,7 @@
           </div>
 
           <!-- Vehicle Type Selector -->
-          <div style="display:flex; align-items:center; justify-content:space-between; font-size:11px; color:var(--text-dim);">
+          <div style="display:flex; align-items:center; justify-content:space-between; font-size:11px; color:var(--digilayn-on-surface-variant);">
             <label for="filter-vehicle-type" style="font-weight:700;">Vehicle Class:</label>
             <select id="filter-vehicle-type" class="search-input" style="width:auto; padding:4px 8px; font-size:11px; height:28px;">
               <option value="all">All Categories</option>
@@ -200,7 +199,7 @@
               </div>
               <div>
                 <h3 id="inspector-name" style="font-size:15px; font-weight:800;">—</h3>
-                <span id="inspector-rating" style="font-size:11px; color:#f59e0b; font-weight:700;">—</span>
+                <span id="inspector-rating" style="font-size:11px; color:var(--digilayn-warning); font-weight:700;">—</span>
               </div>
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
@@ -214,7 +213,7 @@
             <div class="inspector-grid">
               <div class="inspector-item">
                 <span class="inspector-item-label">Live Speed</span>
-                <span id="inspector-speed" class="inspector-item-value" style="font-family:monospace; color:var(--brand);">0 km/h</span>
+                <span id="inspector-speed" class="inspector-item-value" style="font-family:monospace; color:var(--digilayn-primary);">0 km/h</span>
               </div>
               <div class="inspector-item">
                 <span class="inspector-item-label">Heading</span>
@@ -261,9 +260,9 @@
                 </div>
               </div>
 
-              <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed rgba(59,130,246,0.25); padding-top:8px; font-size:11px;">
-                <span style="color:var(--text-dim);">Estimated Fare</span>
-                <strong id="inspector-trip-fare" style="font-size:13px; color:var(--text);">R0.00</strong>
+              <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed rgb(var(--digilayn-info-rgb) / 0.25); padding-top:8px; font-size:11px;">
+                <span style="color:var(--digilayn-on-surface-variant);">Estimated Fare</span>
+                <strong id="inspector-trip-fare" style="font-size:13px; color:var(--digilayn-on-surface);">R0.00</strong>
               </div>
             </div>
 
@@ -280,7 +279,7 @@
               </a>
             </div>
 
-            <div style="font-size:10px; color:var(--text-faint); text-align:center; padding-top:4px;">
+            <div style="font-size:10px; color:var(--digilayn-on-surface-variant); text-align:center; padding-top:4px;">
               Direct LaynFleet Telemetry Link · Encrypted Ingestion
             </div>
           </div>
