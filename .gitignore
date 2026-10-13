@@ -1,3 +1,8 @@
 portfolio/.DS_Store
 portfolio/projects/.DS_Store
 portfolio/projects/laynfleet/.DS_Store
+
+# Local editor, macOS and workspace steering files
+.idea/
+.DS_Store
+/AGENTS.md
