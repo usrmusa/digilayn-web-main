@@ -32,7 +32,9 @@
 
   const driversCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(FS.drivers);
   const ridersCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(FS.riders);
-  const bookingsCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(FS.bookings);
+  const bookingsQuery = db.collectionGroup('requests')
+    .where('environment', '==', fleetEnv.environment)
+    .where('recordType', 'in', ['quickRequests', 'scheduledRequests']);
   const reviewsCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(FS.reviews);
   const pricingCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection('pricing');
   const pricingProposalsCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection('pricingProposals');
@@ -1166,8 +1168,8 @@
 
     // Bookings (read-only; dispatch engine populates these).
     unsub.push(
-      bookingsCol.orderBy('createdAt', 'desc').limit(200).onSnapshot(async (snap) => {
-        const docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      bookingsQuery.orderBy('createdAt', 'desc').limit(200).onSnapshot(async (snap) => {
+        const docs = snap.docs.map((d) => ({ ...d.data(), id: d.id, requestPath: d.ref.path }));
         // Preload identities for participants
         await Promise.all(docs.map(async (b) => {
           if (b.riderId && !userCache.has(b.riderId)) await getUser(b.riderId);
@@ -3174,7 +3176,9 @@
       await reviewsCol.doc(reviewId).delete();
       if (rev && rev.bookingId) {
         try {
-          await bookingsCol.doc(rev.bookingId).update({
+          const matches = state.bookings.filter((booking) => booking.id === rev.bookingId);
+          if (matches.length !== 1 || !matches[0].requestPath) throw new Error('Trip record unavailable.');
+          await db.doc(matches[0].requestPath).update({
             rating: firebase.firestore.FieldValue.delete(),
             review: firebase.firestore.FieldValue.delete(),
             feedback: firebase.firestore.FieldValue.delete(),

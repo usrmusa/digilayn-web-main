@@ -28,7 +28,6 @@
     laynfleetDoc: global.LaynFleetEnvironment.environment,
     drivers: 'drivers',
     riders: 'riders',
-    bookings: 'bookings',
     adminActions: 'adminActions',
     reviews: 'reviews'
   };

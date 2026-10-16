@@ -6,7 +6,7 @@
  * - Realtime Database: `driverLocations/{uid}` (live GPS coordinates, heading, speed, online presence)
  * - Firestore: `laynfleet/main/drivers/{uid}` (driver application & vehicle details)
  * - Firestore: `users/{uid}` (driver identity: name, phone, photo)
- * - Firestore: `laynfleet/main/bookings/{id}` (active trip details, routes, status)
+ * - Firestore: `laynfleet/{environment}/quickRequests/{riderUid}/requests/{id}` and Scheduled requests (active trip details, routes, status)
  */
 
 (function (global) {
@@ -778,8 +778,10 @@
       unsubFirestore.push(unsubDrivers);
 
       // 3. Firestore Active Bookings Collection
-      const bookingsCol = db.collection('laynfleet').doc(window.LaynFleetEnvironment.environment).collection('bookings');
-      const unsubBookings = bookingsCol.where('status', 'in', ['ACCEPTED', 'EN_ROUTE', 'ARRIVED', 'IN_TRIP', 'AT_DESTINATION', 'RETURN_TRIP'])
+      const bookingsQuery = db.collectionGroup('requests')
+        .where('environment', '==', window.LaynFleetEnvironment.environment)
+        .where('recordType', 'in', ['quickRequests', 'scheduledRequests']);
+      const unsubBookings = bookingsQuery.where('status', 'in', ['ACCEPTED', 'EN_ROUTE', 'ARRIVED', 'IN_TRIP', 'AT_DESTINATION', 'RETURN_TRIP'])
         .onSnapshot((snap) => {
           state.rawActiveBookings = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
           consolidateFleet();

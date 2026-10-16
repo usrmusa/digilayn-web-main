@@ -9,19 +9,19 @@ vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../scripts/laynfleet-en
 });
 const select = window.LaynFleetEnvironment.presenceForDriver;
 
-test('legacy driver presence keeps its recorded coordinates', () => {
+test('dev/prod never uses legacy root coordinates without verified ownership', () => {
   const legacy = { online: true, lat: 1, lng: 2 };
-  assert.equal(select(legacy), legacy);
+  assert.equal(select(legacy), undefined);
 });
 test('after handover consoles read B coordinates instead of A root writes', () => {
   const deviceB = { online: true, lat: 3, lng: 4 };
-  assert.equal(select({ online: false, lat: 99, activeSessionId: 'B', sessions: {
+  assert.equal(select({ active: true, online: false, lat: 99, activeSessionId: 'B', sessions: {
     A: { online: true, lat: 1 }, B: deviceB,
   } }), deviceB);
 });
 test('A remains irrelevant when it disconnects after handover', () => {
   const deviceB = { online: true, lat: 3, lng: 4 };
-  assert.equal(select({ online: false, activeSessionId: 'B', sessions: {
+  assert.equal(select({ active: true, online: false, activeSessionId: 'B', sessions: {
     A: { online: false }, B: deviceB,
   } }).online, true);
 });

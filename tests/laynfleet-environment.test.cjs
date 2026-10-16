@@ -25,43 +25,42 @@ function load(url) {
   return { config: window.LaynFleetEnvironment, document, select, badge, towing, link, change, navigation: () => navigation };
 }
 
-test('production keeps original paths, packages, title and clean badge', () => {
+test('production selects explicit prod paths, packages, title and clean badge', () => {
   const page = load('https://digilayn.co.za/portfolio/projects/laynfleet/admin/');
-  assert.equal(page.config.environment, 'main');
-  assert.equal(page.config.locationsPath, 'driverLocations');
-  assert.equal(page.config.driverStoragePath, 'laynfleet/drivers');
+  assert.equal(page.config.environment, 'prod');
+  assert.equal(page.config.locationsPath, 'laynfleet/prod/driverLocations');
+  assert.equal(page.config.driverStoragePath, 'laynfleet/prod/drivers');
   assert.equal(page.config.driverPackage, 'com.digilayn.layndriver');
   assert.equal(page.config.membershipKey, 'laynFleet');
-  assert.equal(page.config.appPackages.length, 3);
+  assert.equal(page.config.appPackages.length, 2);
   assert.equal(page.document.title, 'LaynFleet');
   assert.equal(page.badge.hidden, true);
 });
 test('dev controls select dev paths and packages and show DEV', () => {
   const page = load('https://digilayn.co.za/portfolio/projects/laynfleet/admin/?env=dev');
   assert.equal(page.config.environment, 'dev');
-  assert.equal(page.config.locationsPath, 'driverLocationsDev');
+  assert.equal(page.config.locationsPath, 'laynfleet/dev/driverLocations');
   assert.equal(page.config.driverStoragePath, 'laynfleet/dev/drivers');
   assert.equal(page.config.riderPackage, 'com.digilayn.laynrider.dev');
   assert.equal(page.config.driverPackage, 'com.digilayn.layndriver.dev');
   assert.equal(page.config.membershipKey, 'laynFleetDev');
   assert.equal(page.config.appPackages.length, 2);
   assert.equal(page.badge.hidden, false);
-  assert.equal(page.towing.hidden, true);
   assert.equal(page.document.title, 'DEV · LaynFleet');
   assert.equal(new URL(page.link.href).searchParams.get('env'), 'dev');
 });
 test('invalid or duplicate environment cannot silently select production', () => {
-  for (const query of ['env=', 'env=prod', 'env=DEV', 'env=dev%20', 'env=main&env=dev']) {
-    assert.throws(() => load('https://digilayn.co.za/portfolio/projects/users?' + query), /Choose env=main or env=dev/);
+  for (const query of ['env=', 'env=main', 'env=DEV', 'env=dev%20', 'env=main&env=dev']) {
+    assert.throws(() => load('https://digilayn.co.za/portfolio/projects/users?' + query), /Choose env=prod or env=dev/);
   }
 });
 test('switching environment reloads the page and preserves unrelated URL state', () => {
-  const page = load('https://digilayn.co.za/portfolio/projects/laynfleet/admin/?env=main&view=bookings#pricing');
+  const page = load('https://digilayn.co.za/portfolio/projects/laynfleet/admin/?env=prod&view=bookings#pricing');
   page.select.value = 'dev';
   page.change();
   const target = new URL(page.navigation());
   assert.equal(target.searchParams.get('env'), 'dev');
   assert.equal(target.searchParams.get('view'), 'bookings');
   assert.equal(target.hash, '#pricing');
-  assert.equal(page.config.environment, 'main');
+  assert.equal(page.config.environment, 'prod');
 });
