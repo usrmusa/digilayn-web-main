@@ -3,9 +3,8 @@
  *
  * Responsibilities:
  *   - Gate access to the single manager account (MANAGER_EMAIL).
- *   - Live-list driver applications and approve / reject / demote them (atomic batch:
- *     flips laynfleet/main/drivers/{uid}.approvalStatus AND
- *     users/{uid}.applications.laynFleet.isDriver, per the locked schema).
+ *   - Live-list driver applications; review decisions use the authenticated fleet API.
+ *     Driver identity and application decisions remain environment-owned.
  *   - Live-list riders/members and globally suspend / reactivate them
  *     (users/{uid}.suspended + suspendedReason), and demote drivers from rider table.
  *   - Live-list bookings with rich, multi-criteria filtering, status tabs, and detail views.
@@ -521,13 +520,26 @@
         type
       };
 
-      await driversCol.doc(uid).update({
-        vehicle: vehicleData,
-        updatedAt: serverTimestamp(),
-        updatedBy: MANAGER_EMAIL
-      });
-
       const d = state.drivers.find((x) => x.uid === uid);
+      if (!d) throw new Error('Driver unavailable.');
+      if (d.vehicleDirectory) {
+        const directory = type === 'PRIVATE_CAR' ? 'privateCarDirectory' : 'transportDirectory';
+        const oldRef = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(d.vehicleDirectory).doc(uid);
+        const car = await oldRef.get();
+        if (!car.exists || car.get('driverId') !== uid) throw new Error('Saved car unavailable.');
+        const batch = db.batch();
+        const { displayName, photoUrl, ...carData } = car.data();
+        batch.set(db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(directory).doc(uid), {
+          ...carData, vehicle: vehicleData,
+          ...(directory === 'transportDirectory' ? { displayName: d.displayName, photoUrl: d.photoUrl } : {})
+        });
+        batch.update(driversCol.doc(uid), { vehicleType: type, vehicleDirectory: directory, vehicleId: uid, updatedAt: serverTimestamp(), updatedBy: MANAGER_EMAIL });
+        if (directory !== d.vehicleDirectory) batch.delete(oldRef);
+        await batch.commit();
+      } else {
+        await driversCol.doc(uid).update({ vehicle: vehicleData, vehicleType: type, updatedAt: serverTimestamp(), updatedBy: MANAGER_EMAIL });
+      }
+
       const u = (d && d.user) || userCache.get(uid) || {};
       const driverName = u.displayName || uid;
       if (d) {
@@ -566,10 +578,10 @@
     currentViewingDriverUid = uid;
     const u = (d && d.user) || userCache.get(uid) || {};
     const v = d.vehicle || {};
-    const name = u.displayName || 'Unnamed Driver';
+    const name = d.displayName || 'Name unavailable';
     const email = u.email || '—';
-    const phone = d.phone || (!d.phoneDeletedAt ? (u.phone || '') : '');
-    const photoUrl = d.photoUrl || (!d.photoDeletedAt ? (u.photoUrl || '') : '');
+    const phone = d.phone || '';
+    const photoUrl = d.photoUrl || '';
     const licenceUrl = d.licenceUrl || '';
     const vType = String(v.type || 'PRIVATE_CAR').toUpperCase();
 
@@ -588,6 +600,7 @@
       : '<span class="badge badge-offline">● Offline</span>';
 
     const statusBadge = {
+      CHANGES_REQUESTED: '<span class="badge badge-pending">Changes requested</span>',
       PENDING: '<span class="badge badge-pending">Pending Application</span>',
       APPROVED: '<span class="badge badge-approved">Approved Fleet Driver</span>',
       DEMOTED: '<span class="badge badge-demoted">Demoted Driver</span>',
@@ -663,8 +676,9 @@
             <span class="detail-item-value">
               ${d.approvalStatus === 'APPROVED' && d.approvedAt ? `Approved ${formatDate(d.approvedAt)}${d.approvedBy ? ` by ${d.approvedBy}` : ''}` : ''}
               ${d.approvalStatus === 'DEMOTED' && d.demotedAt ? `Demoted ${formatDate(d.demotedAt)}: ${d.demoteReason || ''}` : ''}
-              ${d.approvalStatus === 'REJECTED' ? `Rejected: ${d.rejectedReason || ''}` : ''}
-              ${d.approvalStatus === 'PENDING' ? 'Pending initial review' : ''}
+              ${d.approvalStatus === 'REJECTED' ? `Rejected: ${escapeHtml(d.rejectedReason || '')}` : ''}
+              ${d.approvalStatus === 'CHANGES_REQUESTED' ? `Changes requested: ${escapeHtml(d.updateReason || '')}` : ''}
+              ${d.approvalStatus === 'PENDING' ? (d.resubmittedAt ? 'Resubmitted for review' : 'Pending initial review') : ''}
             </span>
           </div>
         </div>
@@ -797,6 +811,7 @@
         <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
           ${d.approvalStatus === 'PENDING' ? `
             <button class="btn btn-success btn-sm" id="btn-modal-approve">Approve Application</button>
+            <button class="btn btn-warn btn-sm" id="btn-modal-request-changes">Request changes</button>
             <button class="btn btn-danger btn-sm" id="btn-modal-reject">Reject Application</button>
           ` : ''}
           ${d.approvalStatus === 'APPROVED' ? `
@@ -811,9 +826,8 @@
             <button class="btn btn-success btn-sm" id="btn-modal-reapprove">Re-approve Driver</button>
             <button class="btn btn-danger btn-sm" id="btn-modal-reject">Reject Application</button>
           ` : ''}
-          ${d.approvalStatus === 'REJECTED' ? `
-            <button class="btn btn-ghost btn-sm" id="btn-modal-reapprove">Re-approve Driver</button>
-          ` : ''}
+          ${d.approvalStatus === 'CHANGES_REQUESTED' ? '<span class="driver-sub">Waiting for the driver to update and resubmit.</span>' : ''}
+          ${d.approvalStatus === 'REJECTED' ? '<span class="driver-sub">Rejected — final decision</span>' : ''}
         </div>
       </div>
     `;
@@ -902,6 +916,13 @@
     if (modalReapprove) {
       modalReapprove.addEventListener('click', async () => {
         await approveDriver(uid);
+        if (currentViewingDriverUid === uid) showDriverProfile(uid);
+      });
+    }
+    const modalRequestChanges = $('btn-modal-request-changes');
+    if (modalRequestChanges) {
+      modalRequestChanges.addEventListener('click', async () => {
+        await requestDriverChanges(uid);
         if (currentViewingDriverUid === uid) showDriverProfile(uid);
       });
     }
@@ -1137,17 +1158,34 @@
     detachListeners();
     unsub.push(window.LaynFleetNotices.attach(db));
 
-    // Drivers (application docs = the drivers collection).
-    unsub.push(driversCol.onSnapshot(async (snap) => {
-      const docs = snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
-      // Join identity for each driver.
-      await Promise.all(docs.map(async (d) => { d.user = await getUser(d.uid); }));
-      state.drivers = docs;
+    const carCollections = { privateCarDirectory: new Map(), transportDirectory: new Map() };
+    let driverDocuments = [];
+    function renderDriverDocuments() {
+      state.drivers = driverDocuments.map((driver) => {
+        if (!driver.vehicleDirectory) return driver;
+        const car = carCollections[driver.vehicleDirectory]?.get(driver.vehicleId);
+        return { ...driver, vehicle: car?.driverId === driver.uid ? car.vehicle : undefined };
+      });
       renderDrivers();
       renderOverview();
-      if (currentViewingDriverUid && $('driver-detail-overlay') && !$('driver-detail-overlay').classList.contains('is-hidden')) {
-        showDriverProfile(currentViewingDriverUid);
-      }
+      if (currentViewingDriverUid && $('driver-detail-overlay') && !$('driver-detail-overlay').classList.contains('is-hidden')) showDriverProfile(currentViewingDriverUid);
+    }
+    for (const directory of Object.keys(carCollections)) {
+      unsub.push(db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(directory).onSnapshot((snap) => {
+        carCollections[directory] = new Map(snap.docs.map(doc => [doc.id, doc.data()]));
+        renderDriverDocuments();
+      }, (err) => {
+        carCollections[directory].clear();
+        renderDriverDocuments();
+        console.error('Driver cars listener', err);
+        toast('Could not load driver cars.', 'error');
+      }));
+    }
+    unsub.push(driversCol.onSnapshot(async (snap) => {
+      const docs = snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
+      await Promise.all(docs.map(async (d) => { d.user = await getUser(d.uid); }));
+      driverDocuments = docs;
+      renderDriverDocuments();
     }, (err) => {
       console.error('drivers listener', err);
       toast('Failed to load drivers (check access).', 'error');
@@ -1487,9 +1525,10 @@
   }
 
   function renderDrivers() {
-    const counts = { PENDING: 0, APPROVED: 0, DEMOTED: 0, REJECTED: 0 };
+    const counts = { PENDING: 0, CHANGES_REQUESTED: 0, APPROVED: 0, DEMOTED: 0, REJECTED: 0 };
     state.drivers.forEach((d) => { counts[d.approvalStatus] = (counts[d.approvalStatus] || 0) + 1; });
     $('count-pending').textContent = counts.PENDING || 0;
+    $('count-changes-requested').textContent = counts.CHANGES_REQUESTED;
     $('count-approved').textContent = counts.APPROVED || 0;
     if ($('count-demoted')) $('count-demoted').textContent = counts.DEMOTED || 0;
     $('count-rejected').textContent = counts.REJECTED || 0;
@@ -1501,7 +1540,7 @@
 
     const host = $('drivers-list');
     if (!list.length) {
-      host.innerHTML = emptyState('🚗', 'Nothing here', 'No ' + state.driverTab.toLowerCase() + ' drivers' + (term ? ' matching your search.' : '.'));
+      host.innerHTML = emptyState('🚗', 'Nothing here', 'No ' + state.driverTab.toLowerCase().replace(/_/g, ' ') + ' drivers' + (term ? ' matching your search.' : '.'));
       return;
     }
     host.innerHTML = list.map(driverCardHtml).join('');
@@ -1511,23 +1550,23 @@
   function matchesDriver(d, term) {
     if (!term) return true;
     const v = d.vehicle || {};
-    const u = d.user || {};
-    const driverPhone = d.phone || (!d.phoneDeletedAt ? (u.phone || '') : '');
-    return [u.displayName, driverPhone, v.make, v.model, v.plate, v.colour, d.uid]
+    const driverPhone = d.phone || '';
+    return [d.displayName, driverPhone, v.make, v.model, v.plate, v.colour, d.uid]
       .some((x) => String(x || '').toLowerCase().includes(term));
   }
 
   function driverCardHtml(d) {
     const u = d.user || {};
     const v = d.vehicle || {};
-    const name = u.displayName || 'Unnamed driver';
-    const photo = d.photoUrl || (!d.photoDeletedAt ? u.photoUrl : null);
-    const driverPhone = d.phone || (!d.phoneDeletedAt ? (u.phone || '—') : '—');
+    const name = d.displayName || 'Name unavailable';
+    const photo = d.photoUrl;
+    const driverPhone = d.phone || '—';
     const avatar = photo
       ? `<img class="avatar" src="${escapeHtml(photo)}" alt="" data-view-driver="${escapeHtml(d.uid)}" style="cursor:pointer;" title="Click to view full driver profile" />`
       : `<div class="avatar" data-view-driver="${escapeHtml(d.uid)}" style="cursor:pointer;" title="Click to view full driver profile">${escapeHtml(initials(name))}</div>`;
 
     const statusBadge = {
+      CHANGES_REQUESTED: '<span class="badge badge-pending">Changes requested</span>',
       PENDING: '<span class="badge badge-pending">Pending</span>',
       APPROVED: '<span class="badge badge-approved">Approved</span>',
       DEMOTED: '<span class="badge badge-demoted">Demoted</span>',
@@ -1554,7 +1593,7 @@
       ? '<span class="badge badge-driver" title="Reserved exclusively for Google Play review">PLAY STORE TEST</span>'
       : '';
     const ratingBadge = d.ratingCount
-      ? `<span class="badge badge-rating" style="cursor:pointer;" data-filter-driver-reviews="${escapeHtml(u.displayName || d.uid)}" title="Click to view all reviews for this driver">★ ${Number(d.ratingAvg || 0).toFixed(1)} · ${d.ratingCount}</span>`
+      ? `<span class="badge badge-rating" style="cursor:pointer;" data-filter-driver-reviews="${escapeHtml(d.displayName || d.uid)}" title="Click to view all reviews for this driver">★ ${Number(d.ratingAvg || 0).toFixed(1)} · ${d.ratingCount}</span>`
       : '';
 
     const vehicleType = v.type ? titleCase(String(v.type).replace(/_/g, ' ')) : '—';
@@ -1567,6 +1606,7 @@
     if (d.approvalStatus === 'PENDING') {
       actions = `
         <button class="btn btn-success btn-sm" data-approve="${escapeHtml(d.uid)}">Approve</button>
+        <button class="btn btn-warn btn-sm" data-request-changes="${escapeHtml(d.uid)}">Request changes</button>
         <button class="btn btn-danger btn-sm" data-reject="${escapeHtml(d.uid)}">Reject</button>`;
     } else if (d.approvalStatus === 'APPROVED') {
       const suspendBtn = u.suspended
@@ -1580,18 +1620,22 @@
         <button class="btn btn-success btn-sm" data-approve="${escapeHtml(d.uid)}" title="Re-approve driver">Re-approve</button>
         <button class="btn btn-danger btn-sm" data-reject="${escapeHtml(d.uid)}">Reject</button>`;
     } else if (d.approvalStatus === 'REJECTED') {
-      actions = `
-        <button class="btn btn-ghost btn-sm" data-approve="${escapeHtml(d.uid)}" title="Re-approve driver">Re-approve</button>
-        <span class="driver-sub">${escapeHtml(d.rejectedReason || 'Rejected — terminal')}</span>`;
+      actions = '<span class="driver-sub">Rejected — final decision</span>';
+    } else if (d.approvalStatus === 'CHANGES_REQUESTED') {
+      actions = '<span class="driver-sub">Waiting for driver update</span>';
     }
 
     let subLine = `Applied ${escapeHtml(formatDate(d.createdAt))}${d.legitAcceptedAt ? ' · accepted terms' : ''}`;
-    if (d.approvalStatus === 'DEMOTED') {
+    if (d.approvalStatus === 'CHANGES_REQUESTED') {
+      subLine = `Changes requested ${escapeHtml(formatDate(d.updateRequestedAt))} · ${escapeHtml(d.updateReason || '')}`;
+    } else if (d.approvalStatus === 'PENDING' && d.resubmittedAt) {
+      subLine = `Resubmitted ${escapeHtml(formatDate(d.resubmittedAt))}`;
+    } else if (d.approvalStatus === 'DEMOTED') {
       subLine = `Demoted ${escapeHtml(formatDate(d.demotedAt))}${d.demoteReason ? ` · Reason: ${escapeHtml(d.demoteReason)}` : ''}`;
     } else if (d.approvalStatus === 'APPROVED' && d.approvedAt) {
       subLine = `Approved ${escapeHtml(formatDate(d.approvedAt))}${d.approvedBy ? ` by ${escapeHtml(d.approvedBy)}` : ''}`;
     } else if (d.approvalStatus === 'REJECTED') {
-      subLine = `Rejected ${escapeHtml(formatDate(d.approvedAt || d.updatedAt))}${d.rejectedReason ? ` · Reason: ${escapeHtml(d.rejectedReason)}` : ''}`;
+      subLine = `Rejected ${escapeHtml(formatDate(d.rejectedAt || d.updatedAt))}${d.rejectedReason ? ` · Reason: ${escapeHtml(d.rejectedReason)}` : ''}`;
     }
 
     return `
@@ -1624,6 +1668,8 @@
       b.addEventListener('click', () => showDriverProfile(b.getAttribute('data-view-driver'))));
     host.querySelectorAll('[data-approve]').forEach((b) =>
       b.addEventListener('click', () => approveDriver(b.getAttribute('data-approve'))));
+    host.querySelectorAll('[data-request-changes]').forEach((b) =>
+      b.addEventListener('click', () => requestDriverChanges(b.getAttribute('data-request-changes'))));
     host.querySelectorAll('[data-reject]').forEach((b) =>
       b.addEventListener('click', () => rejectDriver(b.getAttribute('data-reject'))));
     host.querySelectorAll('[data-demote]').forEach((b) =>
@@ -2156,36 +2202,47 @@
   // ---------------------------------------------------------------------------
   async function approveDriver(uid) {
     const d = state.drivers.find((x) => x.uid === uid);
-    const u = userCache.get(uid) || (d && d.user) || {};
-    const name = u.displayName || (d && d.user && d.user.displayName) || 'this driver';
-    const isReapproval = d && (d.approvalStatus === 'DEMOTED' || d.approvalStatus === 'REJECTED');
-
+    if (!d || !['PENDING', 'DEMOTED'].includes(d.approvalStatus)) {
+      toast('Only pending applications or demoted drivers can be approved.', 'error');
+      return;
+    }
+    const name = d.displayName || 'this driver';
+    const isReapproval = d.approvalStatus === 'DEMOTED';
     const res = await openModal({
       title: isReapproval ? 'Re-approve driver' : 'Approve driver',
       message: `${isReapproval ? 'Re-approve' : 'Approve'} ${name}? They will gain driver privileges and be able to go online to receive ride requests.`,
-      confirmText: isReapproval ? 'Re-approve' : 'Approve',
-      confirmClass: 'btn-success'
+      confirmText: isReapproval ? 'Re-approve' : 'Approve', confirmClass: 'btn-success'
     });
     if (!res.confirmed) return;
-
     try {
-      const batch = db.batch();
-      batch.update(driversCol.doc(uid), {
-        approvalStatus: 'APPROVED',
-        approvedBy: MANAGER_EMAIL,
-        approvedAt: serverTimestamp(),
-        rejectedReason: firebase.firestore.FieldValue.delete(),
-        demoteReason: firebase.firestore.FieldValue.delete(),
-        demotedAt: firebase.firestore.FieldValue.delete(),
-        demotedBy: firebase.firestore.FieldValue.delete()
+      await fleetEnv.request(`/admin/driver-applications/${encodeURIComponent(uid)}/review`, {
+        decision: 'APPROVED', reason: null, expectedRevision: d.applicationRevision, expectedStatus: d.approvalStatus
       });
-      await batch.commit();
-      userCache.delete(uid); // force fresh identity join
-      await logAdminAction(isReapproval ? 'reapproveDriver' : 'approveDriver', uid, name);
       toast(`${isReapproval ? 'Re-approved' : 'Approved'} ${name}.`, 'success');
     } catch (err) {
       console.error(err);
-      toast('Approval failed. ' + (err.code || ''), 'error');
+      toast('Approval failed. ' + err.message, 'error');
+    }
+  }
+
+  async function requestDriverChanges(uid) {
+    const d = state.drivers.find((x) => x.uid === uid);
+    if (!d || d.approvalStatus !== 'PENDING') {
+      toast('Only pending applications can be returned for updates.', 'error');
+      return;
+    }
+    const res = await openModal({ title: 'Request application changes',
+      message: `Tell ${d.displayName || 'this driver'} what to update before resubmitting.`,
+      confirmText: 'Request changes', confirmClass: 'btn-warn', requireReason: true });
+    if (!res.confirmed) return;
+    try {
+      await fleetEnv.request(`/admin/driver-applications/${encodeURIComponent(uid)}/review`, {
+        decision: 'CHANGES_REQUESTED', reason: res.reason, expectedRevision: d.applicationRevision, expectedStatus: 'PENDING'
+      });
+      toast('Changes requested. The driver can update and resubmit.', 'success');
+    } catch (err) {
+      console.error(err);
+      toast('Could not request changes. ' + err.message, 'error');
     }
   }
 
@@ -2224,31 +2281,22 @@
 
   async function rejectDriver(uid) {
     const d = state.drivers.find((x) => x.uid === uid);
-    const name = (d && d.user && d.user.displayName) || 'this driver';
-    const res = await openModal({
-      title: 'Reject application',
-      message: `Reject ${name}? This driver application will be marked as rejected.`,
-      confirmText: 'Reject',
-      confirmClass: 'btn-danger',
-      requireReason: true
-    });
+    if (!d || !['PENDING', 'DEMOTED'].includes(d.approvalStatus)) {
+      toast('This application is not open for rejection.', 'error');
+      return;
+    }
+    const res = await openModal({ title: 'Reject application',
+      message: `Reject ${d.displayName || 'this driver'}? This is a final decision. The driver cannot update or resubmit this application.`,
+      confirmText: 'Reject', confirmClass: 'btn-danger', requireReason: true });
     if (!res.confirmed) return;
-
     try {
-      const batch = db.batch();
-      batch.update(driversCol.doc(uid), {
-        approvalStatus: 'REJECTED',
-        rejectedReason: res.reason,
-        approvedBy: MANAGER_EMAIL,
-        approvedAt: serverTimestamp()
+      await fleetEnv.request(`/admin/driver-applications/${encodeURIComponent(uid)}/review`, {
+        decision: 'REJECTED', reason: res.reason, expectedRevision: d.applicationRevision, expectedStatus: d.approvalStatus
       });
-      await batch.commit();
-      userCache.delete(uid);
-      await logAdminAction('rejectDriver', uid, name, res.reason);
-      toast(`Rejected ${name}.`, 'success');
+      toast('Application rejected.', 'success');
     } catch (err) {
       console.error(err);
-      toast('Rejection failed. ' + (err.code || ''), 'error');
+      toast('Rejection failed. ' + err.message, 'error');
     }
   }
 
@@ -3931,7 +3979,7 @@ This applies immediately to all connected devices.`,
   function goToDriverTab(tabName) {
     if (!tabName) return;
     const tabUpper = String(tabName).toUpperCase();
-    const validTabs = ['PENDING', 'APPROVED', 'DEMOTED', 'REJECTED'];
+    const validTabs = ['PENDING', 'CHANGES_REQUESTED', 'APPROVED', 'DEMOTED', 'REJECTED'];
     if (!validTabs.includes(tabUpper)) return;
     state.driverTab = tabUpper;
     document.querySelectorAll('[data-driver-tab]').forEach((t) =>

@@ -25,6 +25,7 @@
   // State
   // ---------------------------------------------------------------------------
   const state = {
+    cars: { privateCarDirectory: new Map(), transportDirectory: new Map() },
     drivers: new Map(), // uid -> unified real driver object
     rawFirestoreDrivers: [],
     rawRtdbLocations: {},
@@ -263,7 +264,10 @@
       const rawPresence = state.rawRtdbLocations[uid];
       const livePresence = window.LaynFleetEnvironment.presenceForDriver(rawPresence);
       const rtdbEntry = lastRecordedLocation(rawPresence) || {};
-      const user = state.userCache.get(uid) || fDoc.user || {};
+      const account = state.userCache.get(uid) || fDoc.user || {};
+      const user = { ...account, displayName: fDoc.displayName };
+      const car = fDoc.vehicleDirectory ? state.cars[fDoc.vehicleDirectory]?.get(fDoc.vehicleId) : undefined;
+      const vehicle = fDoc.vehicleDirectory ? (car?.driverId === uid ? car.vehicle : undefined) : fDoc.vehicle;
 
       // Find active booking for this driver
       const activeBk = state.rawActiveBookings.find((b) => b.driverId === uid);
@@ -293,9 +297,9 @@
       driversMap.set(uid, {
         uid,
         user,
-        photoUrl: fDoc.photoUrl || user.photoUrl || '',
-        phone: fDoc.phone || user.phone || '',
-        vehicle: fDoc.vehicle || {},
+        photoUrl: fDoc.photoUrl || '',
+        phone: fDoc.phone || '',
+        vehicle,
         approvalStatus: fDoc.approvalStatus || 'UNKNOWN',
         ratingAvg: fDoc.ratingAvg || 0,
         ratingCount: fDoc.ratingCount || 0,
@@ -754,6 +758,17 @@
           state.rawRtdbLocations = snap.val() || {};
           consolidateFleet();
         });
+      }
+
+      for (const directory of ['privateCarDirectory', 'transportDirectory']) {
+        unsubFirestore.push(db.collection('laynfleet').doc(window.LaynFleetEnvironment.environment).collection(directory).onSnapshot((snap) => {
+          state.cars[directory] = new Map(snap.docs.map(doc => [doc.id, doc.data()]));
+          consolidateFleet();
+        }, (err) => {
+          state.cars[directory].clear();
+          consolidateFleet();
+          console.warn('Driver car listener error', err);
+        }));
       }
 
       // 2. Firestore Drivers Collection
