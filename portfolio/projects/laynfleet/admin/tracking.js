@@ -267,7 +267,7 @@
       const account = state.userCache.get(uid) || fDoc.user || {};
       const user = { ...account, displayName: fDoc.displayName };
       const car = fDoc.vehicleDirectory ? state.cars[fDoc.vehicleDirectory]?.get(fDoc.vehicleId) : undefined;
-      const vehicle = fDoc.vehicleDirectory ? (car?.driverId === uid ? car.vehicle : undefined) : fDoc.vehicle;
+      const vehicle = fDoc.vehicleDirectory ? (car && (car.driverId === uid || (car.driverId === undefined && fDoc.approvalStatus !== 'APPROVED')) ? car.vehicle : undefined) : fDoc.vehicle;
 
       // Find active booking for this driver
       const activeBk = state.rawActiveBookings.find((b) => b.driverId === uid);

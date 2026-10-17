@@ -522,23 +522,8 @@
 
       const d = state.drivers.find((x) => x.uid === uid);
       if (!d) throw new Error('Driver unavailable.');
-      if (d.vehicleDirectory) {
-        const directory = type === 'PRIVATE_CAR' ? 'privateCarDirectory' : 'transportDirectory';
-        const oldRef = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(d.vehicleDirectory).doc(uid);
-        const car = await oldRef.get();
-        if (!car.exists || car.get('driverId') !== uid) throw new Error('Saved car unavailable.');
-        const batch = db.batch();
-        const { displayName, photoUrl, ...carData } = car.data();
-        batch.set(db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(directory).doc(uid), {
-          ...carData, vehicle: vehicleData,
-          ...(directory === 'transportDirectory' ? { displayName: d.displayName, photoUrl: d.photoUrl } : {})
-        });
-        batch.update(driversCol.doc(uid), { vehicleType: type, vehicleDirectory: directory, vehicleId: uid, updatedAt: serverTimestamp(), updatedBy: MANAGER_EMAIL });
-        if (directory !== d.vehicleDirectory) batch.delete(oldRef);
-        await batch.commit();
-      } else {
-        await driversCol.doc(uid).update({ vehicle: vehicleData, vehicleType: type, updatedAt: serverTimestamp(), updatedBy: MANAGER_EMAIL });
-      }
+      if (d.vehicleDirectory) throw new Error('An approved car cannot be changed.');
+      await driversCol.doc(uid).update({ vehicle: vehicleData, vehicleType: type, updatedAt: serverTimestamp(), updatedBy: MANAGER_EMAIL });
 
       const u = (d && d.user) || userCache.get(uid) || {};
       const driverName = u.displayName || uid;
@@ -768,27 +753,27 @@
           <div class="vehicle-form-grid">
             <label class="field">
               <span class="field-label">Vehicle Make</span>
-              <input id="vehicle-input-make" type="text" class="field-input" value="${escapeHtml(v.make || '')}" placeholder="e.g. Toyota" required />
+              <input id="vehicle-input-make" ${d.vehicleDirectory ? 'disabled' : ''} type="text" class="field-input" value="${escapeHtml(v.make || '')}" placeholder="e.g. Toyota" required />
             </label>
             <label class="field">
               <span class="field-label">Vehicle Model</span>
-              <input id="vehicle-input-model" type="text" class="field-input" value="${escapeHtml(v.model || '')}" placeholder="e.g. Corolla Quest" required />
+              <input id="vehicle-input-model" ${d.vehicleDirectory ? 'disabled' : ''} type="text" class="field-input" value="${escapeHtml(v.model || '')}" placeholder="e.g. Corolla Quest" required />
             </label>
             <label class="field">
               <span class="field-label">Vehicle Colour</span>
-              <input id="vehicle-input-colour" type="text" class="field-input" value="${escapeHtml(v.colour || '')}" placeholder="e.g. White / Silver" />
+              <input id="vehicle-input-colour" ${d.vehicleDirectory ? 'disabled' : ''} type="text" class="field-input" value="${escapeHtml(v.colour || '')}" placeholder="e.g. White / Silver" />
             </label>
             <label class="field">
               <span class="field-label">Licence Plate</span>
-              <input id="vehicle-input-plate" type="text" class="field-input" value="${escapeHtml(v.plate || '')}" placeholder="e.g. CA 123-456" required style="text-transform: uppercase;" />
+              <input id="vehicle-input-plate" ${d.vehicleDirectory ? 'disabled' : ''} type="text" class="field-input" value="${escapeHtml(v.plate || '')}" placeholder="e.g. CA 123-456" required style="text-transform: uppercase;" />
             </label>
             <label class="field">
               <span class="field-label">Passenger Seats</span>
-              <input id="vehicle-input-seats" type="number" min="1" max="50" class="field-input" value="${v.seats != null ? v.seats : 4}" required />
+              <input id="vehicle-input-seats" ${d.vehicleDirectory ? 'disabled' : ''} type="number" min="1" max="50" class="field-input" value="${v.seats != null ? v.seats : 4}" required />
             </label>
             <label class="field">
               <span class="field-label">Vehicle Type</span>
-              <select id="vehicle-input-type" class="field-input">
+              <select id="vehicle-input-type" ${d.vehicleDirectory ? 'disabled' : ''} class="field-input">
                 <option value="PRIVATE_CAR" ${vType === 'PRIVATE_CAR' || vType === 'STANDARD' ? 'selected' : ''}>Private Car (Standard)</option>
                 <option value="XL" ${vType === 'XL' ? 'selected' : ''}>XL (6+ Seats)</option>
                 <option value="PREMIUM" ${vType === 'PREMIUM' ? 'selected' : ''}>Premium</option>
@@ -798,7 +783,7 @@
             </label>
           </div>
           <div style="margin-top: 14px; display: flex; justify-content: flex-end;">
-            <button id="btn-save-vehicle" type="button" class="btn btn-primary btn-sm">
+            <button id="btn-save-vehicle" ${d.vehicleDirectory ? 'disabled' : ''} type="button" class="btn btn-primary btn-sm">
               💾 Save Vehicle Details
             </button>
           </div>
@@ -815,6 +800,7 @@
             <button class="btn btn-danger btn-sm" id="btn-modal-reject">Reject Application</button>
           ` : ''}
           ${d.approvalStatus === 'APPROVED' ? `
+            <button class="btn btn-warn btn-sm" id="btn-modal-request-changes">Request changes</button>
             <button class="btn btn-warn btn-sm" id="btn-modal-demote">Demote Driver</button>
             ${u.suspended ? `
               <button class="btn btn-ghost btn-sm" id="btn-modal-reactivate">Reactivate User</button>
@@ -823,6 +809,7 @@
             `}
           ` : ''}
           ${d.approvalStatus === 'DEMOTED' ? `
+            <button class="btn btn-warn btn-sm" id="btn-modal-request-changes">Request changes</button>
             <button class="btn btn-success btn-sm" id="btn-modal-reapprove">Re-approve Driver</button>
             <button class="btn btn-danger btn-sm" id="btn-modal-reject">Reject Application</button>
           ` : ''}
@@ -1164,7 +1151,7 @@
       state.drivers = driverDocuments.map((driver) => {
         if (!driver.vehicleDirectory) return driver;
         const car = carCollections[driver.vehicleDirectory]?.get(driver.vehicleId);
-        return { ...driver, vehicle: car?.driverId === driver.uid ? car.vehicle : undefined };
+        return { ...driver, vehicle: car && (car.driverId === driver.uid || (car.driverId === undefined && driver.approvalStatus !== 'APPROVED')) ? car.vehicle : undefined };
       });
       renderDrivers();
       renderOverview();
@@ -1614,10 +1601,12 @@
         : `<button class="btn btn-danger btn-sm" data-suspend="${escapeHtml(d.uid)}">Suspend</button>`;
       actions = `
         <button class="btn btn-warn btn-sm" data-demote="${escapeHtml(d.uid)}" title="Demote driver to normal user">Demote</button>
+        <button class="btn btn-warn btn-sm" data-request-changes="${escapeHtml(d.uid)}">Request changes</button>
         ${suspendBtn}`;
     } else if (d.approvalStatus === 'DEMOTED') {
       actions = `
         <button class="btn btn-success btn-sm" data-approve="${escapeHtml(d.uid)}" title="Re-approve driver">Re-approve</button>
+        <button class="btn btn-warn btn-sm" data-request-changes="${escapeHtml(d.uid)}">Request changes</button>
         <button class="btn btn-danger btn-sm" data-reject="${escapeHtml(d.uid)}">Reject</button>`;
     } else if (d.approvalStatus === 'REJECTED') {
       actions = '<span class="driver-sub">Rejected — final decision</span>';
@@ -2227,8 +2216,8 @@
 
   async function requestDriverChanges(uid) {
     const d = state.drivers.find((x) => x.uid === uid);
-    if (!d || d.approvalStatus !== 'PENDING') {
-      toast('Only pending applications can be returned for updates.', 'error');
+    if (!d || !['PENDING', 'APPROVED', 'DEMOTED'].includes(d.approvalStatus)) {
+      toast('Only pending, approved or demoted drivers can be returned for updates.', 'error');
       return;
     }
     const res = await openModal({ title: 'Request application changes',
@@ -2237,7 +2226,7 @@
     if (!res.confirmed) return;
     try {
       await fleetEnv.request(`/admin/driver-applications/${encodeURIComponent(uid)}/review`, {
-        decision: 'CHANGES_REQUESTED', reason: res.reason, expectedRevision: d.applicationRevision, expectedStatus: 'PENDING'
+        decision: 'CHANGES_REQUESTED', reason: res.reason, expectedRevision: d.applicationRevision, expectedStatus: d.approvalStatus
       });
       toast('Changes requested. The driver can update and resubmit.', 'success');
     } catch (err) {
