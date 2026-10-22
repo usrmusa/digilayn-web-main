@@ -1,11 +1,18 @@
 import { accountAccess } from './account-access.js';
-import { functions, db } from "./firebase-config.js";
+import { functions, db, storage } from "./firebase-config.js";
 import { isVerifiedAdmin } from './admin-auth.js';
 import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, Timestamp, writeBatch } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { httpsCallable } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-functions.js";
+import { ref as storageRef, listAll, getMetadata, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
 const fleetEnv = window.LaynFleetEnvironment;
 if (!fleetEnv) throw new Error("Fleet environment is required");
+
+const isLocalhost = typeof window !== 'undefined' && (
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1' ||
+  window.location.hostname === '[::1]'
+);
 
 function requireManager() {
   const user = accountAccess.currentUser;
@@ -23,6 +30,21 @@ export function getTimestampMs(ts) {
   if (typeof ts === "number") return ts;
   const parsed = new Date(ts).getTime();
   return Number.isNaN(parsed) ? 0 : parsed;
+}
+
+export function resolveMediaUrl(url) {
+  if (!url || typeof url !== "string") return "";
+  if (isLocalhost && url.includes("10.0.2.2:9199")) {
+    return url.replace("10.0.2.2:9199", "127.0.0.1:9199");
+  }
+  return url;
+}
+
+export function formatBytes(bytes) {
+  if (!bytes || bytes <= 0) return "0 B";
+  const units = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return `${(bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
 }
 
 class UserManagement {
@@ -61,8 +83,30 @@ class UserManagement {
   async refresh() {
     requireManager();
     try {
-      const response = await this.getInventory({});
-      const inventory = response.data || {};
+      let inventory;
+      if (isLocalhost) {
+        const snapshot = await getDocs(collection(db, "users"));
+        const accounts = snapshot.docs.map((docSnap) => {
+          const data = docSnap.data() || {};
+          return {
+            uid: docSnap.id,
+            firestore: data,
+            auth: null,
+            storage: [],
+            usernames: data.username ? [{ username: data.username, ownerUid: docSnap.id, data: {} }] : []
+          };
+        });
+        inventory = {
+          accounts,
+          orphanStorage: [],
+          orphanUsernames: [],
+          orphanDocuments: [],
+          excludedPrefixes: []
+        };
+      } else {
+        const response = await this.getInventory({});
+        inventory = response.data || {};
+      }
       this.users = (inventory.accounts || []).map((account) => this.normalizeAccount(account));
       this.orphanStorage = inventory.orphanStorage || [];
       this.orphanUsernames = inventory.orphanUsernames || [];
@@ -93,11 +137,11 @@ class UserManagement {
     return {
       userId: account.uid,
       uid: account.uid,
-      displayName: authData?.displayName || source.displayName || "",
+      displayName: authData?.displayName || source.displayName || source.fullName || "",
       username: source.username || usernameReservations[0]?.username || "",
       email: authData?.email || source.email || "",
       phone: authData?.phone || source.phone || "",
-      photoUrl: source.photoUrl || authData?.photoUrl || storageObjects.find((item) => String(item.contentType).startsWith("image/"))?.downloadUrl || "",
+      photoUrl: resolveMediaUrl(source.photoUrl || authData?.photoUrl || storageObjects.find((item) => String(item.contentType).startsWith("image/"))?.downloadUrl || ""),
       suspended: !!source.suspended,
       suspendedReason: source.suspendedReason || "",
       applications: source.applications || {}, roles: source.roles || {}, devices: source.devices || {},
@@ -191,6 +235,16 @@ class UserManagement {
 
   async getDeletePreview(uid) {
     requireManager();
+    if (isLocalhost) {
+      return {
+        uid,
+        storage: [],
+        usernames: [],
+        marketItems: [],
+        businessApplications: [],
+        suggestions: []
+      };
+    }
     return (await this.previewDelete({ uid })).data;
   }
 
@@ -198,6 +252,13 @@ class UserManagement {
     requireManager();
     if (requireManager().uid === uid) throw new Error("You cannot delete yourself.");
     onProgress?.({ step: "requesting", percent: 25, message: "Validating credentials and sending delete request..." });
+    if (isLocalhost) {
+      await deleteDoc(doc(db, "users", uid));
+      onProgress?.({ step: "refreshing", percent: 80, message: "Refreshing user inventory..." });
+      await this.refresh();
+      onProgress?.({ step: "done", percent: 100, message: "User deleted successfully." });
+      return { success: true };
+    }
     const result = await this.deleteUserFully({ uid, confirmation });
     if (result.data.success !== true) {
       await this.refresh();
@@ -338,6 +399,63 @@ class UserManagement {
     return { success: true };
   }
 
+  async getUserMediaHistory(uid) {
+    requireManager();
+    if (!uid) throw new Error("UID is required to fetch media history");
+    try {
+      const folderRef = storageRef(storage, `users/${uid}/profile`);
+      const listResult = await listAll(folderRef);
+      const items = await Promise.all(
+        listResult.items.map(async (item) => {
+          try {
+            const [metadata, downloadUrl] = await Promise.all([
+              getMetadata(item),
+              getDownloadURL(item)
+            ]);
+            return {
+              name: item.name,
+              fullPath: item.fullPath,
+              size: metadata.size || 0,
+              contentType: metadata.contentType || "image/jpeg",
+              timeCreated: metadata.timeCreated || null,
+              updated: metadata.updated || null,
+              downloadUrl: resolveMediaUrl(downloadUrl)
+            };
+          } catch (itemErr) {
+            console.warn(`Failed to get metadata for ${item.fullPath}:`, itemErr);
+            return {
+              name: item.name,
+              fullPath: item.fullPath,
+              size: 0,
+              contentType: "image/jpeg",
+              timeCreated: null,
+              updated: null,
+              downloadUrl: ""
+            };
+          }
+        })
+      );
+
+      items.sort((a, b) => new Date(b.timeCreated || 0) - new Date(a.timeCreated || 0));
+      const totalSizeBytes = items.reduce((sum, item) => sum + (item.size || 0), 0);
+      return {
+        uid,
+        items,
+        totalSizeBytes,
+        count: items.length
+      };
+    } catch (err) {
+      console.error(`Failed to list storage for user ${uid}:`, err);
+      return {
+        uid,
+        items: [],
+        totalSizeBytes: 0,
+        count: 0,
+        error: err.message
+      };
+    }
+  }
+
   findUserByEmail(email) {
     const clean = String(email || "").trim().toLowerCase();
     if (!clean) return null;
@@ -371,7 +489,7 @@ class UserManagement {
           displayName: user.displayName || data.displayName || "Unknown Driver",
           email: user.email || data.email || "",
           phone: user.phone || data.phone || "",
-          photoUrl: user.photoUrl || data.photoUrl || "",
+          photoUrl: resolveMediaUrl(user.photoUrl || data.photoUrl || ""),
           username: user.username || "",
           suspended: !!user.suspended,
           suspendedReason: user.suspendedReason || data.suspendedReason || "",
@@ -409,7 +527,7 @@ class UserManagement {
           displayName: user.displayName || data.displayName || "Unknown User",
           email: user.email || data.email || "",
           phone: user.phone || data.phone || "",
-          photoUrl: user.photoUrl || data.photoUrl || "",
+          photoUrl: resolveMediaUrl(user.photoUrl || data.photoUrl || ""),
           username: user.username || "",
           suspended: !!user.suspended,
           suspendedReason: user.suspendedReason || data.suspendedReason || "",
@@ -439,7 +557,7 @@ class UserManagement {
           displayName: user.displayName || data.displayName || "Rider",
           email: user.email || data.email || "",
           phone: user.phone || data.phone || "",
-          photoUrl: user.photoUrl || data.photoUrl || "",
+          photoUrl: resolveMediaUrl(user.photoUrl || data.photoUrl || ""),
           username: user.username || "",
           suspended: !!user.suspended,
           suspendedReason: user.suspendedReason || data.suspendedReason || "",

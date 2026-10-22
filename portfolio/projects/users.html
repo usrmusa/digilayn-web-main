@@ -721,15 +721,60 @@
         </div>
     </div>
 
-    <!-- Image Viewer Modal -->
+    <!-- Image Viewer & Storage History Modal -->
     <div id="imageViewerModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 hidden">
         <div class="absolute inset-0 bg-digilayn-surface-container-lowest/90 backdrop-blur-md" id="imageViewerCloseOverlay"></div>
-        <div class="relative max-w-4xl w-full flex flex-col items-center">
-            <button id="closeImageViewerBtn" class="absolute -top-12 right-0 text-digilayn-on-primary text-3xl hover:text-digilayn-primary transition-colors">
-                <i class="fas fa-times"></i>
-            </button>
-            <img id="fullSizeImage" src="" alt="Full size profile" class="max-h-[85vh] max-w-full rounded-2xl shadow-2xl border border-digilayn-outline-variant object-contain">
-            <div id="imageViewerCaption" class="mt-4 text-digilayn-on-primary font-bold text-lg"></div>
+        <div class="relative bg-digilayn-surface-container-lowest dark:bg-digilayn-surface w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden border border-digilayn-outline-variant dark:border-digilayn-outline-variant flex flex-col max-h-[92vh]">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-5 sm:p-6 border-b border-digilayn-outline-variant dark:border-digilayn-outline-variant">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-2xl bg-digilayn-primary-container dark:bg-digilayn-primary/10 text-digilayn-on-primary-container dark:text-digilayn-primary flex items-center justify-center text-lg shrink-0">
+                        <i class="far fa-images"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 id="imageViewerTitle" class="text-lg font-bold truncate">User Profile Photos</h3>
+                        <p id="imageViewerSubtitle" class="text-xs text-digilayn-on-surface-variant flex items-center gap-2">
+                            <span>UID: <span id="imageViewerUid" class="font-mono"></span></span>
+                            <span>·</span>
+                            <span id="imageViewerStorageTotal" class="font-semibold text-digilayn-primary">Calculating storage...</span>
+                        </p>
+                    </div>
+                </div>
+                <button id="closeImageViewerBtn" class="text-digilayn-on-surface-variant hover:text-digilayn-on-surface text-xl p-2 rounded-xl hover:bg-digilayn-surface-container transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Content Area -->
+            <div class="flex-1 overflow-y-auto p-5 sm:p-6 flex flex-col md:flex-row gap-6">
+                <!-- Main Preview (Left / Top) -->
+                <div class="flex-1 flex flex-col items-center justify-center bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low rounded-2xl p-4 min-h-[280px] border border-digilayn-outline-variant/60 relative">
+                    <img id="fullSizeImage" src="" alt="Full size profile" class="max-h-[50vh] max-w-full rounded-xl shadow-md object-contain transition-all">
+                    <div id="activeImageBadge" class="mt-3 flex items-center gap-2 text-xs font-semibold px-3 py-1 rounded-full bg-digilayn-primary-container text-digilayn-on-primary-container dark:bg-digilayn-primary/15 dark:text-digilayn-primary">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="activeImageBadgeText">Current Profile Photo</span>
+                    </div>
+                    <div id="activeImageDetails" class="mt-1 text-xs text-digilayn-on-surface-variant text-center"></div>
+                </div>
+
+                <!-- Gallery / History List (Right / Bottom) -->
+                <div class="w-full md:w-80 flex flex-col shrink-0">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-digilayn-on-surface-variant">Storage History</span>
+                        <span id="imageHistoryCount" class="text-xs px-2 py-0.5 rounded-full font-bold bg-digilayn-surface-container-highest text-digilayn-on-surface-variant">0 photos</span>
+                    </div>
+                    <div id="imageHistoryLoading" class="py-8 flex flex-col items-center justify-center text-digilayn-on-surface-variant text-sm gap-2">
+                        <i class="fas fa-circle-notch fa-spin text-digilayn-primary text-xl"></i>
+                        <span>Scanning Firebase Storage...</span>
+                    </div>
+                    <div id="imageHistoryEmpty" class="py-8 text-center text-digilayn-on-surface-variant text-xs hidden">
+                        No previous photo versions found in storage.
+                    </div>
+                    <div id="imageHistoryList" class="flex-1 overflow-y-auto space-y-2 pr-1 max-h-[50vh]">
+                        <!-- Dynamic items -->
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1227,7 +1272,16 @@
         // Image Viewer elements
         const imageViewerModal = document.getElementById('imageViewerModal');
         const fullSizeImage = document.getElementById('fullSizeImage');
-        const imageViewerCaption = document.getElementById('imageViewerCaption');
+        const imageViewerTitle = document.getElementById('imageViewerTitle');
+        const imageViewerUid = document.getElementById('imageViewerUid');
+        const imageViewerStorageTotal = document.getElementById('imageViewerStorageTotal');
+        const activeImageBadge = document.getElementById('activeImageBadge');
+        const activeImageBadgeText = document.getElementById('activeImageBadgeText');
+        const activeImageDetails = document.getElementById('activeImageDetails');
+        const imageHistoryCount = document.getElementById('imageHistoryCount');
+        const imageHistoryLoading = document.getElementById('imageHistoryLoading');
+        const imageHistoryEmpty = document.getElementById('imageHistoryEmpty');
+        const imageHistoryList = document.getElementById('imageHistoryList');
         const closeImageViewerBtn = document.getElementById('closeImageViewerBtn');
         const imageViewerCloseOverlay = document.getElementById('imageViewerCloseOverlay');
 
@@ -2124,7 +2178,7 @@
                 }
 
                 const photoHtml = user.photoUrl
-                    ? `<img src="${user.photoUrl}" class="profile-pic w-12 h-12 rounded-full object-cover bg-digilayn-surface-container-high cursor-zoom-in hover:ring-2 hover:ring-digilayn-primary transition-all" data-full="${user.photoUrl}" data-name="${user.displayName || 'User'}">`
+                    ? `<img src="${user.photoUrl}" class="profile-pic w-12 h-12 rounded-full object-cover bg-digilayn-surface-container-high cursor-zoom-in hover:ring-2 hover:ring-digilayn-primary transition-all" data-full="${user.photoUrl}" data-name="${user.displayName || 'User'}" data-uid="${user.userId || user.uid}">`
                     : `<div class="w-12 h-12 rounded-full bg-digilayn-primary-container dark:bg-digilayn-primary/10 text-digilayn-on-primary-container dark:text-digilayn-primary flex items-center justify-center font-bold text-xl">${(user.displayName || '?')[0].toUpperCase()}</div>`;
 
                 let appBadges = [];
@@ -2249,7 +2303,7 @@
                 });
 
                 card.querySelector('.profile-pic')?.addEventListener('click', (e) => {
-                    showImageViewer(e.target.dataset.full, e.target.dataset.name);
+                    showImageViewer(e.target.dataset.full, e.target.dataset.name, e.target.dataset.uid);
                 });
 
                 usersList.appendChild(card);
@@ -2281,7 +2335,7 @@
                 const isDemoted = (driver.approvalStatus || '').toUpperCase() === 'DEMOTED';
 
                 const photoHtml = u.photoUrl
-                    ? `<img src="${u.photoUrl}" class="profile-pic w-12 h-12 rounded-full object-cover bg-digilayn-surface-container-high cursor-zoom-in hover:ring-2 hover:ring-digilayn-success transition-all" data-full="${u.photoUrl}" data-name="${u.displayName || 'Driver'}">`
+                    ? `<img src="${u.photoUrl}" class="profile-pic w-12 h-12 rounded-full object-cover bg-digilayn-surface-container-high cursor-zoom-in hover:ring-2 hover:ring-digilayn-success transition-all" data-full="${u.photoUrl}" data-name="${u.displayName || 'Driver'}" data-uid="${driver.uid || u.uid || u.userId}">`
                     : `<div class="w-12 h-12 rounded-full bg-digilayn-success-container dark:bg-digilayn-success/10 text-digilayn-on-success-container dark:text-digilayn-success flex items-center justify-center font-bold text-xl">${(u.displayName || 'D')[0].toUpperCase()}</div>`;
 
                 const onlinePill = driver.online
@@ -2379,7 +2433,7 @@
                 `;
 
                 card.querySelector('.profile-pic')?.addEventListener('click', (e) => {
-                    showImageViewer(e.target.dataset.full, e.target.dataset.name);
+                    showImageViewer(e.target.dataset.full, e.target.dataset.name, e.target.dataset.uid);
                 });
 
                 card.querySelector('.suspend-btn')?.addEventListener('click', (e) => {
@@ -2449,7 +2503,7 @@
                 const isRevoked = (driver.approvalStatus || '').toUpperCase() === 'REVOKED';
 
                 const photoHtml = u.photoUrl
-                    ? `<img src="${u.photoUrl}" class="profile-pic w-12 h-12 rounded-full object-cover bg-digilayn-surface-container-high cursor-zoom-in hover:ring-2 hover:ring-digilayn-warning transition-all" data-full="${u.photoUrl}" data-name="${u.displayName || 'Assist Member'}">`
+                    ? `<img src="${u.photoUrl}" class="profile-pic w-12 h-12 rounded-full object-cover bg-digilayn-surface-container-high cursor-zoom-in hover:ring-2 hover:ring-digilayn-warning transition-all" data-full="${u.photoUrl}" data-name="${u.displayName || 'Assist Member'}" data-uid="${driver.uid || u.uid || u.userId}">`
                     : `<div class="w-12 h-12 rounded-full bg-digilayn-warning-container dark:bg-digilayn-warning/10 text-digilayn-on-warning-container dark:text-digilayn-warning flex items-center justify-center font-bold text-xl">${(u.displayName || 'A')[0].toUpperCase()}</div>`;
 
                 const rolePill = isOwner
@@ -2562,7 +2616,7 @@
                 `;
 
                 card.querySelector('.profile-pic')?.addEventListener('click', (e) => {
-                    showImageViewer(e.target.dataset.full, e.target.dataset.name);
+                    showImageViewer(e.target.dataset.full, e.target.dataset.name, e.target.dataset.uid);
                 });
 
                 card.querySelector('.suspend-btn')?.addEventListener('click', (e) => {
@@ -2656,7 +2710,7 @@
                 const u = rider.user || {};
 
                 const photoHtml = u.photoUrl
-                    ? `<img src="${u.photoUrl}" class="profile-pic w-12 h-12 rounded-full object-cover bg-digilayn-surface-container-high cursor-zoom-in hover:ring-2 hover:ring-digilayn-info transition-all" data-full="${u.photoUrl}" data-name="${u.displayName || 'Rider'}">`
+                    ? `<img src="${u.photoUrl}" class="profile-pic w-12 h-12 rounded-full object-cover bg-digilayn-surface-container-high cursor-zoom-in hover:ring-2 hover:ring-digilayn-info transition-all" data-full="${u.photoUrl}" data-name="${u.displayName || 'Rider'}" data-uid="${rider.uid || u.uid || u.userId}">`
                     : `<div class="w-12 h-12 rounded-full bg-digilayn-info-container dark:bg-digilayn-info/10 text-digilayn-on-info-container dark:text-digilayn-info flex items-center justify-center font-bold text-xl">${(u.displayName || 'R')[0].toUpperCase()}</div>`;
 
                 const card = document.createElement('div');
@@ -2713,7 +2767,7 @@
                 `;
 
                 card.querySelector('.profile-pic')?.addEventListener('click', (e) => {
-                    showImageViewer(e.target.dataset.full, e.target.dataset.name);
+                    showImageViewer(e.target.dataset.full, e.target.dataset.name, e.target.dataset.uid);
                 });
 
                 card.querySelectorAll('.suspend-btn').forEach(btn => {
@@ -2759,7 +2813,7 @@
                 const listForSupport = !!user.roles?.poortjie?.listForSupport;
 
                 const photoHtml = user.photoUrl
-                    ? `<img src="${user.photoUrl}" class="profile-pic w-12 h-12 rounded-full object-cover bg-digilayn-surface-container-high cursor-zoom-in hover:ring-2 hover:ring-digilayn-tertiary transition-all" data-full="${user.photoUrl}" data-name="${user.displayName || 'User'}">`
+                    ? `<img src="${user.photoUrl}" class="profile-pic w-12 h-12 rounded-full object-cover bg-digilayn-surface-container-high cursor-zoom-in hover:ring-2 hover:ring-digilayn-tertiary transition-all" data-full="${user.photoUrl}" data-name="${user.displayName || 'User'}" data-uid="${user.userId || user.uid}">`
                     : `<div class="w-12 h-12 rounded-full bg-digilayn-tertiary-container dark:bg-digilayn-tertiary/10 text-digilayn-on-tertiary-container dark:text-digilayn-tertiary flex items-center justify-center font-bold text-xl">${(user.displayName || 'P')[0].toUpperCase()}</div>`;
 
                 const card = document.createElement('div');
@@ -2827,7 +2881,7 @@
                 `;
 
                 card.querySelector('.profile-pic')?.addEventListener('click', (e) => {
-                    showImageViewer(e.target.dataset.full, e.target.dataset.name);
+                    showImageViewer(e.target.dataset.full, e.target.dataset.name, e.target.dataset.uid);
                 });
 
                 card.querySelector('.suspend-btn')?.addEventListener('click', (e) => {
@@ -3203,17 +3257,111 @@
             userToDelete = null;
         });
 
-        // Image Viewer Functions
-        function showImageViewer(url, name) {
-            fullSizeImage.src = url;
-            imageViewerCaption.textContent = name;
+        // Image Viewer & Storage History Functions
+        let activeViewerUid = null;
+
+        async function showImageViewer(url, name, uid) {
+            activeViewerUid = uid;
+            fullSizeImage.src = url || '';
+            imageViewerTitle.textContent = `${name || 'User'}'s Profile Photos`;
+            imageViewerUid.textContent = uid || 'N/A';
+            imageViewerStorageTotal.textContent = 'Calculating storage...';
+            activeImageBadgeText.textContent = 'Current Profile Photo';
+            activeImageBadge.className = "mt-3 flex items-center gap-2 text-xs font-semibold px-3 py-1 rounded-full bg-digilayn-primary-container text-digilayn-on-primary-container dark:bg-digilayn-primary/15 dark:text-digilayn-primary";
+            activeImageDetails.textContent = '';
+            imageHistoryCount.textContent = '0 photos';
+            imageHistoryLoading.classList.remove('hidden');
+            imageHistoryEmpty.classList.add('hidden');
+            imageHistoryList.innerHTML = '';
             imageViewerModal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
+
+            if (!uid) {
+                imageHistoryLoading.classList.add('hidden');
+                imageHistoryEmpty.textContent = 'No UID associated with this image.';
+                imageHistoryEmpty.classList.remove('hidden');
+                imageViewerStorageTotal.textContent = 'No storage data';
+                return;
+            }
+
+            try {
+                const history = await userManager.getUserMediaHistory(uid);
+                if (activeViewerUid !== uid) return;
+
+                imageHistoryLoading.classList.add('hidden');
+                const totalFormatted = formatBytes(history.totalSizeBytes);
+                imageViewerStorageTotal.textContent = `${totalFormatted} total (${history.count} photo${history.count === 1 ? '' : 's'})`;
+                imageHistoryCount.textContent = `${history.count} photo${history.count === 1 ? '' : 's'}`;
+
+                if (!history.items || history.items.length === 0) {
+                    imageHistoryEmpty.textContent = `No storage records found under users/${uid}/profile.`;
+                    imageHistoryEmpty.classList.remove('hidden');
+                    return;
+                }
+
+                // Match active image if possible
+                let activeItem = history.items.find(item => item.downloadUrl === url) || history.items[0];
+                if (activeItem) {
+                    selectHistoryImage(activeItem, url);
+                }
+
+                history.items.forEach((item, index) => {
+                    const isCurrent = (item.downloadUrl === url) || (index === 0 && !history.items.some(i => i.downloadUrl === url));
+                    const itemEl = document.createElement('div');
+                    itemEl.className = `p-2.5 rounded-xl border border-digilayn-outline-variant/60 hover:border-digilayn-primary cursor-pointer transition-all flex items-center gap-3 bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low hover:bg-digilayn-surface-container ${item === activeItem ? 'ring-2 ring-digilayn-primary' : ''}`;
+                    itemEl.dataset.path = item.fullPath;
+
+                    const dateStr = item.timeCreated ? new Date(item.timeCreated).toLocaleString() : 'Unknown date';
+                    const sizeStr = formatBytes(item.size);
+
+                    itemEl.innerHTML = `
+                        <img src="${item.downloadUrl}" class="w-12 h-12 rounded-lg object-cover bg-digilayn-surface-container-high shrink-0 border border-digilayn-outline-variant/40" alt="Thumbnail">
+                        <div class="flex-1 min-w-0 text-left">
+                            <div class="flex items-center justify-between gap-1 mb-0.5">
+                                <span class="font-bold text-xs truncate">${sizeStr}</span>
+                                ${isCurrent ? `<span class="text-[9px] px-1.5 py-0.5 rounded font-bold bg-digilayn-primary-container text-digilayn-on-primary-container dark:bg-digilayn-primary/20 dark:text-digilayn-primary">Current</span>` : `<span class="text-[9px] px-1.5 py-0.5 rounded font-medium text-digilayn-on-surface-variant bg-digilayn-surface-container-high">Previous</span>`}
+                            </div>
+                            <div class="text-[11px] text-digilayn-on-surface-variant truncate">${dateStr}</div>
+                        </div>
+                    `;
+
+                    itemEl.addEventListener('click', () => {
+                        imageHistoryList.querySelectorAll('div[data-path]').forEach(el => el.classList.remove('ring-2', 'ring-digilayn-primary'));
+                        itemEl.classList.add('ring-2', 'ring-digilayn-primary');
+                        selectHistoryImage(item, url);
+                    });
+
+                    imageHistoryList.appendChild(itemEl);
+                });
+            } catch (err) {
+                if (activeViewerUid !== uid) return;
+                console.error("Error displaying user media history:", err);
+                imageHistoryLoading.classList.add('hidden');
+                imageHistoryEmpty.textContent = `Failed to load storage: ${err.message}`;
+                imageHistoryEmpty.classList.remove('hidden');
+                imageViewerStorageTotal.textContent = 'Storage load failed';
+            }
+        }
+
+        function selectHistoryImage(item, currentUrl) {
+            fullSizeImage.src = item.downloadUrl;
+            const isCurrent = item.downloadUrl === currentUrl;
+            activeImageBadgeText.textContent = isCurrent ? 'Current Profile Photo' : 'Previous Photo';
+            if (isCurrent) {
+                activeImageBadge.className = "mt-3 flex items-center gap-2 text-xs font-semibold px-3 py-1 rounded-full bg-digilayn-primary-container text-digilayn-on-primary-container dark:bg-digilayn-primary/15 dark:text-digilayn-primary";
+            } else {
+                activeImageBadge.className = "mt-3 flex items-center gap-2 text-xs font-semibold px-3 py-1 rounded-full bg-digilayn-surface-container-highest text-digilayn-on-surface-variant";
+            }
+            const dateStr = item.timeCreated ? new Date(item.timeCreated).toLocaleString() : 'Unknown date';
+            const sizeStr = formatBytes(item.size);
+            activeImageDetails.textContent = `Size: ${sizeStr} (${item.size.toLocaleString()} bytes) · Uploaded: ${dateStr}`;
         }
 
         function closeImageViewer() {
+            activeViewerUid = null;
             imageViewerModal.classList.add('hidden');
             fullSizeImage.src = '';
+            imageHistoryList.innerHTML = '';
             document.body.style.overflow = '';
         }
 
