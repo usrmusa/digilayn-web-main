@@ -13,6 +13,8 @@
       const user = global.AccountAccess?.currentUser;
       if (!user) throw new Error('Sign in required.');
       const token = await user.getIdToken();
+      if (!global.DigilaynBuild) throw new Error('Website build target is required.');
+      if (global.DigilaynBuild.isLocal) throw new Error('Local fleet API is not configured.');
       const response = await fetch(`https://api.digilayn.co.za/v2/${environment}${path}`, {
         method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(body)

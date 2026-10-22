@@ -31,7 +31,7 @@
     window.connectLaynFleetEmulators(auth, db, typeof firebase.storage === 'function' ? firebase.storage() : null);
   }
   window.installAccountAccess();
-  const rtdb = typeof firebase.database === 'function' ? firebase.database() : null;
+  const rtdb = !window.DigilaynBuild.isLocal && typeof firebase.database === 'function' ? firebase.database() : null;
   const serverTimestamp = firebase.firestore.FieldValue.serverTimestamp;
 
   const driversCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(FS.drivers);

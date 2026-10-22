@@ -8,11 +8,7 @@ import { ref as storageRef, listAll, getMetadata, getDownloadURL } from "https:/
 const fleetEnv = window.LaynFleetEnvironment;
 if (!fleetEnv) throw new Error("Fleet environment is required");
 
-const isLocalhost = typeof window !== 'undefined' && (
-  window.location.hostname === 'localhost' ||
-  window.location.hostname === '127.0.0.1' ||
-  window.location.hostname === '[::1]'
-);
+const isLocalhost = window.DigilaynBuild.isLocal;
 
 function requireManager() {
   const user = accountAccess.currentUser;

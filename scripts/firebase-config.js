@@ -1,9 +1,10 @@
+import "./build-target.js";
 import "./firebase-settings.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
 import { getAuth, connectAuthEmulator } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { getFirestore, connectFirestoreEmulator } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { getFunctions } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-functions.js";
+import { getFunctions, connectFunctionsEmulator } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-functions.js";
 import { getStorage, connectStorageEmulator } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
 /**
@@ -27,16 +28,13 @@ const functions = getFunctions(app);
 const storage = getStorage(app);
 
 // Connect to local emulators in local development
-const isLocalhost = typeof window !== 'undefined' && (
-  window.location.hostname === 'localhost' ||
-  window.location.hostname === '127.0.0.1' ||
-  window.location.hostname === '[::1]'
-);
+const isLocalhost = window.DigilaynBuild.isLocal;
 
 if (isLocalhost) {
   connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true });
   connectFirestoreEmulator(db, '127.0.0.1', 8080);
   connectStorageEmulator(storage, '127.0.0.1', 9199);
+  connectFunctionsEmulator(functions, '127.0.0.1', 5001);
 }
 
 // Analytics is optional and must never break auth/data if it is unsupported

@@ -24,6 +24,7 @@
   const fleetEnv = window.LaynFleetEnvironment;
   if (!fleetEnv) throw new Error("Fleet environment is required");
   firebase.initializeApp(window.LAYNFLEET_FIREBASE_CONFIG);
+  if (window.DigilaynBuild.isLocal) throw new Error('Use the canonical LaynFleet manager console for local builds.');
   const auth = firebase.auth();
   const db = firebase.firestore();
   const rtdb = typeof firebase.database === 'function' ? firebase.database() : null;

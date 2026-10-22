@@ -20,10 +20,6 @@ async function declineAccess() {
 }
 
 async function verifyAdmin(user) {
-  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-    verifiedAdminUid = user.uid;
-    return true;
-  }
   try {
     const { data } = await verifyAccess({});
     if (auth.currentUser?.uid !== user.uid || data.uid !== user.uid) return false;

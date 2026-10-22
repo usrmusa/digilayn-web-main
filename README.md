@@ -9,7 +9,7 @@ This public repository contains the Digilayn business website, founder profile, 
 
 ## Technology
 
-Static HTML, CSS and JavaScript, with Tailwind CSS and Firebase-backed functionality. There is no application build step. Firebase-backed pages require the appropriate authentication and server permissions.
+Static HTML, CSS and JavaScript, with Tailwind CSS and Firebase-backed functionality. The service target is selected by the static build step below. Firebase-backed pages require the appropriate authentication and server permissions.
 
 ## Structure
 
@@ -31,7 +31,7 @@ From the repository root, run:
 python3 -m http.server 8000 --bind 127.0.0.1
 ```
 
-Open [localhost:8000](http://127.0.0.1:8000/). Use explicit `.html` paths with this simple server; it does not reproduce GitHub Pages extensionless URL handling. Previewing does not provide a separate Firebase test environment.
+Open [localhost:8000](http://127.0.0.1:8000/). Use explicit `.html` paths with this simple server; it does not reproduce GitHub Pages extensionless URL handling. Source files select live services explicitly. For emulator development, build and serve `dist/local` as the document root; do not preview source files expecting emulator routing.
 
 ## Shared Theme
 
@@ -64,3 +64,21 @@ See [GitHub Pages documentation](https://docs.github.com/en/pages/getting-starte
 This repository is public intentionally. Keep credentials, service-account keys, access tokens, private account records, local environment files and editor metadata out of it. Backend functions and authoritative Firebase rules are maintained separately; do not deploy backend or rule changes from this website checkout.
 
 Firebase browser configuration identifies the project for client SDKs and is included deliberately. It does not grant administrative access; backend services and Firebase rules must enforce authorization. See [Firebase API key guidance](https://firebase.google.com/docs/projects/api-keys).
+
+## Service Target Builds
+
+Run `python3 tools/build-site.py local` or `python3 tools/build-site.py live`.
+Serve `dist/local` for IntelliJ development and use `dist/live` for live publication.
+The generated `scripts/build-target.js` selects services; the prod/dev fleet selector
+only selects data within those services. Neither hostname nor `env=dev` selects emulators.
+For IntelliJ, open the generated local output as the web root once; its page URLs need
+no service-target parameter. Existing absolute `/scripts` and `/styles` paths require
+serving the output at the URL root.
+
+Local Auth, Firestore and Storage use ports 9099, 8080 and 9199.
+Functions SDK calls target the Functions emulator on port 5001; the current Backend
+configuration does not start that service. Local fleet HTTP API requests explicitly
+fail until an endpoint is configured. Local web tracking is unavailable while the
+Realtime Database emulator is missing. No live-service fallback is used for these paths.
+Local admin login requires the backend verification callable and the shared account
+record; local hosting no longer bypasses admin authorization.
