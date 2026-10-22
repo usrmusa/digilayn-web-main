@@ -35,4 +35,29 @@
 
   // Provenance strings written by the apps at registration.
   global.APP_PACKAGES = global.LaynFleetEnvironment.appPackages;
+
+  // Helper to connect compat SDK instances to local emulators when running dev locally.
+  global.connectLaynFleetEmulators = function (authInstance, dbInstance, storageInstance) {
+    const isLocalhost = typeof window !== 'undefined' && (
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname === '[::1]' ||
+      window.location.hostname === ''
+    );
+    if (global.LaynFleetEnvironment?.isDev && isLocalhost) {
+      try {
+        if (authInstance && typeof authInstance.useEmulator === 'function') {
+          authInstance.useEmulator('http://127.0.0.1:9099');
+        }
+        if (dbInstance && typeof dbInstance.useEmulator === 'function') {
+          dbInstance.useEmulator('127.0.0.1', 8080);
+        }
+        if (storageInstance && typeof storageInstance.useEmulator === 'function') {
+          storageInstance.useEmulator('127.0.0.1', 9199);
+        }
+      } catch (_) {
+        // Already pointed to emulators
+      }
+    }
+  };
 })(window);

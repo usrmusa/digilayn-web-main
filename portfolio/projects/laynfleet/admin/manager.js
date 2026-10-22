@@ -22,10 +22,15 @@
   // ---------------------------------------------------------------------------
   const fleetEnv = window.LaynFleetEnvironment;
   if (!fleetEnv) throw new Error("Fleet environment is required");
-  firebase.initializeApp(window.LAYNFLEET_FIREBASE_CONFIG);
+  if (!firebase.apps.length) {
+    firebase.initializeApp(window.LAYNFLEET_FIREBASE_CONFIG);
+  }
   const auth = firebase.auth();
-  window.installAccountAccess();
   const db = firebase.firestore();
+  if (typeof window.connectLaynFleetEmulators === 'function') {
+    window.connectLaynFleetEmulators(auth, db, typeof firebase.storage === 'function' ? firebase.storage() : null);
+  }
+  window.installAccountAccess();
   const rtdb = typeof firebase.database === 'function' ? firebase.database() : null;
   const serverTimestamp = firebase.firestore.FieldValue.serverTimestamp;
 
