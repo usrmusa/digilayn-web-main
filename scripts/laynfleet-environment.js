@@ -10,7 +10,7 @@
   global.LaynFleetEnvironment = Object.freeze({
     environment, isDev,
     async request(path, body) {
-      const user = global.AccountAccess?.currentUser;
+      const user = global.AdminAccess?.currentUser;
       if (!user) throw new Error('Sign in required.');
       const token = await user.getIdToken();
       if (!global.DigilaynBuild) throw new Error('Website build target is required.');

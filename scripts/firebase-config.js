@@ -15,8 +15,8 @@ import { getStorage, connectStorageEmulator } from "https://www.gstatic.com/fire
  * Web API keys are PUBLIC identifiers — safe to expose. Real access control
  * lives in Firebase/Firestore security rules.
  *
- * Portfolio login and global user-management callables authorize the manager
- * UID on the backend. Direct Firestore operations still depend on rules.
+ * Portfolio login authorizes the verified superuser email through checkAdminAccess.
+ * Direct Firestore operations still depend on rules.
  */
 const firebaseConfig = window.DIGILAYN_FIREBASE_CONFIG;
 

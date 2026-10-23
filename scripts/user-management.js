@@ -1,4 +1,4 @@
-import { accountAccess } from './account-access.js';
+import { adminAccess as accountAccess } from './admin-auth.js';
 import { functions, db, storage } from "./firebase-config.js";
 import { isVerifiedAdmin } from './admin-auth.js';
 import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, Timestamp, writeBatch } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";

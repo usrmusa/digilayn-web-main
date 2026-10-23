@@ -20,8 +20,8 @@
   if (typeof window.connectLaynFleetEmulators === 'function') {
     window.connectLaynFleetEmulators(auth, db);
   }
-  if (typeof window.installAccountAccess === 'function') {
-    window.installAccountAccess();
+  if (typeof window.installAdminAccess === 'function') {
+    window.installAdminAccess();
   }
 
   const errorsCol = db.collection('laynfleet').doc(fleetEnv.environment).collection('clientErrors');
@@ -69,28 +69,12 @@
   // ---------------------------------------------------------------------------
   // AUTH GATING
   // ---------------------------------------------------------------------------
-  if (window.AccountAccess && typeof window.AccountAccess.observe === 'function') {
-    AccountAccess.observe(async (user) => {
-      hide($('boot-view'));
-      if (!user) return showLogin();
-
-      if ((user.email || '').toLowerCase() !== String(window.MANAGER_EMAIL).toLowerCase()) {
-        await auth.signOut();
-        showLogin('This account is not authorised for the manager console.');
-        return;
-      }
-      showApp(user);
-    });
-  } else {
-    auth.onAuthStateChanged((user) => {
-      hide($('boot-view'));
-      if (user) {
-        showApp(user);
-      } else {
-        showLogin();
-      }
-    });
-  }
+  if (!window.AdminAccess) throw new Error('Administrator access gate is required.');
+  AdminAccess.observe((user, error) => {
+    hide($('boot-view'));
+    if (!user) return showLogin(error?.message);
+    showApp(user);
+  });
 
   function showLogin(errorMsg) {
     detachListeners();
@@ -128,11 +112,7 @@
 
       btn.disabled = true; btn.textContent = 'Signing in…';
       try {
-        if (window.AccountAccess && typeof window.AccountAccess.signIn === 'function') {
-          await AccountAccess.signIn(() => auth.signInWithEmailAndPassword(email, password));
-        } else {
-          await auth.signInWithEmailAndPassword(email, password);
-        }
+        await AdminAccess.signIn(() => auth.signInWithEmailAndPassword(email, password));
       } catch (err) {
         console.error(err);
         const el = $('login-error');

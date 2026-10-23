@@ -76,9 +76,23 @@ no service-target parameter. Existing absolute `/scripts` and `/styles` paths re
 serving the output at the URL root.
 
 Local Auth, Firestore and Storage use ports 9099, 8080 and 9199.
-Functions SDK calls target the Functions emulator on port 5001; the current Backend
-configuration does not start that service. Local fleet HTTP API requests explicitly
+Functions SDK calls target the Functions emulator on port 5001. Backend now includes
+`checkAdminAccess`; restart the local emulator suite after compiling the new backend. Local fleet HTTP API requests explicitly
 fail until an endpoint is configured. Local web tracking is unavailable while the
 Realtime Database emulator is missing. No live-service fallback is used for these paths.
-Local admin login requires the backend verification callable and the shared account
-record; local hosting no longer bypasses admin authorization.
+Admin login requires `checkAdminAccess` to confirm the authenticated email
+`admin@digilayn.co.za` and explicit email verification. No account document,
+suspension check, UID allowlist or local-hosting bypass participates in admin access.
+
+## Superuser Login
+
+Projects, global user management and the canonical LaynFleet manager/errors/tracking
+pages share one admin gate. Modular and compat Firebase adapters call the same
+backend function. Signed-out startup makes no authorization request. Authenticated
+entry and restored sessions remain closed until the backend approves the identity.
+Backend errors and malformed responses cannot publish admin access. Normal user
+account gates remain separate; the superuser gate performs no profile lookup.
+
+The new function and website wiring remain local/unpublished until the owner
+confirms behavior and separately authorizes delivery. No admin account or email
+verification flag is created or changed by this implementation.

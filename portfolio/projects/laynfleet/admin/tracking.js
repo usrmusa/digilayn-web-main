@@ -882,6 +882,8 @@
     document.head.appendChild(script);
   }
 
+  let consolidateTimer = null;
+
   function boot() {
     initDOM();
     if (typeof firebase === 'undefined' || !firebaseConfig?.apiKey) {
@@ -890,18 +892,20 @@
     }
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     window.connectLaynFleetEmulators(firebase.auth(), firebase.firestore());
-    window.installAccountAccess();
+    window.installAdminAccess();
     loadGoogleMaps();
-    AccountAccess.observe((user) => {
+    AdminAccess.observe((user, error, checking) => {
       if (!user || user.email?.toLowerCase() !== global.MANAGER_EMAIL?.toLowerCase()) {
         unsubFirestore.forEach((unsubscribe) => unsubscribe());
         unsubFirestore = [];
-        window.location.replace('./');
+        clearInterval(consolidateTimer);
+        consolidateTimer = null;
+        if (!checking) window.location.replace('./');
         return;
       }
       if (unsubFirestore.length === 0) {
         attachFirebaseListeners();
-        setInterval(consolidateFleet, 15000);
+        consolidateTimer = setInterval(consolidateFleet, 15000);
       }
     });
 

@@ -1,79 +1,34 @@
-import { accountAccess } from './account-access.js';
+import './admin-access-core.js';
 import { auth, functions } from './firebase-config.js';
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
+import { onIdTokenChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
 import { httpsCallable } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-functions.js';
 
-// The backend owns the UID allowlist; this state controls presentation only.
-const verifyAccess = httpsCallable(functions, 'verifyAdminAccessCallable');
-let verifiedAdminUid = null;
-let declining = false;
+const checkAccess = httpsCallable(functions, 'checkAdminAccess', { timeout: 10000 });
+export const adminAccess = window.AdminAccessCore.createAdminAccess({
+  currentUser: () => auth.currentUser,
+  observeAuth: listener => onIdTokenChanged(auth, listener),
+  checkAccess: async () => (await checkAccess({})).data
+});
+
+window.AdminAccess = adminAccess;
 
 export function isVerifiedAdmin(user) {
-  return !!user && user.uid === verifiedAdminUid && auth.currentUser?.uid === user.uid;
-}
-
-async function declineAccess() {
-  declining = true;
-  verifiedAdminUid = null;
-  try { await signOut(auth); }
-  finally { window.location.replace('https://digilayn.co.za/'); }
-}
-
-async function verifyAdmin(user) {
-  try {
-    const { data } = await verifyAccess({});
-    if (auth.currentUser?.uid !== user.uid || data.uid !== user.uid) return false;
-    verifiedAdminUid = data.uid;
-    return true;
-  } catch (error) {
-    if (auth.currentUser?.uid !== user.uid) return false;
-    verifiedAdminUid = null;
-    if (error.code === 'functions/permission-denied' || error.code === 'functions/unauthenticated') {
-      await declineAccess();
-      return false;
-    }
-    throw error;
-  }
+  return !!user && adminAccess.currentUser?.uid === user.uid && auth.currentUser?.uid === user.uid;
 }
 
 export function initAdminAuth(onAuthorized, onUnauthorized, redirectPath = null) {
-  let stopAccountObserver = null;
-  let generation = 0;
-  return onAuthStateChanged(auth, async (user) => {
-    const currentGeneration = ++generation;
-    stopAccountObserver?.();
-    stopAccountObserver = null;
-    verifiedAdminUid = null;
-    if (declining) return;
-    if (!user) {
-      if (redirectPath) window.location.replace(redirectPath);
-      else onUnauthorized();
-      return;
-    }
-    onUnauthorized();
-    try {
-      if (!await verifyAdmin(user) || currentGeneration !== generation) return;
-      stopAccountObserver = accountAccess.observe((verifiedUser) => {
-        if (currentGeneration !== generation || declining) return;
-        if (isVerifiedAdmin(verifiedUser)) onAuthorized(verifiedUser);
-        else onUnauthorized();
-      });
-    } catch (error) {
-      if (currentGeneration === generation && !declining) onUnauthorized(error.message);
-    }
+  return adminAccess.observe((user, error, checking) => {
+    if (isVerifiedAdmin(user)) onAuthorized(user);
+    else if (redirectPath && !checking && !auth.currentUser && !error) window.location.replace(redirectPath);
+    else onUnauthorized(error?.message);
   });
 }
 
 export async function loginAdmin(email, password) {
-  const credential = await accountAccess.signIn(async () => {
-    const result = await signInWithEmailAndPassword(auth, (email || '').trim(), password);
-    if (!await verifyAdmin(result.user)) return null;
-    return result;
-  });
-  return credential?.user || null;
+  const credential = await adminAccess.signIn(() => signInWithEmailAndPassword(auth, email.trim(), password));
+  return credential.user;
 }
 
 export async function logoutAdmin() {
-  verifiedAdminUid = null;
   await signOut(auth);
 }

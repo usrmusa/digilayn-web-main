@@ -30,7 +30,7 @@
   if (typeof window.connectLaynFleetEmulators === 'function') {
     window.connectLaynFleetEmulators(auth, db, typeof firebase.storage === 'function' ? firebase.storage() : null);
   }
-  window.installAccountAccess();
+  window.installAdminAccess();
   const rtdb = !window.DigilaynBuild.isLocal && typeof firebase.database === 'function' ? firebase.database() : null;
   const serverTimestamp = firebase.firestore.FieldValue.serverTimestamp;
 
@@ -1065,9 +1065,9 @@
   // ---------------------------------------------------------------------------
   // AUTH GATE
   // ---------------------------------------------------------------------------
-  AccountAccess.observe(async (user) => {
+  AdminAccess.observe(async (user, error) => {
     hide($('boot-view'));
-    if (!user) return showLogin();
+    if (!user) return showLogin(error?.message);
 
     if ((user.email || '').toLowerCase() !== String(MANAGER_EMAIL).toLowerCase()) {
       // Wrong account — reject and sign out.
@@ -1116,8 +1116,8 @@
 
     btn.disabled = true; btn.textContent = 'Signing in…';
     try {
-      await AccountAccess.signIn(() => auth.signInWithEmailAndPassword(email, password));
-      // AccountAccess publishes the verified user from here.
+      await AdminAccess.signIn(() => auth.signInWithEmailAndPassword(email, password));
+      // AdminAccess publishes the backend-authorized user from here.
     } catch (err) {
       console.error(err);
       const el = $('login-error');
@@ -1132,14 +1132,12 @@
 
   function friendlyAuthError(err) {
     switch (err && err.code) {
-      case 'auth/account-suspended': return AccountAccessCore.messages['auth/account-suspended'];
-      case 'auth/account-unverified': return AccountAccessCore.messages['auth/account-unverified'];
       case 'auth/invalid-credential':
       case 'auth/wrong-password':
       case 'auth/user-not-found': return 'Incorrect email or password.';
       case 'auth/too-many-requests': return 'Too many attempts. Try again shortly.';
       case 'auth/network-request-failed': return 'Network error. Check your connection.';
-      default: return 'Could not sign in. Please try again.';
+      default: return err?.message || 'Could not sign in. Please try again.';
     }
   }
 
@@ -3371,7 +3369,7 @@
   async function loadPricingVoterProfiles(records) {
     const voterUids = new Set(records.flatMap((record) => Object.keys(record.votes || {})));
     await Promise.all([...voterUids].map((uid) => getUser(uid)));
-    if (AccountAccess.currentUser) renderPricing();
+    if (AdminAccess.currentUser) renderPricing();
   }
 
   function curveLabel(value) {
