@@ -25,13 +25,12 @@ Static HTML, CSS and JavaScript, with Tailwind CSS and Firebase-backed functiona
 
 ## Local Preview
 
-From the repository root, run:
-
-```sh
-python3 -m http.server 8000 --bind 127.0.0.1
-```
-
-Open [localhost:8000](http://127.0.0.1:8000/). Use explicit `.html` paths with this simple server; it does not reproduce GitHub Pages extensionless URL handling. Source files select live services explicitly. For emulator development, build and serve `dist/local` as the document root; do not preview source files expecting emulator routing.
+Double-click `launch-local.command` in Finder. It rebuilds `dist/local`, verifies
+that the service target is local, starts http://127.0.0.1:8101/ and opens your
+browser. Keep the Terminal window open; Control-C stops the website server.
+Python 3 is required. Start the Backend Firebase Emulator Suite separately.
+The launcher never serves the live build; an unavailable emulator remains an error.
+Extensionless page URLs are supported by the local server.
 
 ## Shared Theme
 
@@ -96,3 +95,8 @@ account gates remain separate; the superuser gate performs no profile lookup.
 The new function and website wiring remain local/unpublished until the owner
 confirms behavior and separately authorizes delivery. No admin account or email
 verification flag is created or changed by this implementation.
+
+For Android Studio Play actions, use the scripts in
+`Apps/LaynFleet/local-dev/` in the Digilayn workspace. Console actions select a
+page via `tools/launch-local.py --page <relative-html-path>` and can reuse an
+already-running server after verifying its local build configuration.

@@ -456,8 +456,8 @@
         <div class="stat-grid" style="margin-bottom: 20px;">
           <div class="stat-card">
             <span class="stat-label">Standard Rate (Private Car)</span>
-            <strong id="stat-pricing-private-rate" class="stat-value">R10.00/km</strong>
-            <span class="stat-hint" id="stat-pricing-private-min">Min Fare: R25.00</span>
+            <strong id="stat-pricing-private-rate" class="stat-value">Not configured</strong>
+            <span class="stat-hint" id="stat-pricing-private-min">Verified pricing required</span>
           </div>
           <div class="stat-card">
             <span class="stat-label">Active Proposals</span>
@@ -479,7 +479,16 @@
         <div class="panel" style="margin-bottom: 20px;">
           <div class="panel-head">
             <h3>Active Fleet Pricing (By Vehicle Type)</h3>
-            <span class="panel-badge">100% Driver Governed</span>
+            <span class="panel-badge">Driver voting · local admin configuration</span>
+          </div>
+          <div style="padding: 16px"><button class="btn btn-primary btn-sm" id="pricing-config-open">Configure pricing</button></div>
+          <div id="pricing-config-panel" class="is-hidden" style="padding:16px">
+            <h3>Configure vehicle-type pricing</h3>
+            <p>Local dev only. Suggestions are editable starting values, not active rates. Save one type or all seven. Existing values appear where available.</p>
+            <button class="btn btn-ghost btn-sm" id="pricing-config-suggest-all">Use suggestions for all types</button>
+            <div id="pricing-config-editor"></div>
+            <button class="btn btn-primary btn-sm" id="pricing-config-save-all">Save all seven types</button>
+            <button class="btn btn-ghost btn-sm" id="pricing-config-close">Close</button>
           </div>
           <div id="pricing-rates-table" class="table-wrap"></div>
         </div>

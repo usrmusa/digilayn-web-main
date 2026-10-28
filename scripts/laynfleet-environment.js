@@ -14,7 +14,19 @@
       if (!user) throw new Error('Sign in required.');
       const token = await user.getIdToken();
       if (!global.DigilaynBuild) throw new Error('Website build target is required.');
-      if (global.DigilaynBuild.isLocal) throw new Error('Local fleet API is not configured.');
+      if (global.DigilaynBuild.isLocal) {
+        if (!isDev) throw new Error('Local application review supports dev only.');
+        const review = path.match(/^\/admin\/driver-applications\/([A-Za-z0-9_-]{1,128})\/review$/);
+        const pricing = path === '/admin/pricing-configuration';
+        if (!review && !pricing) throw new Error('This local fleet API is not configured.');
+        const response = await fetch('http://127.0.0.1:5001/' + global.DIGILAYN_FIREBASE_CONFIG.projectId + '/us-central1/' + (pricing ? 'configurePricing' : 'reviewDriverApplication'), {
+          method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(pricing ? body : { ...body, applicantUid: review[1] })
+        });
+        const result = await response.json();
+        if (!response.ok || !result.data) throw new Error(result.error?.message || 'Application review failed.');
+        return result;
+      }
       const response = await fetch(`https://api.digilayn.co.za/v2/${environment}${path}`, {
         method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
