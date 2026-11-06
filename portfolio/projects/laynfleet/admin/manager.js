@@ -22,10 +22,12 @@
   // ---------------------------------------------------------------------------
   const fleetEnv = window.LaynFleetEnvironment;
   if (!fleetEnv) throw new Error("Fleet environment is required");
-  firebase.initializeApp(window.LAYNFLEET_FIREBASE_CONFIG);
+  if (!firebase.apps.length) {
+    firebase.initializeApp(window.LAYNFLEET_FIREBASE_CONFIG);
+  }
   const auth = firebase.auth();
-  window.installAccountAccess();
   const db = firebase.firestore();
+  window.installAdminAccess();
   const rtdb = typeof firebase.database === 'function' ? firebase.database() : null;
   const serverTimestamp = firebase.firestore.FieldValue.serverTimestamp;
 
@@ -168,6 +170,13 @@
     btnDeleteLicence.addEventListener('click', () => {
       promptDeleteLicencePhoto();
     });
+  }
+
+  const driverVehicleTypes = ['MINI_BUS', 'PRIVATE_CAR', 'BAKKIE', 'MOTORBIKE', 'TUK_TUK', 'TRUCK', 'FAMILY_CAR'];
+  const bakkieSubtypes = ['SMALL', 'SINGLE_CAB', 'DOUBLE_CAB'];
+
+  function driverImageUrl(value) {
+    return value;
   }
 
   function viewImage(url, title = 'Driver Licence', uid = '', name = '') {
@@ -493,8 +502,14 @@
     const model = modelEl.value.trim();
     const colour = (colourEl ? colourEl.value : '').trim();
     const plate = plateEl.value.trim().toUpperCase();
-    const seats = parseInt(seatsEl ? seatsEl.value : '4', 10) || 4;
-    const type = typeEl ? typeEl.value : 'PRIVATE_CAR';
+    const seats = Number(seatsEl?.value);
+    const type = typeEl?.value;
+    const bakkieSubtype = $('vehicle-input-bakkie-subtype')?.value;
+    if (!driverVehicleTypes.includes(type) || !Number.isInteger(seats) || seats < 1 || seats > 2147483647 ||
+        (type === 'BAKKIE' && !bakkieSubtypes.includes(bakkieSubtype))) {
+      toast('Select a valid vehicle type, passenger seats and Bakkie subtype where required.', 'error');
+      return;
+    }
 
     if (!make || !model) {
       toast('Vehicle make and model are required.', 'error');
@@ -517,7 +532,8 @@
         colour,
         plate,
         seats,
-        type
+        type,
+        ...(type === 'BAKKIE' ? { bakkieSubtype } : {})
       };
 
       const d = state.drivers.find((x) => x.uid === uid);
@@ -566,9 +582,9 @@
     const name = d.displayName || 'Name unavailable';
     const email = u.email || '—';
     const phone = d.phone || '';
-    const photoUrl = d.photoUrl || '';
-    const licenceUrl = d.licenceUrl || '';
-    const vType = String(v.type || 'PRIVATE_CAR').toUpperCase();
+    const photoUrl = driverImageUrl(d.photoUrl) || '';
+    const licenceUrl = driverImageUrl(d.licenceUrl) || '';
+    const vType = v.type;
 
     $('driver-modal-name').textContent = name;
     $('driver-modal-id').textContent = `UID: ${uid}`;
@@ -650,7 +666,7 @@
           </div>
           <div class="detail-item">
             <span class="detail-item-label">Terms Accepted</span>
-            <span class="detail-item-value">${d.legitAcceptedAt ? formatDate(d.legitAcceptedAt) : 'Not recorded'}</span>
+            <span class="detail-item-value">${d.consent?.acceptedTerms === true ? 'Accepted · ' + escapeHtml(formatDate(d.consent.acceptedAt)) : 'Not recorded'}</span>
           </div>
           <div class="detail-item">
             <span class="detail-item-label">Application Date</span>
@@ -666,6 +682,15 @@
               ${d.approvalStatus === 'PENDING' ? (d.resubmittedAt ? 'Resubmitted for review' : 'Pending initial review') : ''}
             </span>
           </div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title"><span>Submitted Application</span></div>
+        <div class="detail-grid">
+          <div class="detail-item"><span class="detail-item-label">Terms Version</span><span class="detail-item-value">${escapeHtml(d.consent?.termsVersion || 'Not recorded')}</span></div>
+          <div class="detail-item"><span class="detail-item-label">Application Revision</span><span class="detail-item-value">${escapeHtml(d.applicationRevision == null ? 'Not recorded' : String(d.applicationRevision))}</span></div>
+          <div class="detail-item"><span class="detail-item-label">Last Submitted Update</span><span class="detail-item-value">${escapeHtml(formatDate(d.updatedAt))}</span></div>
         </div>
       </div>
 
@@ -746,7 +771,7 @@
       <!-- Vehicle Details (Editable) -->
       <div class="detail-section">
         <div class="detail-section-title">
-          <span>🚘 Vehicle Details (Editable)</span>
+          <span>🚘 Vehicle Details ${d.vehicleDirectory ? '(Locked after approval)' : '(Application)'}</span>
           <span style="font-size: 11px; text-transform: none; color: var(--digilayn-primary);">Instant fleet sync</span>
         </div>
         <form id="driver-vehicle-form" onsubmit="return false;">
@@ -769,16 +794,20 @@
             </label>
             <label class="field">
               <span class="field-label">Passenger Seats</span>
-              <input id="vehicle-input-seats" ${d.vehicleDirectory ? 'disabled' : ''} type="number" min="1" max="50" class="field-input" value="${v.seats != null ? v.seats : 4}" required />
+              <input id="vehicle-input-seats" ${d.vehicleDirectory ? 'disabled' : ''} type="number" min="1" max="2147483647" class="field-input" value="${v.seats != null ? v.seats : ''}" required />
             </label>
             <label class="field">
               <span class="field-label">Vehicle Type</span>
               <select id="vehicle-input-type" ${d.vehicleDirectory ? 'disabled' : ''} class="field-input">
-                <option value="PRIVATE_CAR" ${vType === 'PRIVATE_CAR' || vType === 'STANDARD' ? 'selected' : ''}>Private Car (Standard)</option>
-                <option value="XL" ${vType === 'XL' ? 'selected' : ''}>XL (6+ Seats)</option>
-                <option value="PREMIUM" ${vType === 'PREMIUM' ? 'selected' : ''}>Premium</option>
-                <option value="DELIVERY" ${vType === 'DELIVERY' ? 'selected' : ''}>Delivery</option>
-                <option value="TUKTUK" ${vType === 'TUKTUK' ? 'selected' : ''}>Tuktuk</option>
+                <option value="" ${!driverVehicleTypes.includes(vType) ? 'selected' : ''} disabled>${escapeHtml(driverVehicleTypes.includes(vType) ? 'Select vehicle type' : vType ? 'Unrecognised type: ' + vType : 'Vehicle type not recorded')}</option>
+                ${driverVehicleTypes.map(type => `<option value="${type}" ${vType === type ? 'selected' : ''}>${escapeHtml(titleCase(type.replace(/_/g, ' ')))}</option>`).join('')}
+              </select>
+            </label>
+            <label class="field ${vType === 'BAKKIE' ? '' : 'is-hidden'}" id="bakkie-subtype-field">
+              <span class="field-label">Bakkie Subtype</span>
+              <select id="vehicle-input-bakkie-subtype" ${d.vehicleDirectory ? 'disabled' : ''} class="field-input">
+                <option value="" disabled ${!bakkieSubtypes.includes(v.bakkieSubtype) ? 'selected' : ''}>Subtype not recorded</option>
+                ${bakkieSubtypes.map(type => `<option value="${type}" ${v.bakkieSubtype === type ? 'selected' : ''}>${escapeHtml(titleCase(type.replace(/_/g, ' ')))}</option>`).join('')}
               </select>
             </label>
           </div>
@@ -820,6 +849,10 @@
     `;
 
     // Wire listeners inside driver details modal
+    $('vehicle-input-type').addEventListener('change', (event) => {
+      $('bakkie-subtype-field').classList.toggle('is-hidden', event.target.value !== 'BAKKIE');
+    });
+    bodyEl.querySelector('[data-view-full-photo]')?.addEventListener('click', () => viewImage(photoUrl, 'Applicant Photo — ' + name));
     const saveVehicleBtn = $('btn-save-vehicle');
     if (saveVehicleBtn) {
       saveVehicleBtn.addEventListener('click', () => saveDriverVehicle(uid));
@@ -853,7 +886,7 @@
           driverName: `${name} (${uid.slice(0, 8)}…)`,
           itemLabel: 'driver profile picture',
           detailsText: `You are about to permanently delete the profile picture for ${name} from the driver fleet record. The user's main profile and personal photos will remain untouched. This cannot be undone.`,
-          onConfirm: () => deleteDriverProfilePhoto(uid, name, photoUrl)
+          onConfirm: () => deleteDriverProfilePhoto(uid, name, d.photoUrl)
         });
       });
     }
@@ -1046,6 +1079,7 @@
       search: ''                // review search input
     },
     pricingRates: [],
+    pricingLoadStatus: "loading",
     pricingProposals: [],
     pricingHistory: [],
     appConfig: {},
@@ -1060,9 +1094,9 @@
   // ---------------------------------------------------------------------------
   // AUTH GATE
   // ---------------------------------------------------------------------------
-  AccountAccess.observe(async (user) => {
+  AdminAccess.observe(async (user, error) => {
     hide($('boot-view'));
-    if (!user) return showLogin();
+    if (!user) return showLogin(error?.message);
 
     if ((user.email || '').toLowerCase() !== String(MANAGER_EMAIL).toLowerCase()) {
       // Wrong account — reject and sign out.
@@ -1111,8 +1145,8 @@
 
     btn.disabled = true; btn.textContent = 'Signing in…';
     try {
-      await AccountAccess.signIn(() => auth.signInWithEmailAndPassword(email, password));
-      // AccountAccess publishes the verified user from here.
+      await AdminAccess.signIn(() => auth.signInWithEmailAndPassword(email, password));
+      // AdminAccess publishes the backend-authorized user from here.
     } catch (err) {
       console.error(err);
       const el = $('login-error');
@@ -1127,14 +1161,12 @@
 
   function friendlyAuthError(err) {
     switch (err && err.code) {
-      case 'auth/account-suspended': return AccountAccessCore.messages['auth/account-suspended'];
-      case 'auth/account-unverified': return AccountAccessCore.messages['auth/account-unverified'];
       case 'auth/invalid-credential':
       case 'auth/wrong-password':
       case 'auth/user-not-found': return 'Incorrect email or password.';
       case 'auth/too-many-requests': return 'Too many attempts. Try again shortly.';
       case 'auth/network-request-failed': return 'Network error. Check your connection.';
-      default: return 'Could not sign in. Please try again.';
+      default: return err?.message || 'Could not sign in. Please try again.';
     }
   }
 
@@ -1226,10 +1258,14 @@
 
     // Pricing Rates
     unsub.push(
-      pricingCol.onSnapshot((snap) => {
+      pricingCol.onSnapshot({ includeMetadataChanges: true }, (snap) => {
+        state.pricingLoadStatus = snap.metadata.fromCache ? "loading" : "ready";
         state.pricingRates = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
         renderPricing();
       }, (err) => {
+        state.pricingLoadStatus = 'error';
+        state.pricingRates = [];
+        renderPricing();
         console.warn('pricing listener', err);
       })
     );
@@ -1546,7 +1582,7 @@
     const u = d.user || {};
     const v = d.vehicle || {};
     const name = d.displayName || 'Name unavailable';
-    const photo = d.photoUrl;
+    const photo = driverImageUrl(d.photoUrl);
     const driverPhone = d.phone || '—';
     const avatar = photo
       ? `<img class="avatar" src="${escapeHtml(photo)}" alt="" data-view-driver="${escapeHtml(d.uid)}" style="cursor:pointer;" title="Click to view full driver profile" />`
@@ -1586,7 +1622,7 @@
     const vehicleType = v.type ? titleCase(String(v.type).replace(/_/g, ' ')) : '—';
     const vehicleLine = [v.make, v.model].filter(Boolean).join(' ') || 'Vehicle not set';
     const licence = d.licenceUrl
-      ? `<img class="doc-thumb" src="${escapeHtml(d.licenceUrl)}" alt="Licence" data-view="${escapeHtml(d.licenceUrl)}" data-title="Driver Licence — ${escapeHtml(name)}" data-uid="${escapeHtml(d.uid)}" data-name="${escapeHtml(name)}" title="Click to view licence in full" />`
+      ? `<img class="doc-thumb" src="${escapeHtml(driverImageUrl(d.licenceUrl))}" alt="Licence" data-view="${escapeHtml(driverImageUrl(d.licenceUrl))}" data-title="Driver Licence — ${escapeHtml(name)}" data-uid="${escapeHtml(d.uid)}" data-name="${escapeHtml(name)}" title="Click to view licence in full" />`
       : '<span class="driver-sub">No licence photo</span>';
 
     let actions = '';
@@ -1614,7 +1650,7 @@
       actions = '<span class="driver-sub">Waiting for driver update</span>';
     }
 
-    let subLine = `Applied ${escapeHtml(formatDate(d.createdAt))}${d.legitAcceptedAt ? ' · accepted terms' : ''}`;
+    let subLine = `Applied ${escapeHtml(formatDate(d.createdAt))}${d.consent?.acceptedTerms === true ? ' · accepted terms' : ''}`;
     if (d.approvalStatus === 'CHANGES_REQUESTED') {
       subLine = `Changes requested ${escapeHtml(formatDate(d.updateRequestedAt))} · ${escapeHtml(d.updateReason || '')}`;
     } else if (d.approvalStatus === 'PENDING' && d.resubmittedAt) {
@@ -3327,8 +3363,78 @@
     { type: 'MINI_BUS', label: 'Mini Bus', defaultRate: 12.0, defaultMin: 30.0 },
     { type: 'BAKKIE', label: 'Bakkie', defaultRate: 12.0, defaultMin: 30.0 },
     { type: 'MOTORBIKE', label: 'Motorbike', defaultRate: 7.0, defaultMin: 18.0 },
-    { type: 'TUK_TUK', label: 'Tuk Tuk', defaultRate: 6.0, defaultMin: 15.0 }
+    { type: 'TUK_TUK', label: 'Tuk Tuk', defaultRate: 6.0, defaultMin: 15.0 },
+    { type: 'TRUCK', label: 'Truck', defaultRate: 18.0, defaultMin: 60.0 },
+    { type: 'FAMILY_CAR', label: 'Family Car', defaultRate: 12.0, defaultMin: 35.0 }
   ];
+
+  function validPricing(doc) {
+    return !!doc && ['ratePerKm', 'minimumFare', 'returnTripPercent', 'waitRatePerMinute', 'freeWaitMinutes'].every(key => typeof doc[key] === 'number' && Number.isFinite(doc[key]) && doc[key] >= 0) && doc.ratePerKm > 0 && Number.isInteger(doc.freeWaitMinutes) && doc.freeWaitMinutes <= 2147483647 && (doc.curveScaleKm == null || (typeof doc.curveScaleKm === 'number' && Number.isFinite(doc.curveScaleKm) && doc.curveScaleKm > 0));
+  }
+  let pricingEditorSnapshot = new Map();
+  let pricingConfigSaving = false;
+  const pricingFields = [
+    ['ratePerKm', 'Rate / km (R)'], ['minimumFare', 'Minimum fare (R)'],
+    ['returnTripPercent', 'Return trip surcharge (%)'], ['waitRatePerMinute', 'Waiting / minute (R)'],
+    ['freeWaitMinutes', 'Free waiting minutes'], ['curveScaleKm', 'Curve scale km (blank = linear)']
+  ];
+  function openPricingEditor() {
+    if (pricingConfigSaving) return;
+    pricingEditorSnapshot = new Map(state.pricingRates.filter(doc => driverVehicleTypes.includes(doc.vehicleType) && doc.id === doc.vehicleType.toLowerCase()).map(doc => [doc.vehicleType, { ...doc }]));
+    $('pricing-config-editor').innerHTML = DEFAULT_VEHICLE_PRICING.map(vp => {
+      const current = pricingEditorSnapshot.get(vp.type);
+      return `<div class="detail-section" data-pricing-editor="${vp.type}">
+        <div class="detail-section-title"><span>${escapeHtml(vp.label)}</span></div>
+        <p>Suggestions: R${vp.defaultRate}/km, minimum R${vp.defaultMin}, return +50%, waiting R2/min, 5 free minutes, linear. Review before saving.</p>
+        <div class="vehicle-form-grid">${pricingFields.map(([key, label]) => `<label class="field"><span class="field-label">${label}</span><input class="field-input" type="number" min="${key === 'ratePerKm' || key === 'curveScaleKm' ? '0.01' : '0'}" step="${key === 'freeWaitMinutes' ? '1' : 'any'}" data-pricing-field="${key}" value="${typeof current?.[key] === 'number' ? escapeHtml(String(current[key])) : ''}" ${key === 'curveScaleKm' ? '' : 'required'}></label>`).join('')}</div>
+        <div class="driver-actions"><button class="btn btn-ghost btn-sm" data-pricing-suggest="${vp.type}">Use suggestions</button><button class="btn btn-primary btn-sm" data-pricing-save="${vp.type}">Save ${escapeHtml(vp.label)}</button></div>
+      </div>`;
+    }).join('');
+    show($('pricing-config-panel'));
+  }
+  $('pricing-config-open').addEventListener('click', openPricingEditor);
+  $('pricing-config-suggest-all').addEventListener('click', () => {
+    if (!pricingConfigSaving) $('pricing-config-editor').querySelectorAll('[data-pricing-suggest]').forEach(button => button.click());
+  });
+  $('pricing-config-close').addEventListener('click', () => { if (!pricingConfigSaving) hide($('pricing-config-panel')); });
+  $('pricing-config-editor').addEventListener('click', event => {
+    const suggestion = event.target.closest('[data-pricing-suggest]');
+    if (suggestion && !pricingConfigSaving) {
+      const vp = DEFAULT_VEHICLE_PRICING.find(v => v.type === suggestion.dataset.pricingSuggest);
+      const values = { ratePerKm: vp.defaultRate, minimumFare: vp.defaultMin, returnTripPercent: 50, waitRatePerMinute: 2, freeWaitMinutes: 5, curveScaleKm: '' };
+      const row = suggestion.closest('[data-pricing-editor]');
+      pricingFields.forEach(([key]) => { row.querySelector(`[data-pricing-field="${key}"]`).value = values[key]; });
+    }
+    const save = event.target.closest('[data-pricing-save]');
+    if (save) void savePricingConfiguration([save.dataset.pricingSave]);
+  });
+  $('pricing-config-save-all').addEventListener('click', () => void savePricingConfiguration(driverVehicleTypes));
+  async function savePricingConfiguration(types) {
+    if (pricingConfigSaving) return;
+    if (!window.DigilaynBuild.isLocal || !fleetEnv.isDev) return toast('Pricing configuration is available in local dev only.', 'error');
+    const rates = [];
+    for (const type of types) {
+      const row = $('pricing-config-editor').querySelector(`[data-pricing-editor="${type}"]`);
+      const previous = pricingEditorSnapshot.get(type);
+      const values = { vehicleType: type, expectedExists: !!previous, expectedUpdatedAt: previous?.updatedAt ?? null };
+      for (const [key] of pricingFields) {
+        const input = row.querySelector(`[data-pricing-field="${key}"]`);
+        if (!input.reportValidity()) return;
+        values[key] = key === 'curveScaleKm' && input.value === '' ? null : Number(input.value);
+      }
+      if (!validPricing(values)) return toast('Complete valid pricing for ' + type, 'error');
+      rates.push(values);
+    }
+    if (!window.confirm(`Save pricing for ${rates.length === 1 ? types[0] : 'all seven vehicle types'} to local dev Firestore?`)) return;
+    pricingConfigSaving = true;
+    $('pricing-config-panel').querySelectorAll('button,input').forEach(input => { input.disabled = true; });
+    try {
+      await fleetEnv.request('/admin/pricing-configuration', { rates });
+      hide($('pricing-config-panel'));
+      toast('Pricing saved. Reopen configuration for further edits.', 'success');
+    } catch (error) { toast(error.message, 'error'); }
+    finally { pricingConfigSaving = false; $('pricing-config-panel').querySelectorAll('button,input').forEach(input => { input.disabled = false; }); }
+  }
 
   let pricingResolutionPending = false;
   $('pricing-proposals-list').addEventListener('click', async (event) => {
@@ -3366,7 +3472,7 @@
   async function loadPricingVoterProfiles(records) {
     const voterUids = new Set(records.flatMap((record) => Object.keys(record.votes || {})));
     await Promise.all([...voterUids].map((uid) => getUser(uid)));
-    if (AccountAccess.currentUser) renderPricing();
+    if (AdminAccess.currentUser) renderPricing();
   }
 
   function curveLabel(value) {
@@ -3419,20 +3525,28 @@
 
   function renderPricing() {
     const ratesTableEl = $('pricing-rates-table');
+    $('pricing-config-open').disabled = state.pricingLoadStatus !== 'ready' || !window.DigilaynBuild.isLocal || !fleetEnv.isDev;
+    if (state.pricingLoadStatus !== 'ready') {
+      const message = state.pricingLoadStatus === 'error' ? 'Pricing unavailable — read failed' : 'Loading pricing…';
+      $('stat-pricing-private-rate').textContent = message;
+      $('stat-pricing-private-min').textContent = '';
+      ratesTableEl.textContent = message;
+      return;
+    }
     const proposalsListEl = $('pricing-proposals-list');
     const historyTableEl = $('pricing-history-table');
 
     // Build rate mapping
     const ratesMap = new Map();
     state.pricingRates.forEach((r) => {
-      const key = (r.vehicleType || r.id).toUpperCase();
-      ratesMap.set(key, r);
+      if (driverVehicleTypes.includes(r.vehicleType) && r.id === r.vehicleType.toLowerCase()) ratesMap.set(r.vehicleType, r);
     });
 
     // 1. Stats Summary
-    const privateRate = ratesMap.get('PRIVATE_CAR') || { ratePerKm: 10.0, minimumFare: 25.0 };
-    if ($('stat-pricing-private-rate')) $('stat-pricing-private-rate').textContent = `R${privateRate.ratePerKm.toFixed(2)}/km`;
-    if ($('stat-pricing-private-min')) $('stat-pricing-private-min').textContent = `Min Fare: R${privateRate.minimumFare.toFixed(2)}`;
+    const privateRate = ratesMap.get('PRIVATE_CAR');
+    const privateValid = validPricing(privateRate);
+    if ($('stat-pricing-private-rate')) $('stat-pricing-private-rate').textContent = privateValid ? `R${privateRate.ratePerKm.toFixed(2)}/km` : 'Not configured';
+    if ($('stat-pricing-private-min')) $('stat-pricing-private-min').textContent = privateValid ? `Min Fare: R${privateRate.minimumFare.toFixed(2)}` : 'Verified pricing required';
     if ($('stat-pricing-active-proposals')) $('stat-pricing-active-proposals').textContent = state.pricingProposals.length;
     if ($('stat-pricing-history-count')) $('stat-pricing-history-count').textContent = state.pricingHistory.length;
 
@@ -3440,19 +3554,19 @@
     if (ratesTableEl) {
       const rowsHtml = DEFAULT_VEHICLE_PRICING.map((vp) => {
         const doc = ratesMap.get(vp.type);
-        const ratePerKm = (doc && typeof doc.ratePerKm === 'number') ? doc.ratePerKm : vp.defaultRate;
-        const minFare = (doc && typeof doc.minimumFare === 'number') ? doc.minimumFare : vp.defaultMin;
-        const curveScaleKm = (doc && typeof doc.curveScaleKm === 'number') ? doc.curveScaleKm : null;
+        const configured = validPricing(doc);
+        const ratePerKm = configured ? doc.ratePerKm : null;
+        const minFare = configured ? doc.minimumFare : null;
+        const curveScaleKm = configured ? doc.curveScaleKm : null;
         const hasActiveProposal = doc && Boolean(doc.activeProposalId);
-        const updatedAtStr = doc && doc.updatedAt ? formatDate(doc.updatedAt) : 'Seed Baseline';
-
+        const updatedAtStr = doc && doc.updatedAt ? formatDate(doc.updatedAt) : 'Not recorded';
         return `
           <tr>
             <td><strong>${escapeHtml(vp.label)}</strong></td>
-            <td><strong>R${ratePerKm.toFixed(2)}</strong> / km<div class="muted" style="font-size:11px;">${curveLabel(curveScaleKm)}</div></td>
-            <td>R${minFare.toFixed(2)}</td>
+            <td><strong>R${configured ? ratePerKm.toFixed(2) : '—'}</strong> / km<div class="muted" style="font-size:11px;">${configured ? curveLabel(curveScaleKm) : 'Not configured'}</div></td>
+            <td>R${configured ? minFare.toFixed(2) : '—'}</td>
             <td>
-              ${hasActiveProposal
+              ${!configured ? '<span class="status-badge">Not configured</span>' : hasActiveProposal
                 ? '<span class="status-badge status-badge-pending">🗳️ Voting in Progress</span>'
                 : '<span class="status-badge status-badge-approved">✓ Active Rate</span>'}
             </td>

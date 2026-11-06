@@ -9,7 +9,7 @@ This public repository contains the Digilayn business website, founder profile, 
 
 ## Technology
 
-Static HTML, CSS and JavaScript, with Tailwind CSS and Firebase-backed functionality. There is no application build step. Firebase-backed pages require the appropriate authentication and server permissions.
+Static HTML, CSS and JavaScript, with Tailwind CSS and Firebase-backed functionality. The service target is selected by the static build step below. Firebase-backed pages require the appropriate authentication and server permissions.
 
 ## Structure
 
@@ -25,13 +25,12 @@ Static HTML, CSS and JavaScript, with Tailwind CSS and Firebase-backed functiona
 
 ## Local Preview
 
-From the repository root, run:
-
-```sh
-python3 -m http.server 8000 --bind 127.0.0.1
-```
-
-Open [localhost:8000](http://127.0.0.1:8000/). Use explicit `.html` paths with this simple server; it does not reproduce GitHub Pages extensionless URL handling. Previewing does not provide a separate Firebase test environment.
+Double-click `launch-local.command` in Finder. It rebuilds `dist/local`, verifies
+that the service target is local, starts http://127.0.0.1:8101/ and opens your
+browser. Keep the Terminal window open; Control-C stops the website server.
+Python 3 is required. Start the Backend Firebase Emulator Suite separately.
+The launcher never serves the live build; an unavailable emulator remains an error.
+Extensionless page URLs are supported by the local server.
 
 ## Shared Theme
 
@@ -64,3 +63,40 @@ See [GitHub Pages documentation](https://docs.github.com/en/pages/getting-starte
 This repository is public intentionally. Keep credentials, service-account keys, access tokens, private account records, local environment files and editor metadata out of it. Backend functions and authoritative Firebase rules are maintained separately; do not deploy backend or rule changes from this website checkout.
 
 Firebase browser configuration identifies the project for client SDKs and is included deliberately. It does not grant administrative access; backend services and Firebase rules must enforce authorization. See [Firebase API key guidance](https://firebase.google.com/docs/projects/api-keys).
+
+## Service Target Builds
+
+Run `python3 tools/build-site.py local` or `python3 tools/build-site.py live`.
+Serve `dist/local` for IntelliJ development and use `dist/live` for live publication.
+The generated `scripts/build-target.js` selects services; the prod/dev fleet selector
+only selects data within those services. Neither hostname nor `env=dev` selects emulators.
+For IntelliJ, open the generated local output as the web root once; its page URLs need
+no service-target parameter. Existing absolute `/scripts` and `/styles` paths require
+serving the output at the URL root.
+
+Local Auth, Firestore and Storage use ports 9099, 8080 and 9199.
+Functions SDK calls target the Functions emulator on port 5001. Backend now includes
+`checkAdminAccess`; restart the local emulator suite after compiling the new backend. Local fleet HTTP API requests explicitly
+fail until an endpoint is configured. Local web tracking is unavailable while the
+Realtime Database emulator is missing. No live-service fallback is used for these paths.
+Admin login requires `checkAdminAccess` to confirm the authenticated email
+`admin@digilayn.co.za` and explicit email verification. No account document,
+suspension check, UID allowlist or local-hosting bypass participates in admin access.
+
+## Superuser Login
+
+Projects, global user management and the canonical LaynFleet manager/errors/tracking
+pages share one admin gate. Modular and compat Firebase adapters call the same
+backend function. Signed-out startup makes no authorization request. Authenticated
+entry and restored sessions remain closed until the backend approves the identity.
+Backend errors and malformed responses cannot publish admin access. Normal user
+account gates remain separate; the superuser gate performs no profile lookup.
+
+The new function and website wiring remain local/unpublished until the owner
+confirms behavior and separately authorizes delivery. No admin account or email
+verification flag is created or changed by this implementation.
+
+For Android Studio Play actions, use the scripts in
+`Apps/LaynFleet/local-dev/` in the Digilayn workspace. Console actions select a
+page via `tools/launch-local.py --page <relative-html-path>` and can reuse an
+already-running server after verifying its local build configuration.
