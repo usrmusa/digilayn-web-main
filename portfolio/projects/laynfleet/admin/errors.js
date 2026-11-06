@@ -17,9 +17,6 @@
   }
   const auth = firebase.auth();
   const db = firebase.firestore();
-  if (typeof window.connectLaynFleetEmulators === 'function') {
-    window.connectLaynFleetEmulators(auth, db);
-  }
   if (typeof window.installAdminAccess === 'function') {
     window.installAdminAccess();
   }

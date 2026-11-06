@@ -27,12 +27,8 @@
   }
   const auth = firebase.auth();
   const db = firebase.firestore();
-  if (typeof window.connectLaynFleetEmulators === 'function') {
-    window.connectLaynFleetEmulators(auth, db, typeof firebase.storage === 'function' ? firebase.storage() : null);
-  }
   window.installAdminAccess();
   const rtdb = typeof firebase.database === 'function' ? firebase.database() : null;
-  if (rtdb && window.DigilaynBuild.isLocal) rtdb.useEmulator('127.0.0.1', 9000);
   const serverTimestamp = firebase.firestore.FieldValue.serverTimestamp;
 
   const driversCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(FS.drivers);
@@ -179,15 +175,8 @@
   const driverVehicleTypes = ['MINI_BUS', 'PRIVATE_CAR', 'BAKKIE', 'MOTORBIKE', 'TUK_TUK', 'TRUCK', 'FAMILY_CAR'];
   const bakkieSubtypes = ['SMALL', 'SINGLE_CAB', 'DOUBLE_CAB'];
 
-  // Android's emulator uses a host alias that is unreachable from a desktop browser.
-  // Adapt only the known local Storage emulator endpoint; preserve saved records.
   function driverImageUrl(value) {
-    if (!value || !window.DigilaynBuild?.isLocal) return value;
-    const url = new URL(value);
-    if (url.protocol === 'http:' && url.hostname === '10.0.2.2' && url.port === '9199') {
-      url.hostname = '127.0.0.1';
-    }
-    return url.href;
+    return value;
   }
 
   function viewImage(url, title = 'Driver Licence', uid = '', name = '') {

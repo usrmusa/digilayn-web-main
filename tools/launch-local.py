@@ -55,7 +55,7 @@ def main():
         return
     with server:
         print(f'\nLocal website: {url}', flush=True)
-        print('Firebase target: local emulators only. Start the Backend emulator suite separately.', flush=True)
+        print('Firebase target: online testing.', flush=True)
         print('Keep this Terminal window open. Press Control-C to stop.\n', flush=True)
         webbrowser.open(url)
         try:

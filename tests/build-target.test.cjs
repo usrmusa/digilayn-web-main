@@ -18,10 +18,7 @@ for (const target of ['local', 'live']) {
       assert.equal(window.LaynFleetEnvironment.environment, environment);
       window.DIGILAYN_FIREBASE_CONFIG = {};
       vm.runInContext(fs.readFileSync(path.join(output, 'portfolio/projects/laynfleet/admin/firebase-config.js'), 'utf8'), context);
-      const calls = [];
-      const sdk = { useEmulator: (...args) => calls.push(args) };
-      window.connectLaynFleetEmulators(sdk, sdk, sdk);
-      assert.equal(calls.length, target === 'local' ? 3 : 0);
+      assert.equal(typeof window.connectLaynFleetEmulators, 'undefined');
     });
   }
 }

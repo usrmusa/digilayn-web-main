@@ -750,7 +750,6 @@
       }
       db = firebase.firestore();
       rtdb = typeof firebase.database === 'function' ? firebase.database() : null;
-      if (rtdb && window.DigilaynBuild.isLocal) rtdb.useEmulator('127.0.0.1', 9000);
 
       // 1. RTDB Driver Locations Listener
       if (rtdb) {
@@ -892,7 +891,6 @@
       return;
     }
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    window.connectLaynFleetEmulators(firebase.auth(), firebase.firestore());
     window.installAdminAccess();
     loadGoogleMaps();
     AdminAccess.observe((user, error, checking) => {

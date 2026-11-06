@@ -35,20 +35,4 @@
 
   // Provenance strings written by the apps at registration.
   global.APP_PACKAGES = global.LaynFleetEnvironment.appPackages;
-
-  // Helper to connect compat SDK instances to local emulators for a local build.
-  global.connectLaynFleetEmulators = function (authInstance, dbInstance, storageInstance) {
-    if (!global.DigilaynBuild) throw new Error('Website build target is required.');
-    if (global.DigilaynBuild.isLocal) {
-        if (authInstance && typeof authInstance.useEmulator === 'function') {
-          authInstance.useEmulator('http://127.0.0.1:9099');
-        }
-        if (dbInstance && typeof dbInstance.useEmulator === 'function') {
-          dbInstance.useEmulator('127.0.0.1', 8080);
-        }
-        if (storageInstance && typeof storageInstance.useEmulator === 'function') {
-          storageInstance.useEmulator('127.0.0.1', 9199);
-        }
-    }
-  };
 })(window);
