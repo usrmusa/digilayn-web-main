@@ -3411,7 +3411,6 @@
   $('pricing-config-save-all').addEventListener('click', () => void savePricingConfiguration(driverVehicleTypes));
   async function savePricingConfiguration(types) {
     if (pricingConfigSaving) return;
-    if (!window.DigilaynBuild.isLocal || !fleetEnv.isDev) return toast('Pricing configuration is available in local dev only.', 'error');
     const rates = [];
     for (const type of types) {
       const row = $('pricing-config-editor').querySelector(`[data-pricing-editor="${type}"]`);
@@ -3425,7 +3424,7 @@
       if (!validPricing(values)) return toast('Complete valid pricing for ' + type, 'error');
       rates.push(values);
     }
-    if (!window.confirm(`Save pricing for ${rates.length === 1 ? types[0] : 'all seven vehicle types'} to local dev Firestore?`)) return;
+    if (!window.confirm(`Save pricing for ${rates.length === 1 ? types[0] : 'all seven vehicle types'} to ${fleetEnv.environment} Firestore?`)) return;
     pricingConfigSaving = true;
     $('pricing-config-panel').querySelectorAll('button,input').forEach(input => { input.disabled = true; });
     try {
@@ -3525,7 +3524,7 @@
 
   function renderPricing() {
     const ratesTableEl = $('pricing-rates-table');
-    $('pricing-config-open').disabled = state.pricingLoadStatus !== 'ready' || !window.DigilaynBuild.isLocal || !fleetEnv.isDev;
+    $('pricing-config-open').disabled = state.pricingLoadStatus !== 'ready';
     if (state.pricingLoadStatus !== 'ready') {
       const message = state.pricingLoadStatus === 'error' ? 'Pricing unavailable — read failed' : 'Loading pricing…';
       $('stat-pricing-private-rate').textContent = message;
