@@ -159,6 +159,30 @@ textarea.field-input { resize: vertical; }
 }
 
 .sidebar-footer { display: flex; flex-direction: column; gap: 12px; }
+.sidebar-environment {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--digilayn-on-surface-variant);
+}
+.sidebar-environment select {
+  width: 100%;
+  font: inherit;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--digilayn-on-surface);
+  background: var(--digilayn-surface-container-lowest);
+  border: 1px solid var(--digilayn-outline-variant);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+.sidebar-environment select:focus { outline: none; border-color: var(--digilayn-primary); }
+.sidebar-environment .fleet-dev-badge { align-self: flex-start; }
 .sidebar-user { display: flex; align-items: center; gap: 10px; padding: 4px; }
 .sidebar-avatar {
   display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
@@ -167,7 +191,7 @@ textarea.field-input { resize: vertical; }
 .sidebar-user-email { font-size: 12px; color: var(--digilayn-on-surface-variant); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* ---------- Content ---------- */
-.content { padding: 24px 28px 60px; max-width: 1200px; }
+.content { padding: 24px 28px 60px; }
 .topbar {
   display: flex; align-items: flex-start; justify-content: space-between;
   gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
@@ -1346,3 +1370,98 @@ tbody tr:hover { background: var(--digilayn-surface-container-high); }
 .notice-body { white-space: pre-wrap; overflow-wrap: anywhere; }
 .notice-error { color: var(--digilayn-error); }
 @media (max-width: 600px) { .notice-form-grid { grid-template-columns: 1fr; } }
+
+/* ---------------------------------------------------------------------------
+   Service Area (pickup radius)
+   --------------------------------------------------------------------------- */
+.service-area-body { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+.service-area-note { color: var(--digilayn-on-surface-variant); font-size: 13px; line-height: 1.5; margin: 0; }
+.service-area-note code { font-size: 12px; background: rgb(var(--digilayn-primary-rgb) / 0.08); padding: 1px 5px; border-radius: 4px; }
+.service-area-map {
+  width: 100%;
+  height: 360px;
+  border-radius: 12px;
+  border: 1px solid var(--digilayn-outline, rgba(0, 0, 0, 0.12));
+  background: var(--digilayn-surface-variant);
+}
+.service-area-controls {
+  display: grid;
+  grid-template-columns: 1fr 180px;
+  gap: 16px;
+  align-items: end;
+}
+.service-area-field { display: flex; flex-direction: column; gap: 6px; }
+.service-area-slider { width: 100%; }
+.service-area-readout { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 12px; }
+.service-area-readout strong { font-size: 20px; color: var(--digilayn-primary); }
+.service-area-actions { display: flex; gap: 10px; }
+@media (max-width: 640px) {
+  .service-area-controls { grid-template-columns: 1fr; }
+}
+
+/* ---------------------------------------------------------------------------
+   Client Errors & Telemetry
+   --------------------------------------------------------------------------- */
+#section-errors .empty-state { text-align: center; padding: 32px 16px; color: var(--digilayn-on-surface-variant); }
+.error-card {
+  background: var(--digilayn-surface-container);
+  border: 1px solid var(--digilayn-outline-variant);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  cursor: pointer;
+}
+.error-card:hover { border-color: var(--digilayn-primary); box-shadow: 0 4px 16px rgb(var(--digilayn-shadow-rgb) / 0.15); }
+.error-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+.error-time { font-size: 13px; color: var(--digilayn-on-surface-variant); margin-left: auto; font-variant-numeric: tabular-nums; }
+.error-message {
+  font-size: 16px; font-weight: 700; color: var(--digilayn-on-surface);
+  margin-bottom: 10px; word-break: break-word;
+}
+.error-meta-grid {
+  display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 12px;
+  color: var(--digilayn-on-surface-variant);
+  background: var(--digilayn-surface-container-high);
+  padding: 8px 12px; border-radius: var(--radius-sm);
+}
+.error-meta-item strong { color: var(--digilayn-on-surface); font-weight: 600; }
+.badge-rider { background: var(--digilayn-info); color: var(--digilayn-on-info); }
+.badge-driver { background: var(--digilayn-tertiary); color: var(--digilayn-on-tertiary); }
+.badge-type {
+  background: var(--digilayn-error-container); color: var(--digilayn-on-error-container);
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+}
+.badge-anon { background: var(--digilayn-surface-container-highest); color: var(--digilayn-on-surface-variant); }
+.filter-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.filter-chip {
+  padding: 6px 14px; border-radius: 20px; border: 1px solid var(--digilayn-outline-variant);
+  background: var(--digilayn-surface-container); color: var(--digilayn-on-surface);
+  font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+}
+.filter-chip.is-active { background: var(--digilayn-primary); color: var(--digilayn-on-primary); border-color: var(--digilayn-primary); }
+.live-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--digilayn-success); box-shadow: 0 0 8px var(--digilayn-success); margin-right: 6px; }
+.json-code {
+  background: var(--digilayn-surface-container-highest); color: var(--digilayn-on-surface); padding: 16px; border-radius: var(--radius-sm);
+  border: 1px solid var(--digilayn-outline-variant);
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.5;
+  overflow-x: auto; max-height: 400px; white-space: pre-wrap; word-break: break-all; margin: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Live Radar (embedded tracker workspace)
+   Override tracking.css full-viewport sizing so it fits inside the console.
+   --------------------------------------------------------------------------- */
+#section-tracking .tracker-workspace.tracker-embed {
+  height: calc(100vh - 160px);
+  min-height: 480px;
+  border: 1px solid var(--digilayn-outline-variant);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+#section-tracking .header-kpi-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}

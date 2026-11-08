@@ -739,81 +739,76 @@
   // Live Firebase Listeners (Real Data)
   // ---------------------------------------------------------------------------
   function attachFirebaseListeners() {
-    if (typeof firebase === 'undefined' || !firebaseConfig?.apiKey || !firebaseConfig?.databaseURL) {
-      console.error('Firebase SDK or shared Firebase configuration not loaded.');
+    if (!db) {
+      console.error('Live Radar: Firestore handle unavailable.');
       return;
     }
 
-    try {
-      if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-      }
-      db = firebase.firestore();
-      rtdb = typeof firebase.database === 'function' ? firebase.database() : null;
+    // 1. RTDB Driver Locations Listener
+    if (rtdb) {
+      const locRef = rtdb.ref(window.LaynFleetEnvironment.locationsPath);
+      const onLocValue = (snap) => {
+        state.rawRtdbLocations = snap.val() || {};
+        consolidateFleet();
+      };
+      locRef.on('value', onLocValue);
+      unsubFirestore.push(() => locRef.off('value', onLocValue));
+    }
 
-      // 1. RTDB Driver Locations Listener
-      if (rtdb) {
-        const locRef = rtdb.ref(window.LaynFleetEnvironment.locationsPath);
-        locRef.on('value', (snap) => {
-          state.rawRtdbLocations = snap.val() || {};
-          consolidateFleet();
-        });
-      }
-
-      for (const directory of ['privateCarDirectory', 'transportDirectory']) {
-        unsubFirestore.push(db.collection('laynfleet').doc(window.LaynFleetEnvironment.environment).collection(directory).onSnapshot((snap) => {
-          state.cars[directory] = new Map(snap.docs.map(doc => [doc.id, doc.data()]));
-          consolidateFleet();
-        }, (err) => {
-          state.cars[directory].clear();
-          consolidateFleet();
-          console.warn('Driver car listener error', err);
-        }));
-      }
-
-      // 2. Firestore Drivers Collection
-      const driversCol = db.collection('laynfleet').doc(window.LaynFleetEnvironment.environment).collection('drivers');
-      const unsubDrivers = driversCol.onSnapshot(async (snap) => {
-        const docs = snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
-        await Promise.all(docs.map(async (d) => {
-          if (!state.userCache.has(d.uid)) {
-            try {
-              const uSnap = await db.collection('users').doc(d.uid).get();
-              if (uSnap.exists) state.userCache.set(d.uid, uSnap.data());
-            } catch (e) { /* ignore */ }
-          }
-          d.user = state.userCache.get(d.uid) || {};
-        }));
-
-        state.rawFirestoreDrivers = docs;
+    for (const directory of ['privateCarDirectory', 'transportDirectory']) {
+      unsubFirestore.push(db.collection('laynfleet').doc(window.LaynFleetEnvironment.environment).collection(directory).onSnapshot((snap) => {
+        state.cars[directory] = new Map(snap.docs.map(doc => [doc.id, doc.data()]));
         consolidateFleet();
       }, (err) => {
-        console.warn('Firestore drivers listener error', err);
-      });
-      unsubFirestore.push(unsubDrivers);
-
-      // 3. Firestore Active Bookings Collection
-      const bookingsQuery = db.collectionGroup('requests')
-        .where('environment', '==', window.LaynFleetEnvironment.environment)
-        .where('recordType', 'in', ['quickRequests', 'scheduledRequests']);
-      const unsubBookings = bookingsQuery.where('status', 'in', ['ACCEPTED', 'EN_ROUTE', 'ARRIVED', 'IN_TRIP', 'AT_DESTINATION', 'RETURN_TRIP'])
-        .onSnapshot((snap) => {
-          state.rawActiveBookings = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-          consolidateFleet();
-        }, (err) => {
-          console.warn('Firestore bookings listener error', err);
-        });
-      unsubFirestore.push(unsubBookings);
-
-    } catch (err) {
-      console.error('Firebase initialization failed', err);
+        state.cars[directory].clear();
+        consolidateFleet();
+        console.warn('Driver car listener error', err);
+      }));
     }
+
+    // 2. Firestore Drivers Collection
+    const driversCol = db.collection('laynfleet').doc(window.LaynFleetEnvironment.environment).collection('drivers');
+    const unsubDrivers = driversCol.onSnapshot(async (snap) => {
+      const docs = snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
+      await Promise.all(docs.map(async (d) => {
+        if (!state.userCache.has(d.uid)) {
+          try {
+            const uSnap = await db.collection('users').doc(d.uid).get();
+            if (uSnap.exists) state.userCache.set(d.uid, uSnap.data());
+          } catch (e) { /* ignore */ }
+        }
+        d.user = state.userCache.get(d.uid) || {};
+      }));
+
+      state.rawFirestoreDrivers = docs;
+      consolidateFleet();
+    }, (err) => {
+      console.warn('Firestore drivers listener error', err);
+    });
+    unsubFirestore.push(unsubDrivers);
+
+    // 3. Firestore Active Bookings Collection
+    const bookingsQuery = db.collectionGroup('requests')
+      .where('environment', '==', window.LaynFleetEnvironment.environment)
+      .where('recordType', 'in', ['quickRequests', 'scheduledRequests']);
+    const unsubBookings = bookingsQuery.where('status', 'in', ['ACCEPTED', 'EN_ROUTE', 'ARRIVED', 'IN_TRIP', 'AT_DESTINATION', 'RETURN_TRIP'])
+      .onSnapshot((snap) => {
+        state.rawActiveBookings = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        consolidateFleet();
+      }, (err) => {
+        console.warn('Firestore bookings listener error', err);
+      });
+    unsubFirestore.push(unsubBookings);
   }
 
   // ---------------------------------------------------------------------------
   // DOM Wiring & Event Listeners
   // ---------------------------------------------------------------------------
+  let domWired = false;
   function initDOM() {
+    if (domWired) return;
+    domWired = true;
+
     const searchInput = $('search-drivers');
     if (searchInput) {
       searchInput.addEventListener('input', (e) => {
@@ -864,62 +859,66 @@
   }
 
   // ---------------------------------------------------------------------------
-  // App Bootstrapper
+  // Google Maps lazy loader
   // ---------------------------------------------------------------------------
+  let mapRequested = false;
   function loadGoogleMaps() {
-    if (!firebaseConfig?.apiKey) {
+    if (map) { setTimeout(() => { google.maps.event.trigger(map, 'resize'); fitAllDrivers(); }, 200); return; }
+    if (typeof google !== 'undefined' && google.maps) { initMap(); setTimeout(fitAllDrivers, 600); return; }
+    if (mapRequested) return;
+    const apiKey = firebaseConfig?.apiKey;
+    if (!apiKey) {
       showToast('Google Maps API key is unavailable.', 'error');
       return;
     }
+    mapRequested = true;
     global.initLaynFleetTrackingMap = () => {
       initMap();
       setTimeout(fitAllDrivers, 1500);
     };
     const script = document.createElement('script');
     script.async = true;
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(firebaseConfig.apiKey)}&loading=async&callback=initLaynFleetTrackingMap`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&loading=async&callback=initLaynFleetTrackingMap`;
     script.onerror = () => showToast('Google Maps could not load. Check the browser key and connection.', 'error');
     document.head.appendChild(script);
   }
 
+  // ---------------------------------------------------------------------------
+  // Controller: attach / detach (driven by the host console)
+  // ---------------------------------------------------------------------------
   let consolidateTimer = null;
 
-  function boot() {
+  function attach(dbInstance, rtdbInstance) {
+    if (!dbInstance) throw new Error('LaynFleetTracker.attach requires a Firestore instance.');
+    db = dbInstance;
+    rtdb = rtdbInstance || (typeof firebase !== 'undefined' && typeof firebase.database === 'function' ? firebase.database() : null);
     initDOM();
-    if (typeof firebase === 'undefined' || !firebaseConfig?.apiKey) {
-      console.error('Firebase configuration is unavailable.');
-      return;
-    }
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    window.installAdminAccess();
     loadGoogleMaps();
-    AdminAccess.observe((user, error, checking) => {
-      if (!user || user.email?.toLowerCase() !== global.MANAGER_EMAIL?.toLowerCase()) {
-        unsubFirestore.forEach((unsubscribe) => unsubscribe());
-        unsubFirestore = [];
-        clearInterval(consolidateTimer);
-        consolidateTimer = null;
-        if (!checking) window.location.replace('./');
-        return;
-      }
-      if (unsubFirestore.length === 0) {
-        attachFirebaseListeners();
-        consolidateTimer = setInterval(consolidateFleet, 15000);
-      }
-    });
+    if (unsubFirestore.length === 0) {
+      attachFirebaseListeners();
+      if (!consolidateTimer) consolidateTimer = setInterval(consolidateFleet, 15000);
+    }
+    return detach;
+  }
 
+  function detach() {
+    unsubFirestore.forEach((unsubscribe) => { try { unsubscribe(); } catch (e) { /* ignore */ } });
+    unsubFirestore = [];
+    if (consolidateTimer) { clearInterval(consolidateTimer); consolidateTimer = null; }
+    markerLayers.forEach((_, uid) => clearDriverMapLayers(uid));
+    state.drivers = new Map();
+    state.rawFirestoreDrivers = [];
+    state.rawRtdbLocations = {};
+    state.rawActiveBookings = [];
+    deselectDriver();
   }
 
   global.LaynFleetTracker = {
+    attach,
+    detach,
     selectDriver,
     deselectDriver,
     fitAllDrivers
   };
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
-  } else {
-    boot();
-  }
 
 })(window);

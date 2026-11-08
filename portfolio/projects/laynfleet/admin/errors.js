@@ -1,29 +1,24 @@
 /**
- * errors.js — LaynFleet Client Errors & Telemetry Console.
+ * errors.js — LaynFleet Client Errors & Telemetry controller.
+ *
+ * Embedded as an in-page section of the manager console (index.html).
+ * It does NOT initialize Firebase, the auth gate, or the login form — the host
+ * (manager.js) owns the single Firebase app, single auth session, and shell.
+ *
+ * Exposes window.LaynFleetErrors:
+ *   attach(db, fleetEnv) — start the live clientErrors stream + wire interactions.
+ *   detach()             — stop the stream and remove this section's listeners.
  *
  * Streams client errors from Firestore:
  *   Dev:  laynfleet/dev/clientErrors
  *   Prod: laynfleet/prod/clientErrors
+ *
+ * All DOM ids used here are namespaced `err-*` to avoid colliding with the
+ * host console's elements.
  */
-(function () {
+(function (global) {
   'use strict';
 
-  const fleetEnv = window.LaynFleetEnvironment;
-  if (!fleetEnv) throw new Error("Fleet environment is required");
-
-  // Initialize Firebase using shared configuration
-  if (!firebase.apps.length) {
-    firebase.initializeApp(window.LAYNFLEET_FIREBASE_CONFIG);
-  }
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-  if (typeof window.installAdminAccess === 'function') {
-    window.installAdminAccess();
-  }
-
-  const errorsCol = db.collection('laynfleet').doc(fleetEnv.environment).collection('clientErrors');
-
-  // DOM Helpers
   const $ = (id) => document.getElementById(id);
   const show = (el) => el && el.classList.remove('is-hidden');
   const hide = (el) => el && el.classList.add('is-hidden');
@@ -57,129 +52,38 @@
   }
 
   // State
+  let fleetEnv = null;
   let allErrors = [];
   let activeAppFilter = 'all';
   let searchQuery = '';
   let unsubErrors = null;
   let selectedError = null;
+  let interactionsWired = false;
 
-  // ---------------------------------------------------------------------------
-  // AUTH GATING
-  // ---------------------------------------------------------------------------
-  if (!window.AdminAccess) throw new Error('Administrator access gate is required.');
-  AdminAccess.observe((user, error) => {
-    hide($('boot-view'));
-    if (!user) return showLogin(error?.message);
-    showApp(user);
-  });
-
-  function showLogin(errorMsg) {
-    detachListeners();
-    hide($('app-view'));
-    show($('login-view'));
-    const err = $('login-error');
-    if (errorMsg) { err.textContent = errorMsg; show(err); } else { hide(err); }
-  }
-
-  function showApp(user) {
-    hide($('login-view'));
-    show($('app-view'));
-    if ($('sidebar-email')) $('sidebar-email').textContent = user?.email || 'dev-manager';
-    if ($('sidebar-avatar')) $('sidebar-avatar').textContent = (user?.displayName || user?.email || 'M').charAt(0).toUpperCase();
-    if ($('stat-env-label')) $('stat-env-label').textContent = `Environment: ${fleetEnv.environment}`;
-    attachListeners();
-  }
-
-  // Login Form
-  const loginForm = $('login-form');
-  if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = $('login-email').value.trim();
-      const password = $('login-password').value;
-      const btn = $('login-submit');
-      hide($('login-error'));
-
-      if (email.toLowerCase() !== String(window.MANAGER_EMAIL).toLowerCase()) {
-        const err = $('login-error');
-        err.textContent = 'This account is not authorised for the manager console.';
-        show(err);
-        return;
-      }
-
-      btn.disabled = true; btn.textContent = 'Signing in…';
-      try {
-        await AdminAccess.signIn(() => auth.signInWithEmailAndPassword(email, password));
-      } catch (err) {
-        console.error(err);
-        const el = $('login-error');
-        el.textContent = err.message || 'Could not sign in.';
-        show(el);
-      } finally {
-        btn.disabled = false; btn.textContent = 'Sign in';
-      }
-    });
-  }
-
-  const logoutBtn = $('logout-btn');
-  if (logoutBtn) logoutBtn.addEventListener('click', () => auth.signOut());
-
-  // ---------------------------------------------------------------------------
-  // DATA STREAMING
-  // ---------------------------------------------------------------------------
-  function attachListeners() {
-    detachListeners();
-    unsubErrors = errorsCol.orderBy('createdAt', 'desc').limit(150).onSnapshot((snapshot) => {
-      allErrors = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      updateKpis();
-      renderErrors();
-    }, (error) => {
-      console.warn('Firestore clientErrors listener failure:', error);
-      const container = $('errors-container');
-      if (container) {
-        container.innerHTML = `<div class="empty-state"><p style="color:var(--digilayn-error);">Failed to load errors: ${escapeHtml(error.message)}</p></div>`;
-      }
-    });
-  }
-
-  function detachListeners() {
-    if (unsubErrors) {
-      unsubErrors();
-      unsubErrors = null;
-    }
-  }
-
-  // ---------------------------------------------------------------------------
-  // RENDERING & METRICS
-  // ---------------------------------------------------------------------------
   function updateKpis() {
     const total = allErrors.length;
-    const rider = allErrors.filter(e => e.app === 'laynrider').length;
-    const driver = allErrors.filter(e => e.app === 'layndriver').length;
-    const anon = allErrors.filter(e => !e.uid).length;
+    const rider = allErrors.filter((e) => e.app === 'laynrider').length;
+    const driver = allErrors.filter((e) => e.app === 'layndriver').length;
+    const anon = allErrors.filter((e) => !e.uid).length;
 
-    if ($('stat-total')) $('stat-total').textContent = total;
-    if ($('stat-rider')) $('stat-rider').textContent = rider;
-    if ($('stat-driver')) $('stat-driver').textContent = driver;
-    if ($('stat-anon')) $('stat-anon').textContent = anon;
-    if ($('nav-badge-errors')) $('nav-badge-errors').textContent = total;
+    if ($('err-stat-total')) $('err-stat-total').textContent = total;
+    if ($('err-stat-rider')) $('err-stat-rider').textContent = rider;
+    if ($('err-stat-driver')) $('err-stat-driver').textContent = driver;
+    if ($('err-stat-anon')) $('err-stat-anon').textContent = anon;
+    if ($('nav-badge-errors')) {
+      $('nav-badge-errors').textContent = total;
+      $('nav-badge-errors').classList.toggle('is-hidden', total === 0);
+    }
+    if ($('err-stat-env-label') && fleetEnv) $('err-stat-env-label').textContent = `Environment: ${fleetEnv.environment}`;
   }
 
   function getFilteredErrors() {
     return allErrors.filter((item) => {
-      if (activeAppFilter !== 'all' && item.app !== activeAppFilter) {
-        return false;
-      }
+      if (activeAppFilter !== 'all' && item.app !== activeAppFilter) return false;
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
-        const text = [
-          item.message,
-          item.errorType,
-          item.deviceId,
-          item.deviceModel,
-          item.uid,
-          item.app
-        ].filter(Boolean).join(' ').toLowerCase();
+        const text = [item.message, item.errorType, item.deviceId, item.deviceModel, item.uid, item.app]
+          .filter(Boolean).join(' ').toLowerCase();
         if (!text.includes(query)) return false;
       }
       return true;
@@ -187,7 +91,7 @@
   }
 
   function renderErrors() {
-    const container = $('errors-container');
+    const container = $('err-container');
     if (!container) return;
 
     const filtered = getFilteredErrors();
@@ -196,9 +100,8 @@
         <div class="empty-state" style="text-align:center; padding:48px 16px; background:var(--digilayn-surface-container); border-radius:var(--radius); border:1px dashed var(--digilayn-outline-variant);">
           <span style="font-size:32px; display:block; margin-bottom:12px;">✅</span>
           <p style="font-size:16px; font-weight:700; color:var(--digilayn-on-surface); margin-bottom:4px;">No client errors recorded</p>
-          <p style="font-size:13px; color:var(--digilayn-on-surface-variant);">No client crashes or startup failures matching the current criteria in ${escapeHtml(fleetEnv.environment)}.</p>
-        </div>
-      `;
+          <p style="font-size:13px; color:var(--digilayn-on-surface-variant);">No client crashes or startup failures matching the current criteria in ${escapeHtml(fleetEnv ? fleetEnv.environment : '')}.</p>
+        </div>`;
       return;
     }
 
@@ -218,9 +121,7 @@
             <span class="badge ${uidBadgeClass}">${escapeHtml(uidDisplay)}</span>
             <span class="error-time">${escapeHtml(timeStr)} (${escapeHtml(relTime)})</span>
           </div>
-
           <div class="error-message">${escapeHtml(err.message || 'No error message provided')}</div>
-
           <div class="error-meta-grid">
             <div class="error-meta-item">Device: <strong>${escapeHtml(err.deviceModel || 'Unknown')}</strong></div>
             <div class="error-meta-item">OS: <strong>${escapeHtml(err.osVersion || 'Unknown')}</strong></div>
@@ -228,76 +129,62 @@
             <div class="error-meta-item">Device ID: <strong>${escapeHtml(err.deviceId || 'unknown')}</strong></div>
             <div class="error-meta-item">Doc ID: <strong>${escapeHtml(err.id)}</strong></div>
           </div>
-        </div>
-      `;
+        </div>`;
     }).join('');
   }
 
-  // ---------------------------------------------------------------------------
-  // INTERACTIONS & MODAL
-  // ---------------------------------------------------------------------------
-  // App Filters
-  document.querySelectorAll('[data-app-filter]').forEach((chip) => {
-    chip.addEventListener('click', () => {
-      document.querySelectorAll('[data-app-filter]').forEach(c => c.classList.remove('is-active'));
-      chip.classList.add('is-active');
-      activeAppFilter = chip.getAttribute('data-app-filter');
-      renderErrors();
-    });
-  });
-
-  // Search Input
-  const searchInput = $('search-input');
-  if (searchInput) {
-    searchInput.addEventListener('input', () => {
-      searchQuery = searchInput.value.trim();
-      renderErrors();
-    });
-  }
-
-  // Error Card Click -> Open Detail Modal
-  const errorsContainer = $('errors-container');
-  if (errorsContainer) {
-    errorsContainer.addEventListener('click', (e) => {
-      const card = e.target.closest('.error-card');
-      if (!card) return;
-      const errorId = card.getAttribute('data-error-id');
-      selectedError = allErrors.find(item => item.id === errorId);
-      if (selectedError) {
-        openModal(selectedError);
-      }
-    });
-  }
-
   function openModal(err) {
-    const modal = $('error-modal');
+    const modal = $('err-modal');
     if (!modal) return;
-    $('modal-error-title').textContent = `${err.app === 'layndriver' ? 'LaynDriver' : 'LaynRider'} — ${err.errorType || 'Error'}`;
-    $('modal-json').textContent = JSON.stringify(err, null, 2);
+    $('err-modal-title').textContent = `${err.app === 'layndriver' ? 'LaynDriver' : 'LaynRider'} — ${err.errorType || 'Error'}`;
+    $('err-modal-json').textContent = JSON.stringify(err, null, 2);
     show(modal);
   }
 
   function closeModal() {
-    hide($('error-modal'));
+    hide($('err-modal'));
     selectedError = null;
   }
 
-  const modalCloseBtn = $('modal-close-btn');
-  if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
-  const modalDismissBtn = $('modal-dismiss-btn');
-  if (modalDismissBtn) modalDismissBtn.addEventListener('click', closeModal);
-
-  const errorModal = $('error-modal');
-  if (errorModal) {
-    errorModal.addEventListener('click', (e) => {
-      if (e.target === errorModal) closeModal();
-    });
+  function onKeydown(e) {
+    if (e.key === 'Escape') closeModal();
   }
 
-  // Copy JSON Button
-  const modalCopyBtn = $('modal-copy-btn');
-  if (modalCopyBtn) {
-    modalCopyBtn.addEventListener('click', () => {
+  // Wire one-time interactions scoped to this section's elements.
+  function wireInteractions() {
+    if (interactionsWired) return;
+    interactionsWired = true;
+
+    document.querySelectorAll('[data-err-app-filter]').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('[data-err-app-filter]').forEach((c) => c.classList.remove('is-active'));
+        chip.classList.add('is-active');
+        activeAppFilter = chip.getAttribute('data-err-app-filter');
+        renderErrors();
+      });
+    });
+
+    const searchInput = $('err-search-input');
+    if (searchInput) searchInput.addEventListener('input', () => { searchQuery = searchInput.value.trim(); renderErrors(); });
+
+    const container = $('err-container');
+    if (container) container.addEventListener('click', (e) => {
+      const card = e.target.closest('.error-card');
+      if (!card) return;
+      selectedError = allErrors.find((item) => item.id === card.getAttribute('data-error-id'));
+      if (selectedError) openModal(selectedError);
+    });
+
+    const modalCloseBtn = $('err-modal-close-btn');
+    if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+    const modalDismissBtn = $('err-modal-dismiss-btn');
+    if (modalDismissBtn) modalDismissBtn.addEventListener('click', closeModal);
+
+    const errorModal = $('err-modal');
+    if (errorModal) errorModal.addEventListener('click', (e) => { if (e.target === errorModal) closeModal(); });
+
+    const modalCopyBtn = $('err-modal-copy-btn');
+    if (modalCopyBtn) modalCopyBtn.addEventListener('click', () => {
       if (!selectedError) return;
       const json = JSON.stringify(selectedError, null, 2);
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -307,11 +194,35 @@
         });
       }
     });
+
+    document.addEventListener('keydown', onKeydown);
   }
 
-  // ESC closes modal
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeModal();
-  });
+  function attach(db, env) {
+    if (!db || !env) throw new Error('LaynFleetErrors.attach requires (db, fleetEnv).');
+    fleetEnv = env;
+    wireInteractions();
+    updateKpis();
 
-})();
+    const errorsCol = db.collection('laynfleet').doc(fleetEnv.environment).collection('clientErrors');
+    if (unsubErrors) { unsubErrors(); unsubErrors = null; }
+    unsubErrors = errorsCol.orderBy('createdAt', 'desc').limit(150).onSnapshot((snapshot) => {
+      allErrors = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      updateKpis();
+      renderErrors();
+    }, (error) => {
+      console.warn('Firestore clientErrors listener failure:', error);
+      const container = $('err-container');
+      if (container) container.innerHTML = `<div class="empty-state"><p style="color:var(--digilayn-error);">Failed to load errors: ${escapeHtml(error.message)}</p></div>`;
+    });
+
+    return detach;
+  }
+
+  function detach() {
+    if (unsubErrors) { unsubErrors(); unsubErrors = null; }
+    closeModal();
+  }
+
+  global.LaynFleetErrors = { attach, detach };
+})(window);

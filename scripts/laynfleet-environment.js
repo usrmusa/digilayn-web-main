@@ -15,11 +15,12 @@
       const token = await user.getIdToken();
       const review = path.match(/^\/admin\/driver-applications\/([A-Za-z0-9_-]{1,128})\/review$/);
       const pricing = path === '/admin/pricing-configuration';
-      if (!review && !pricing) throw new Error('This fleet API endpoint is not configured.');
-      const functionName = pricing ? 'configurePricing' : 'reviewDriverApplication';
+      const serviceArea = path === '/admin/service-area';
+      if (!review && !pricing && !serviceArea) throw new Error('This fleet API endpoint is not configured.');
+      const functionName = serviceArea ? 'configureServiceArea' : pricing ? 'configurePricing' : 'reviewDriverApplication';
       const projectId = global.DIGILAYN_FIREBASE_CONFIG?.projectId || 'digilayn-projects';
       const endpoint = `https://us-central1-${projectId}.cloudfunctions.net/${functionName}`;
-      const payload = pricing ? { ...body, environment } : { ...body, applicantUid: review[1], environment };
+      const payload = (pricing || serviceArea) ? { ...body, environment } : { ...body, applicantUid: review[1], environment };
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },

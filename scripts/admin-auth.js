@@ -17,10 +17,23 @@ export function isVerifiedAdmin(user) {
 }
 
 export function initAdminAuth(onAuthorized, onUnauthorized, redirectPath = null) {
+  let graceTimer = null;
+  const clearGrace = () => { if (graceTimer) { clearTimeout(graceTimer); graceTimer = null; } };
   return adminAccess.observe((user, error, checking) => {
-    if (isVerifiedAdmin(user)) onAuthorized(user);
-    else if (redirectPath && !checking && !auth.currentUser && !error) window.location.replace(redirectPath);
-    else onUnauthorized(error?.message);
+    if (isVerifiedAdmin(user)) { clearGrace(); onAuthorized(user); return; }
+    if (redirectPath && !checking && !auth.currentUser && !error) { clearGrace(); window.location.replace(redirectPath); return; }
+
+    // Still verifying, or Firebase may just be restoring a persisted session
+    // (initial null emission before rehydration). Hold the current view briefly
+    // instead of flashing the login screen for an already signed-in admin.
+    if (error) { clearGrace(); onUnauthorized(error.message); return; }
+    if (checking || auth.currentUser) { clearGrace(); return; }
+
+    clearGrace();
+    graceTimer = setTimeout(() => {
+      graceTimer = null;
+      if (!isVerifiedAdmin(adminAccess.currentUser) && !auth.currentUser) onUnauthorized();
+    }, 1500);
   });
 }
 

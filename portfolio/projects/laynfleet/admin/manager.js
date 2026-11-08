@@ -43,6 +43,7 @@
   const appConfigCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection('appConfig');
   const appConfigId = pkg => pkg === fleetEnv.riderPackage ? 'laynrider' : 'layndriver';
   const adminActionsCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(FS.adminActions);
+  const serviceAreaDoc = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection('settings').doc('serviceArea');
   const usersCol = db.collection(FS.users);
   document.querySelectorAll('[data-app-tab]').forEach((button) => {
     const pkg = button.getAttribute('data-app-tab');
@@ -1094,21 +1095,55 @@
   // ---------------------------------------------------------------------------
   // AUTH GATE
   // ---------------------------------------------------------------------------
-  AdminAccess.observe(async (user, error) => {
-    hide($('boot-view'));
-    if (!user) return showLogin(error?.message);
+  let loginGraceTimer = null;
+  AdminAccess.observe(async (user, error, checking) => {
+    // While the gate is still verifying a (possibly persisted) session, keep the
+    // loading view — do not flash the login form for an already signed-in admin.
+    if (checking && !error) {
+      if (loginGraceTimer) { clearTimeout(loginGraceTimer); loginGraceTimer = null; }
+      hide($('login-view'));
+      hide($('app-view'));
+      show($('boot-view'));
+      return;
+    }
 
-    if ((user.email || '').toLowerCase() !== String(MANAGER_EMAIL).toLowerCase()) {
-      // Wrong account — reject and sign out.
+    if (user && (user.email || '').toLowerCase() === String(MANAGER_EMAIL).toLowerCase()) {
+      if (loginGraceTimer) { clearTimeout(loginGraceTimer); loginGraceTimer = null; }
+      hide($('boot-view'));
+      showApp(user);
+      return;
+    }
+
+    if (user) {
+      // Signed in but not the manager account — reject and sign out.
+      if (loginGraceTimer) { clearTimeout(loginGraceTimer); loginGraceTimer = null; }
+      hide($('boot-view'));
       await auth.signOut();
       showLogin('This account is not authorised for the manager console.');
       return;
     }
-    showApp(user);
+
+    // No user. This may be Firebase's initial null emission before it restores a
+    // persisted session. Keep the loading view for a short grace window; only show
+    // the login form if no admin session arrives (and show immediately on error).
+    if (error) {
+      if (loginGraceTimer) { clearTimeout(loginGraceTimer); loginGraceTimer = null; }
+      return showLogin(error.message);
+    }
+    hide($('login-view'));
+    hide($('app-view'));
+    show($('boot-view'));
+    if (loginGraceTimer) clearTimeout(loginGraceTimer);
+    loginGraceTimer = setTimeout(() => {
+      loginGraceTimer = null;
+      if (!AdminAccess.currentUser && !auth.currentUser) showLogin();
+    }, 1500);
   });
 
   function showLogin(errorMsg) {
+    if (loginGraceTimer) { clearTimeout(loginGraceTimer); loginGraceTimer = null; }
     detachListeners();
+    hide($('boot-view'));
     hide($('app-view'));
     show($('login-view'));
     const err = $('login-error');
@@ -1176,6 +1211,8 @@
   function attachListeners() {
     detachListeners();
     unsub.push(window.LaynFleetNotices.attach(db));
+    attachServiceAreaListener();
+    if (window.LaynFleetErrors) unsub.push(window.LaynFleetErrors.attach(db, fleetEnv));
 
     const carCollections = { privateCarDirectory: new Map(), transportDirectory: new Map() };
     let driverDocuments = [];
@@ -1356,8 +1393,10 @@
     }
   }
 
+  let trackerDetach = null;
   function detachListeners() {
     while (unsub.length) { try { unsub.pop()(); } catch (e) { /* ignore */ } }
+    if (trackerDetach) { try { trackerDetach(); } catch (e) { /* ignore */ } trackerDetach = null; }
   }
 
   // ---------------------------------------------------------------------------
@@ -3435,6 +3474,198 @@
     finally { pricingConfigSaving = false; $('pricing-config-panel').querySelectorAll('button,input').forEach(input => { input.disabled = false; }); }
   }
 
+  // ---------------------------------------------------------------------------
+  // SERVICE AREA (pickup radius)
+  //
+  // The centre is a LOCKED app constant — not a Firestore field — so it is shown
+  // read-only on the map and never written. Only pickupRadiusMeters is saved,
+  // through the authenticated admin endpoint (server-side Firestore write).
+  // Missing document/field falls back to the documented default for DISPLAY only;
+  // no default is ever written (strict no-fallback contract).
+  // ---------------------------------------------------------------------------
+  const SERVICE_AREA_CENTRE = { lat: -26.458127, lng: 27.768157 };
+  const SERVICE_AREA_DEFAULT_METERS = 175933;
+  const SERVICE_AREA_MIN_METERS = 1000;
+  const SERVICE_AREA_MAX_METERS = 1500000;
+  const serviceAreaState = {
+    currentMeters: null,       // last verified value from Firestore (null until loaded)
+    usingDefault: false,       // true when no stored value exists
+    selectedMeters: SERVICE_AREA_DEFAULT_METERS,
+    saving: false,
+    mapLoaded: false,
+    map: null,
+    circle: null,
+    marker: null,
+  };
+
+  function serviceAreaKmLabel(meters) {
+    return (Number(meters) / 1000).toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 3 }) + ' km';
+  }
+
+  function clampServiceAreaMeters(value) {
+    const num = Math.round(Number(value));
+    if (!Number.isFinite(num)) return SERVICE_AREA_MIN_METERS;
+    return Math.min(SERVICE_AREA_MAX_METERS, Math.max(SERVICE_AREA_MIN_METERS, num));
+  }
+
+  function renderServiceAreaInputs() {
+    const meters = serviceAreaState.selectedMeters;
+    const slider = $('service-area-slider');
+    const input = $('service-area-meters');
+    const km = $('service-area-km');
+    if (slider) slider.value = String(meters);
+    if (input && document.activeElement !== input) input.value = String(meters);
+    if (km) km.textContent = serviceAreaKmLabel(meters);
+    if (serviceAreaState.circle) serviceAreaState.circle.setRadius(meters);
+    const centreEl = $('service-area-centre');
+    if (centreEl) centreEl.textContent = `${SERVICE_AREA_CENTRE.lat}, ${SERVICE_AREA_CENTRE.lng}`;
+  }
+
+  function renderServiceAreaStatus() {
+    const statusEl = $('service-area-status');
+    if (!statusEl) return;
+    if (serviceAreaState.currentMeters == null && !serviceAreaState.usingDefault) {
+      statusEl.textContent = 'Loading current value…';
+      return;
+    }
+    if (serviceAreaState.usingDefault) {
+      statusEl.textContent = `No stored value — using default ${serviceAreaKmLabel(SERVICE_AREA_DEFAULT_METERS)}. Save to store an override.`;
+    } else {
+      statusEl.textContent = `Current stored radius: ${serviceAreaKmLabel(serviceAreaState.currentMeters)}`;
+    }
+  }
+
+  function setSelectedServiceAreaMeters(value, { fromInput } = {}) {
+    serviceAreaState.selectedMeters = clampServiceAreaMeters(value);
+    renderServiceAreaInputs();
+    // Only correct the numeric input's text when the edit came from elsewhere.
+    if (!fromInput) {
+      const input = $('service-area-meters');
+      if (input) input.value = String(serviceAreaState.selectedMeters);
+    }
+  }
+
+  function initServiceAreaMap() {
+    if (serviceAreaState.mapLoaded || typeof google === 'undefined' || !google.maps) return;
+    const container = $('service-area-map');
+    if (!container) return;
+    serviceAreaState.mapLoaded = true;
+    serviceAreaState.map = new google.maps.Map(container, {
+      center: SERVICE_AREA_CENTRE,
+      zoom: 7,
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: false,
+    });
+    serviceAreaState.marker = new google.maps.Marker({
+      position: SERVICE_AREA_CENTRE,
+      map: serviceAreaState.map,
+      title: 'Service-area centre (locked)',
+    });
+    const circleColor = (window.DigilaynTheme && typeof window.DigilaynTheme.getColor === 'function')
+      ? window.DigilaynTheme.getColor('primary')
+      : '#1a73e8';
+    serviceAreaState.circle = new google.maps.Circle({
+      map: serviceAreaState.map,
+      center: SERVICE_AREA_CENTRE,
+      radius: serviceAreaState.selectedMeters,
+      editable: false,
+      draggable: false,
+      strokeColor: circleColor,
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: circleColor,
+      fillOpacity: 0.12,
+    });
+    serviceAreaState.map.fitBounds(serviceAreaState.circle.getBounds());
+    renderServiceAreaInputs();
+  }
+
+  // Lazy-load Google Maps JS API (same browser key as Live Radar).
+  window.initLaynFleetServiceAreaMap = initServiceAreaMap;
+  let serviceAreaMapRequested = false;
+  function ensureServiceAreaMap() {
+    if (serviceAreaState.mapLoaded) { renderServiceAreaInputs(); return; }
+    if (typeof google !== 'undefined' && google.maps) { initServiceAreaMap(); return; }
+    if (serviceAreaMapRequested) return;
+    const apiKey = window.LAYNFLEET_FIREBASE_CONFIG?.apiKey;
+    if (!apiKey) {
+      const statusEl = $('service-area-status');
+      if (statusEl) statusEl.textContent = 'Map unavailable (missing browser key). Radius can still be set numerically.';
+      return;
+    }
+    serviceAreaMapRequested = true;
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&loading=async&callback=initLaynFleetServiceAreaMap`;
+    script.onerror = () => {
+      const statusEl = $('service-area-status');
+      if (statusEl) statusEl.textContent = 'Map could not load. Radius can still be set numerically.';
+    };
+    document.head.appendChild(script);
+  }
+
+  // Live read of the current stored radius (client read is permitted).
+  function attachServiceAreaListener() {
+    unsub.push(serviceAreaDoc.onSnapshot({ includeMetadataChanges: true }, (snap) => {
+      if (snap.metadata.fromCache) return; // wait for a verified server read
+      const raw = snap.exists ? snap.data().pickupRadiusMeters : undefined;
+      if (typeof raw === 'number' && Number.isFinite(raw) && raw > 0) {
+        serviceAreaState.currentMeters = raw;
+        serviceAreaState.usingDefault = false;
+        setSelectedServiceAreaMeters(raw);
+      } else {
+        // Missing / null / invalid stored value: display the documented default only.
+        serviceAreaState.currentMeters = null;
+        serviceAreaState.usingDefault = true;
+        setSelectedServiceAreaMeters(SERVICE_AREA_DEFAULT_METERS);
+      }
+      renderServiceAreaStatus();
+    }, (err) => {
+      console.warn('serviceArea listener', err);
+      const statusEl = $('service-area-status');
+      if (statusEl) statusEl.textContent = 'Could not read the current radius.';
+    }));
+  }
+
+  (function wireServiceAreaControls() {
+    const slider = $('service-area-slider');
+    const input = $('service-area-meters');
+    if (slider) slider.addEventListener('input', () => setSelectedServiceAreaMeters(slider.value));
+    if (input) {
+      input.addEventListener('input', () => setSelectedServiceAreaMeters(input.value, { fromInput: true }));
+      input.addEventListener('blur', () => setSelectedServiceAreaMeters(input.value));
+    }
+    const reset = $('service-area-reset');
+    if (reset) reset.addEventListener('click', () => {
+      const base = serviceAreaState.usingDefault || serviceAreaState.currentMeters == null
+        ? SERVICE_AREA_DEFAULT_METERS : serviceAreaState.currentMeters;
+      setSelectedServiceAreaMeters(base);
+    });
+    const save = $('service-area-save');
+    if (save) save.addEventListener('click', () => void saveServiceAreaRadius());
+  })();
+
+  async function saveServiceAreaRadius() {
+    if (serviceAreaState.saving) return;
+    const meters = clampServiceAreaMeters(serviceAreaState.selectedMeters);
+    if (!Number.isFinite(meters) || meters <= 0) return toast('Enter a valid radius in metres.', 'error');
+    if (!window.confirm(`Save pickup radius of ${serviceAreaKmLabel(meters)} (${meters} m) to ${fleetEnv.environment} Firestore?`)) return;
+    serviceAreaState.saving = true;
+    ['service-area-save', 'service-area-reset', 'service-area-slider', 'service-area-meters']
+      .forEach((id) => { const el = $(id); if (el) el.disabled = true; });
+    try {
+      await fleetEnv.request('/admin/service-area', { pickupRadiusMeters: meters });
+      toast('Pickup radius saved.', 'success');
+    } catch (error) {
+      toast(error.message || 'Could not save the pickup radius.', 'error');
+    } finally {
+      serviceAreaState.saving = false;
+      ['service-area-save', 'service-area-reset', 'service-area-slider', 'service-area-meters']
+        .forEach((id) => { const el = $(id); if (el) el.disabled = false; });
+    }
+  }
+
   let pricingResolutionPending = false;
   $('pricing-proposals-list').addEventListener('click', async (event) => {
     const button = event.target.closest('[data-pricing-decision]');
@@ -4074,6 +4305,9 @@ This applies immediately to all connected devices.`,
     bookings: ['Bookings', 'Live and historical rides with detailed filters'],
     reviews: ['Reviews & Moderation', 'Scrutinize feedback, moderate ratings, and contact reviewers'],
     pricing: ['Pricing & Governance', 'Democratic driver-determined fleet rates, live voting progress, and audit history'],
+    tracking: ['Live Radar', 'Real-time driver locations, telemetry and active trips'],
+    errors: ['Client Errors & Failures', 'Real-time fatal startup and runtime telemetry'],
+    servicearea: ['Service Area', 'Set the pickup radius around the locked service-area centre'],
     notices: ['Rider Notices', 'Publish news, information, warnings and promotions for all riders'],
     appcontrol: ['App Control & System State', 'Manage maintenance kill switches, version requirements, and live launch gates']
   };
@@ -4139,6 +4373,22 @@ This applies immediately to all connected devices.`,
       goToReviewTab(subTab);
     } else if (sec === 'appcontrol' && subTab) {
       goToAppTab(subTab);
+    }
+
+    if (sec === 'servicearea') {
+      ensureServiceAreaMap();
+      // The map was likely created while hidden (0×0); nudge it to re-layout.
+      setTimeout(() => {
+        if (serviceAreaState.map && typeof google !== 'undefined' && google.maps) {
+          google.maps.event.trigger(serviceAreaState.map, 'resize');
+          if (serviceAreaState.circle) serviceAreaState.map.fitBounds(serviceAreaState.circle.getBounds());
+        }
+      }, 200);
+    }
+
+    if (sec === 'tracking' && window.LaynFleetTracker && AdminAccess.currentUser) {
+      if (!trackerDetach) trackerDetach = window.LaynFleetTracker.attach(db, rtdb);
+      else window.LaynFleetTracker.fitAllDrivers();
     }
 
     // Keep URL hash updated for deep linking and back/forward browser navigation
