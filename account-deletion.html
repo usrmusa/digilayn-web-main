@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="styles/digilayn-theme.css">
+    <script src="scripts/theme.js"></script>
+    <script src="/scripts/digilayn-info.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account &amp; Data Deletion | Digilayn</title>
+    <meta name="author" content="Musa Mgijima">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="scripts/digilayn-tailwind.js"></script>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="icon" href="/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    <link rel="stylesheet" href="styles/digilayn-components.css">
+
+    <meta name="description" content="Manage the permanent deletion of your universal Digilayn Account and associated data across Digilayn applications under POPIA and Google Play policies.">
+    <link rel="canonical" href="https://digilayn.co.za/account-deletion">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Digilayn">
+    <meta property="og:title" content="Account &amp; Data Deletion | Digilayn">
+    <meta property="og:description" content="Manage the permanent deletion of your universal Digilayn Account and associated data across Digilayn applications under POPIA and Google Play policies.">
+    <meta property="og:url" content="https://digilayn.co.za/account-deletion">
+    <meta property="og:image" content="https://digilayn.co.za/img/social-preview-logo.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1732">
+    <meta property="og:image:height" content="908">
+    <meta property="og:image:alt" content="Digilayn — custom business software, mobile apps and web systems">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Account &amp; Data Deletion | Digilayn">
+    <meta name="twitter:description" content="Manage the permanent deletion of your universal Digilayn Account and associated data across Digilayn applications under POPIA and Google Play policies.">
+    <meta name="twitter:image" content="https://digilayn.co.za/img/social-preview-logo.png">
+    <meta name="twitter:image:alt" content="Digilayn — custom business software, mobile apps and web systems">
+    <meta name="robots" content="index, follow">
+
+    <style>
+        .status.error { color: var(--digilayn-error); font-weight: 700; margin-top: 0.5rem; }
+        .status.success { color: var(--digilayn-primary); font-weight: 700; margin-top: 0.5rem; }
+        pre#data-output {
+            max-height: 400px;
+            overflow: auto;
+            padding: 1rem;
+            border-radius: 1rem;
+            background-color: var(--digilayn-surface-container-high);
+            color: var(--digilayn-on-surface);
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+    </style>
+</head>
+
+<body class="font-sans antialiased bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface transition-colors duration-300 min-h-screen flex flex-col justify-between">
+
+<!-- Top Navigation -->
+<nav class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center p-6 pointer-events-none">
+    <a href="./" class="pointer-events-auto text-sm font-black tracking-wide px-4 py-2 rounded-full bg-digilayn-surface-container-lowest/80 dark:bg-digilayn-surface-container-low/80 backdrop-blur-md shadow border border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:text-digilayn-primary transition">
+        digilayn
+    </a>
+
+    <div class="flex items-center gap-3 pointer-events-auto">
+        <a href="terms" class="hidden sm:inline-flex text-sm font-bold px-4 py-2 rounded-full bg-digilayn-surface-container-lowest/80 dark:bg-digilayn-surface-container-low/80 backdrop-blur-md shadow border border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:text-digilayn-primary transition">
+            Terms of Use
+        </a>
+        <a href="privacy" class="hidden sm:inline-flex text-sm font-bold px-4 py-2 rounded-full bg-digilayn-surface-container-lowest/80 dark:bg-digilayn-surface-container-low/80 backdrop-blur-md shadow border border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:text-digilayn-primary transition">
+            Privacy Policy
+        </a>
+        <button id="theme-toggle" class="p-3 bg-digilayn-surface-container-lowest/80 dark:bg-digilayn-surface-container-low/80 backdrop-blur-md rounded-full shadow-lg border border-digilayn-outline-variant dark:border-digilayn-outline-variant transition-transform hover:scale-110 active:scale-95" aria-label="Toggle Theme">
+            <span id="theme-icon" class="text-xl"></span>
+        </button>
+    </div>
+</nav>
+
+<!-- Main Header -->
+<header class="max-w-4xl mx-auto pt-28 pb-8 px-6">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-digilayn-primary/10 text-digilayn-primary dark:text-digilayn-primary text-xs font-black uppercase tracking-wider mb-4 border border-digilayn-primary/20">
+        Account &amp; Data Governance
+    </div>
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">
+        Delete Your Account &amp; Data
+    </h1>
+    <p class="text-lg opacity-85 leading-relaxed">
+        Digilayn provides full ownership and transparency over your personal information. This portal allows you to manage the permanent deletion of your account and personal data across all connected applications and services.
+    </p>
+    <p class="text-xs text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant mt-3">
+        Compliance with South Africa's POPIA &bull; Google Play Account Deletion Requirement &bull; Single Universal Identity.
+    </p>
+</header>
+
+<main class="max-w-4xl mx-auto px-6 space-y-8 pb-20">
+
+    <!-- Overview Highlights Box -->
+    <div class="card p-6 sm:p-8 rounded-3xl border-l-4 border-l-digilayn-primary">
+        <h2 class="text-xl font-bold mb-3 flex items-center gap-2">
+            <span>🛡️</span> Understanding Universal Deletion
+        </h2>
+        <ul class="space-y-2 text-sm sm:text-base opacity-90">
+            <li class="flex items-start gap-2">
+                <span class="text-digilayn-primary font-bold">✓</span>
+                <span><strong>Single Universal Account:</strong> Digilayn operates a shared database across all services. Deleting your universal account revokes your sign-in credentials across all Digilayn applications simultaneously.</span>
+            </li>
+            <li class="flex items-start gap-2">
+                <span class="text-digilayn-primary font-bold">✓</span>
+                <span><strong>Immediate Erasure:</strong> When confirmed, your authentication credentials, personal profile, device records, and user data are purged from active systems.</span>
+            </li>
+            <li class="flex items-start gap-2">
+                <span class="text-digilayn-warning font-bold">⚠</span>
+                <span><strong>Statutory Record Retention:</strong> In compliance with South African tax and transport regulations, completed transaction receipts and historical dispatch audit logs are retained in an immutable state for auditing and accounting compliance.</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- 1. GENERAL & ALL APPS DELETION REQUEST -->
+    <section class="card p-6 sm:p-8 rounded-3xl space-y-4">
+        <div class="flex items-center gap-3">
+            <span class="px-3 py-1 rounded-full text-xs font-black bg-digilayn-primary/10 text-digilayn-primary dark:text-digilayn-primary uppercase">Option 1</span>
+            <h2 class="text-2xl font-bold">Universal Account Deletion (All Apps)</h2>
+        </div>
+        <p class="text-sm opacity-90 leading-relaxed">
+            If you use any Digilayn service, mobile app, or web portal, you can request full account erasure at any time even if you have uninstalled the app:
+        </p>
+        <div class="p-5 rounded-2xl bg-digilayn-surface dark:bg-digilayn-surface-container-low border border-digilayn-outline-variant space-y-2 text-sm">
+            <p><strong>Contact the Information Officer directly:</strong></p>
+            <p>Email: <a href="mailto:info@digilayn.co.za?subject=Account%20Deletion%20Request" data-digilayn="email" class="text-digilayn-primary font-bold hover:underline">info@digilayn.co.za</a></p>
+            <p>WhatsApp: <a href="https://wa.me/27815532209" data-digilayn="whatsapp-contact" target="_blank" class="text-digilayn-primary font-bold hover:underline">+27 81 553 2209</a></p>
+            <p class="text-xs opacity-80 pt-1">Please provide your registered email address and contact phone number. Never send your password.</p>
+        </div>
+    </section>
+
+    <!-- 2. LAYNDRIVER PARTNER DELETION -->
+    <section class="card p-6 sm:p-8 rounded-3xl space-y-4">
+        <div class="flex items-center gap-3">
+            <span class="px-3 py-1 rounded-full text-xs font-black bg-digilayn-warning/10 text-digilayn-warning dark:text-digilayn-warning uppercase">Option 2</span>
+            <h2 class="text-2xl font-bold">LaynDriver Partners: Profile &amp; Account Deletion</h2>
+        </div>
+        <p class="text-sm opacity-90 leading-relaxed">
+            Drivers can request profile and account deletion through the app or by direct email:
+        </p>
+        <ul class="list-disc list-inside space-y-2 text-sm opacity-90 pl-2">
+            <li><strong>In-App Request:</strong> Open <em>More &rarr; Security Hub &rarr; Deregister</em> in LaynDriver to submit a deletion request. This suspends the account pending manager processing.</li>
+            <li><strong>Email Request:</strong> Email <a href="mailto:info@digilayn.co.za?subject=LaynDriver%20account%20deletion" data-digilayn="email" class="text-digilayn-primary font-bold hover:underline">info@digilayn.co.za</a> from your registered address.</li>
+            <li><strong>Data Handled:</strong> Manager deletion permanently removes your driver profile, vehicle registrations, driver documentation, and device records. Completed booking records are retained unchanged for dispatch accounting and audit compliance.</li>
+        </ul>
+    </section>
+
+    <!-- 3. LAYNRIDER SELF-SERVICE DELETION TOOL -->
+    <section class="card p-6 sm:p-8 rounded-3xl space-y-6">
+        <div class="flex items-center gap-3">
+            <span class="px-3 py-1 rounded-full text-xs font-black bg-digilayn-info/10 text-digilayn-info dark:text-digilayn-info uppercase">Option 3</span>
+            <h2 class="text-2xl font-bold">LaynRider: Instant Self-Service Deletion</h2>
+        </div>
+        <p class="text-sm opacity-90 leading-relaxed">
+            Sign in below with the account you use on LaynRider to view your stored records and immediately permanently delete your rider profile and booking data.
+        </p>
+
+        <!-- Sign-in Card -->
+        <div id="login-card" class="p-6 rounded-2xl bg-digilayn-surface dark:bg-digilayn-surface-container-low border border-digilayn-outline-variant space-y-4">
+            <h3 class="text-lg font-bold">Sign In to Delete Account</h3>
+            <form id="email-form" class="space-y-4">
+                <div>
+                    <label for="email" class="block text-xs font-bold uppercase mb-1">Email address</label>
+                    <input id="email" type="email" autocomplete="email" required class="w-full px-4 py-3 rounded-xl border border-digilayn-outline-variant bg-digilayn-surface text-digilayn-on-surface">
+                </div>
+                <div>
+                    <label for="password" class="block text-xs font-bold uppercase mb-1">Password</label>
+                    <input id="password" type="password" autocomplete="current-password" required class="w-full px-4 py-3 rounded-xl border border-digilayn-outline-variant bg-digilayn-surface text-digilayn-on-surface">
+                </div>
+                <div class="flex flex-wrap gap-3 pt-2">
+                    <button type="submit" class="px-6 py-3 bg-digilayn-primary text-digilayn-on-primary font-bold rounded-xl hover:opacity-90 transition digilayn-button">
+                        Sign in with Email
+                    </button>
+                    <button id="google-button" type="button" class="px-6 py-3 bg-digilayn-surface-container-high border border-digilayn-outline-variant font-bold rounded-xl hover:opacity-90 transition digilayn-button">
+                        Sign in with Google
+                    </button>
+                </div>
+            </form>
+            <p id="login-status" class="status text-sm" role="status" aria-live="polite"></p>
+        </div>
+
+        <!-- Data Preview Card (Hidden until signed in) -->
+        <div id="account-card" class="p-6 rounded-2xl bg-digilayn-surface dark:bg-digilayn-surface-container-low border border-digilayn-outline-variant space-y-4 hidden">
+            <h3 class="text-lg font-bold">Your Stored Data</h3>
+            <p id="identity" class="text-xs opacity-80"></p>
+            <div class="flex flex-wrap gap-3">
+                <button id="refresh-button" type="button" class="px-4 py-2 bg-digilayn-primary text-digilayn-on-primary text-xs font-bold rounded-xl digilayn-button">
+                    Refresh Data
+                </button>
+                <button id="signout-button" type="button" class="px-4 py-2 bg-digilayn-surface-container-high text-xs font-bold rounded-xl border border-digilayn-outline-variant digilayn-button">
+                    Sign Out
+                </button>
+            </div>
+            <p id="data-status" class="status text-xs" role="status" aria-live="polite"></p>
+            <pre id="data-output">Loading…</pre>
+        </div>
+
+        <!-- Deletion Confirmation Card (Hidden until signed in) -->
+        <div id="delete-card" class="p-6 rounded-2xl bg-digilayn-surface dark:bg-digilayn-surface-container-low border-2 border-digilayn-error space-y-4 hidden">
+            <h3 class="text-lg font-bold text-digilayn-error flex items-center gap-2">
+                <span>⚠️</span> Permanently Delete Account &amp; Data
+            </h3>
+            <p class="text-sm opacity-90 leading-relaxed">
+                This deletes your shared profile and sign-in credentials, device records, rider profiles in production and dev, bookings you created as a rider, ratings authored, reserved usernames, and presence data. Bookings where you were only the driver remain unchanged for accounting compliance.
+            </p>
+            <p class="text-sm font-bold text-digilayn-error">
+                This action is immediate and cannot be undone.
+            </p>
+            <div class="pt-2">
+                <label class="flex items-start gap-2 cursor-pointer text-sm">
+                    <input id="understand-checkbox" type="checkbox" class="mt-1">
+                    <span>I understand that deletion is immediate and permanent.</span>
+                </label>
+            </div>
+            <div>
+                <label for="delete-confirmation" class="block text-xs font-bold uppercase mb-1">
+                    Type your <strong>email address</strong> (or DELETE) to confirm
+                </label>
+                <input id="delete-confirmation" type="text" placeholder="Enter confirmation" autocomplete="off" class="w-full px-4 py-3 rounded-xl border border-digilayn-outline-variant bg-digilayn-surface text-digilayn-on-surface">
+            </div>
+            <div class="pt-2">
+                <button id="delete-button" type="button" disabled class="px-6 py-3 bg-digilayn-error text-digilayn-on-error font-bold rounded-xl hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed digilayn-button">
+                    Permanently Delete Account
+                </button>
+            </div>
+            <p id="delete-status" class="status text-sm" role="status" aria-live="assertive"></p>
+        </div>
+    </section>
+
+</main>
+
+<!-- Footer -->
+<digilayn-footer></digilayn-footer>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-functions-compat.js"></script>
+<script src="/scripts/build-target.js"></script>
+<script src="/scripts/firebase-settings.js"></script>
+<script src="/scripts/account-access-core.js"></script>
+<script src="/scripts/account-access-compat.js"></script>
+<script src="account-deletion.js"></script>
+<script src="scripts/security.js"></script>
+
+</body>
+</html>

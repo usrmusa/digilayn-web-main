@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://digilayn.co.za/</loc></url>
+  <url><loc>https://digilayn.co.za/terms</loc></url>
+  <url><loc>https://digilayn.co.za/privacy</loc></url>
+  <url><loc>https://digilayn.co.za/account-deletion</loc></url>
+  <url><loc>https://digilayn.co.za/portfolio</loc></url>
   <url><loc>https://digilayn.co.za/mgijima</loc></url>
+  <url><loc>https://digilayn.co.za/laynfleet/terms</loc></url>
+  <url><loc>https://digilayn.co.za/laynfleet/privacy</loc></url>
 </urlset>
