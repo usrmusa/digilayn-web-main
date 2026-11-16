@@ -3,6 +3,7 @@
 <head>
     <link rel="stylesheet" href="styles/digilayn-theme.css">
     <script src="scripts/theme.js"></script>
+    <script src="/scripts/digilayn-info.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Policy | Digilayn</title>
@@ -116,9 +117,9 @@
             For the purposes of the Protection of Personal Information Act 4 of 2013 ("POPIA"), the <strong>Responsible Party</strong> determining the purpose and means of processing personal data is:
         </p>
         <div class="p-4 rounded-2xl bg-digilayn-surface-container-low border border-digilayn-outline-variant text-sm">
-            <p class="font-bold">Musa Mgijima trading as Digilayn</p>
+            <p class="font-bold" data-digilayn="entity">Musa Mgijima trading as Digilayn</p>
             <p class="text-xs opacity-80 mt-1">Sole Proprietorship operating under the laws of the Republic of South Africa</p>
-            <p class="text-xs opacity-80 mt-1">Official Information Officer Contact: <a href="mailto:digilayn@gmail.com" class="text-digilayn-primary font-bold hover:underline">digilayn@gmail.com</a></p>
+            <p class="text-xs opacity-80 mt-1">Official Information Officer Contact: <a href="mailto:info@digilayn.co.za" data-digilayn="email" class="text-digilayn-primary font-bold hover:underline">info@digilayn.co.za</a></p>
         </div>
         <p class="text-sm opacity-90 leading-relaxed">
             This Policy applies globally to all websites, web portals, mobile applications, software tools, databases, and digital platforms operated or powered by Digilayn ("Digilayn Services") that share the Digilayn infrastructure and centralized user database.
@@ -285,7 +286,7 @@
                     <span>✉️</span> Manual Deletion Request
                 </h4>
                 <p class="text-xs opacity-80 leading-relaxed">
-                    If you cannot access your account or prefer manager assistance, email the Information Officer at <a href="mailto:digilayn@gmail.com" class="text-digilayn-primary font-bold hover:underline">digilayn@gmail.com</a> or WhatsApp <a href="https://wa.me/27815532209" target="_blank" class="text-digilayn-primary font-bold hover:underline">+27 81 553 2209</a> with your registered phone number or email address.
+                    If you cannot access your account or prefer manager assistance, email the Information Officer at <a href="mailto:info@digilayn.co.za" data-digilayn="email" class="text-digilayn-primary font-bold hover:underline">info@digilayn.co.za</a> or WhatsApp <a href="https://wa.me/27815532209" data-digilayn="whatsapp-contact" target="_blank" class="text-digilayn-primary font-bold hover:underline">+27 81 553 2209</a> with your registered phone number or email address.
                 </p>
             </div>
         </div>
@@ -368,28 +369,17 @@
         </p>
         <div class="p-5 rounded-2xl bg-digilayn-surface-container-low border border-digilayn-outline-variant text-sm space-y-2">
             <p><strong>Digilayn Information Officer</strong></p>
-            <p>Operator: Musa Mgijima trading as Digilayn</p>
-            <p>Email: <a href="mailto:digilayn@gmail.com" class="text-digilayn-primary font-bold hover:underline">digilayn@gmail.com</a></p>
-            <p>WhatsApp Support: <a href="https://wa.me/27815532209" target="_blank" class="text-digilayn-primary font-bold hover:underline">+27 81 553 2209</a></p>
-            <p>Official Website: <a href="https://digilayn.co.za" class="text-digilayn-primary font-bold hover:underline">digilayn.co.za</a></p>
+            <p>Operator: <span data-digilayn="entity">Musa Mgijima trading as Digilayn</span></p>
+            <p>Email: <a href="mailto:info@digilayn.co.za" data-digilayn="email" class="text-digilayn-primary font-bold hover:underline">info@digilayn.co.za</a></p>
+            <p>WhatsApp Support: <a href="https://wa.me/27815532209" data-digilayn="whatsapp-contact" target="_blank" class="text-digilayn-primary font-bold hover:underline">+27 81 553 2209</a></p>
+            <p>Official Website: <a href="https://digilayn.co.za" data-digilayn="website" class="text-digilayn-primary font-bold hover:underline">digilayn.co.za</a></p>
         </div>
     </section>
 
 </main>
 
 <!-- Footer -->
-<footer class="text-center py-10 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant text-sm opacity-80">
-    <div class="flex flex-wrap justify-center gap-4 mb-3">
-        <a href="terms" class="hover:text-digilayn-primary font-bold transition">Terms of Use</a>
-        <span>&bull;</span>
-        <a href="privacy" class="text-digilayn-primary font-bold">Privacy Policy</a>
-        <span>&bull;</span>
-        <a href="portfolio" class="hover:text-digilayn-primary transition">Portfolio</a>
-        <span>&bull;</span>
-        <a href="mgijima" class="hover:text-digilayn-primary transition">Founder</a>
-    </div>
-    <p>&copy; 2026 Digilayn. All rights reserved.</p>
-</footer>
+<digilayn-footer></digilayn-footer>
 
 <script src="scripts/security.js"></script>
 

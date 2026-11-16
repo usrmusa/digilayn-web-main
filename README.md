@@ -5,7 +5,7 @@ Digilayn builds practical mobile apps, web portals, dashboards and internal tool
 This public repository contains the Digilayn business website, founder profile, portfolio, project support pages and authenticated management interfaces.
 
 - Website: [digilayn.co.za](https://digilayn.co.za/)
-- Contact: [digilayn@gmail.com](mailto:digilayn@gmail.com)
+- Contact: [info@digilayn.co.za](mailto:info@digilayn.co.za)
 
 ## Technology
 

@@ -3,6 +3,7 @@
 <head>
     <link rel="stylesheet" href="styles/digilayn-theme.css">
     <script src="scripts/theme.js"></script>
+    <script src="/scripts/digilayn-info.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Musa Mgijima | Founder of Digilayn</title>
@@ -73,7 +74,7 @@
                 <a href="https://wa.me/27815532209" target="_blank" class="px-8 py-4 bg-digilayn-primary text-digilayn-on-primary font-black rounded-xl hover:bg-digilayn-primary transition transform hover:scale-105 digilayn-button">
                     Book Discovery on WhatsApp
                 </a>
-                <a href="mailto:digilayn@gmail.com" class="px-8 py-4 border border-digilayn-primary text-digilayn-primary dark:text-digilayn-primary font-black rounded-xl hover:bg-digilayn-primary-container dark:hover:bg-digilayn-primary-container/20 transition">
+                <a href="mailto:info@digilayn.co.za" class="px-8 py-4 border border-digilayn-primary text-digilayn-primary dark:text-digilayn-primary font-black rounded-xl hover:bg-digilayn-primary-container dark:hover:bg-digilayn-primary-container/20 transition">
                     Email Digilayn
                 </a>
                 <a href="https://linkedin.com/in/mgijima" target="_blank" class="px-8 py-4 border border-digilayn-outline-variant text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant font-black rounded-xl hover:bg-digilayn-surface dark:hover:bg-digilayn-surface-container-low transition">
@@ -204,22 +205,14 @@
             Digilayn is built for businesses that want practical software, not unnecessary complexity.
         </p>
         <div class="flex flex-wrap justify-center gap-4">
-            <a href="https://wa.me/27815532209" target="_blank" class="px-10 py-4 bg-digilayn-primary text-digilayn-on-primary font-black rounded-xl hover:bg-digilayn-primary transition transform hover:scale-105 digilayn-button">WhatsApp Digilayn</a>
+            <a href="https://wa.me/27815532209" data-digilayn="whatsapp" target="_blank" class="px-10 py-4 bg-digilayn-primary text-digilayn-on-primary font-black rounded-xl hover:bg-digilayn-primary transition transform hover:scale-105 digilayn-button">WhatsApp Digilayn</a>
             <a href="portfolio" class="px-10 py-4 border border-digilayn-primary text-digilayn-primary dark:text-digilayn-primary font-black rounded-xl hover:bg-digilayn-primary-container dark:hover:bg-digilayn-primary-container/20 transition">View Portfolio</a>
         </div>
     </section>
 
 </main>
 
-<footer class="text-center py-12 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant opacity-80 text-sm">
-    <div class="flex flex-wrap justify-center gap-4 mb-3 text-xs">
-        <a href="/privacy" class="hover:text-digilayn-primary transition">Privacy Policy</a>
-        <span>&bull;</span>
-        <a href="/terms" class="hover:text-digilayn-primary transition">Terms of Use</a>
-    </div>
-    <p>&copy; 2026 digilayn. All rights reserved.</p>
-    <p class="mt-2">Built by <a href="https://linkedin.com/in/mgijima" target="_blank" class="hover:text-digilayn-primary underline transition">Musa Mgijima</a>.</p>
-</footer>
+<digilayn-footer></digilayn-footer>
 
 <script src="scripts/security.js"></script>
 

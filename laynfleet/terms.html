@@ -3,6 +3,7 @@
 <head>
     <link rel="stylesheet" href="../styles/digilayn-theme.css">
     <script src="../scripts/theme.js"></script>
+    <script src="/scripts/digilayn-info.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LaynFleet Terms &amp; Conditions | Digilayn</title>
@@ -253,7 +254,7 @@
         <div>
             <h3 class="text-lg font-bold mb-2">3. Support &amp; Operational Disputes</h3>
             <p class="text-sm opacity-90 leading-relaxed">
-                For trip disputes, operational questions, or support, contact us at <a href="mailto:digilayn@gmail.com" class="text-digilayn-primary font-bold hover:underline">digilayn@gmail.com</a> or via WhatsApp at <a href="https://wa.me/27815532209" target="_blank" class="text-digilayn-primary font-bold hover:underline">+27 81 553 2209</a>.
+                For trip disputes, operational questions, or support, contact us at <a href="mailto:info@digilayn.co.za" data-digilayn="email" class="text-digilayn-primary font-bold hover:underline">info@digilayn.co.za</a> or via WhatsApp at <a href="https://wa.me/27815532209" data-digilayn="whatsapp-contact" target="_blank" class="text-digilayn-primary font-bold hover:underline">+27 81 553 2209</a>.
             </p>
         </div>
     </section>
@@ -261,16 +262,7 @@
 </main>
 
 <!-- Footer -->
-<footer class="text-center py-10 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant text-sm opacity-80">
-    <div class="flex flex-wrap justify-center gap-4 mb-3">
-        <a href="/terms" class="hover:text-digilayn-primary font-bold transition">Digilayn Terms of Use</a>
-        <span>&bull;</span>
-        <a href="/laynfleet/terms" class="text-digilayn-primary font-bold">LaynFleet Terms</a>
-        <span>&bull;</span>
-        <a href="/laynfleet/privacy" class="hover:text-digilayn-primary font-bold transition">LaynFleet Privacy</a>
-    </div>
-    <p>&copy; 2026 Digilayn. All rights reserved.</p>
-</footer>
+<digilayn-footer context="laynfleet"></digilayn-footer>
 
 <script>
     function filterTermsRole(role) {

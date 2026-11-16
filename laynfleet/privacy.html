@@ -3,6 +3,7 @@
 <head>
     <link rel="stylesheet" href="../styles/digilayn-theme.css">
     <script src="../scripts/theme.js"></script>
+    <script src="/scripts/digilayn-info.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LaynFleet Privacy Policy | Digilayn</title>
@@ -249,8 +250,8 @@
         </p>
         <div class="p-5 rounded-2xl bg-digilayn-surface-container-low border border-digilayn-outline-variant text-sm space-y-2">
             <p><strong>Digilayn Technologies &bull; LaynFleet Support</strong></p>
-            <p>Email: <a href="mailto:digilayn@gmail.com" class="text-digilayn-primary font-bold hover:underline">digilayn@gmail.com</a></p>
-            <p>WhatsApp Support: <a href="https://wa.me/27815532209" target="_blank" class="text-digilayn-primary font-bold hover:underline">+27 81 553 2209</a></p>
+            <p>Email: <a href="mailto:info@digilayn.co.za" data-digilayn="email" class="text-digilayn-primary font-bold hover:underline">info@digilayn.co.za</a></p>
+            <p>WhatsApp Support: <a href="https://wa.me/27815532209" data-digilayn="whatsapp-contact" target="_blank" class="text-digilayn-primary font-bold hover:underline">+27 81 553 2209</a></p>
             <p>Parent Privacy Policy: <a href="/privacy" class="text-digilayn-primary font-bold hover:underline">digilayn.co.za/privacy</a></p>
         </div>
     </section>
@@ -258,16 +259,7 @@
 </main>
 
 <!-- Footer -->
-<footer class="text-center py-10 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant text-sm opacity-80">
-    <div class="flex flex-wrap justify-center gap-4 mb-3">
-        <a href="/privacy" class="hover:text-digilayn-primary font-bold transition">Digilayn Privacy Policy</a>
-        <span>&bull;</span>
-        <a href="/laynfleet/privacy" class="text-digilayn-primary font-bold">LaynFleet Privacy</a>
-        <span>&bull;</span>
-        <a href="/laynfleet/terms" class="hover:text-digilayn-primary font-bold transition">LaynFleet Terms</a>
-    </div>
-    <p>&copy; 2026 Digilayn. All rights reserved.</p>
-</footer>
+<digilayn-footer context="laynfleet"></digilayn-footer>
 
 <script>
     function filterRole(role) {
