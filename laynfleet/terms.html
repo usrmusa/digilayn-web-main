@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../styles/digilayn-theme.css">
+    <script src="../scripts/theme.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaynFleet Terms &amp; Conditions | Digilayn</title>
+    <meta name="author" content="Digilayn">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../scripts/digilayn-tailwind.js"></script>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="icon" href="/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    <link rel="stylesheet" href="../styles/digilayn-components.css">
+
+    <meta name="description" content="LaynFleet Service Addendum: Transport and dispatch terms governing the LaynRider and LaynDriver applications under Digilayn.">
+    <link rel="canonical" href="https://digilayn.co.za/laynfleet/terms">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Digilayn">
+    <meta property="og:title" content="LaynFleet Terms &amp; Conditions | Digilayn">
+    <meta property="og:description" content="LaynFleet Service Addendum: Transport and dispatch terms governing the LaynRider and LaynDriver applications under Digilayn.">
+    <meta property="og:url" content="https://digilayn.co.za/laynfleet/terms">
+    <meta property="og:image" content="https://digilayn.co.za/img/social-preview-logo.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1732">
+    <meta property="og:image:height" content="908">
+    <meta property="og:image:alt" content="Digilayn — custom business software, mobile apps and web systems">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="LaynFleet Terms &amp; Conditions | Digilayn">
+    <meta name="twitter:description" content="LaynFleet Service Addendum: Transport and dispatch terms governing the LaynRider and LaynDriver applications under Digilayn.">
+    <meta name="twitter:image" content="https://digilayn.co.za/img/social-preview-logo.png">
+    <meta name="twitter:image:alt" content="Digilayn — custom business software, mobile apps and web systems">
+    <meta name="robots" content="index, follow">
+</head>
+
+<body class="font-sans antialiased bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface transition-colors duration-300 min-h-screen flex flex-col justify-between">
+
+<!-- Top Navigation -->
+<nav class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center p-6 pointer-events-none">
+    <a href="/" class="pointer-events-auto text-sm font-black tracking-wide px-4 py-2 rounded-full bg-digilayn-surface-container-lowest/80 dark:bg-digilayn-surface-container-low/80 backdrop-blur-md shadow border border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:text-digilayn-primary transition">
+        digilayn
+    </a>
+
+    <div class="flex items-center gap-3 pointer-events-auto">
+        <a href="/terms" class="hidden sm:inline-flex text-sm font-bold px-4 py-2 rounded-full bg-digilayn-surface-container-lowest/80 dark:bg-digilayn-surface-container-low/80 backdrop-blur-md shadow border border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:text-digilayn-primary transition">
+            Parent Terms
+        </a>
+        <a href="/laynfleet/privacy" class="text-sm font-bold px-4 py-2 rounded-full bg-digilayn-surface-container-lowest/80 dark:bg-digilayn-surface-container-low/80 backdrop-blur-md shadow border border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:text-digilayn-primary transition">
+            Privacy Policy
+        </a>
+        <button id="theme-toggle" class="p-3 bg-digilayn-surface-container-lowest/80 dark:bg-digilayn-surface-container-low/80 backdrop-blur-md rounded-full shadow-lg border border-digilayn-outline-variant dark:border-digilayn-outline-variant transition-transform hover:scale-110 active:scale-95" aria-label="Toggle Theme">
+            <span id="theme-icon" class="text-xl"></span>
+        </button>
+    </div>
+</nav>
+
+<!-- Main Header -->
+<header class="max-w-4xl mx-auto pt-28 pb-8 px-6">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-digilayn-primary/10 text-digilayn-primary dark:text-digilayn-primary text-xs font-black uppercase tracking-wider mb-4 border border-digilayn-primary/20">
+        Service Addendum &bull; LaynFleet
+    </div>
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">
+        LaynFleet Terms &amp; Conditions
+    </h1>
+    <p class="text-lg opacity-85 leading-relaxed">
+        These terms govern the transport-specific use of the <strong>LaynFleet</strong> platform, including the <strong>LaynRider</strong> passenger app and the <strong>LaynDriver</strong> partner app.
+    </p>
+    <p class="text-xs text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant mt-3">
+        Last updated: November 16, 2026 &bull; Published by Musa Mgijima trading as Digilayn &bull; Republic of South Africa.
+    </p>
+
+    <!-- Role Filter Tabs -->
+    <div class="mt-8 flex flex-wrap gap-3">
+        <button id="tab-btn-all" onclick="filterTermsRole('all')" class="role-tab-btn active px-5 py-2.5 rounded-xl font-bold text-sm bg-digilayn-primary text-digilayn-on-primary shadow-md transition digilayn-button">
+            Full Agreement
+        </button>
+        <button id="tab-btn-rider" onclick="filterTermsRole('rider')" class="role-tab-btn px-5 py-2.5 rounded-xl font-bold text-sm bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low hover:bg-digilayn-surface-container-high dark:hover:bg-digilayn-surface-container-high transition">
+            🧑 Rider Terms (LaynRider)
+        </button>
+        <button id="tab-btn-driver" onclick="filterTermsRole('driver')" class="role-tab-btn px-5 py-2.5 rounded-xl font-bold text-sm bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low hover:bg-digilayn-surface-container-high dark:hover:bg-digilayn-surface-container-high transition">
+            🚗 Driver Terms (LaynDriver)
+        </button>
+    </div>
+</header>
+
+<main class="max-w-4xl mx-auto px-6 space-y-8 pb-20">
+
+    <!-- Parent Platform Relationship Box -->
+    <div class="card p-6 sm:p-8 rounded-3xl border-l-4 border-l-digilayn-info bg-digilayn-info-container/20 dark:bg-digilayn-info/10">
+        <div class="flex items-start gap-3">
+            <span class="text-2xl">🔗</span>
+            <div>
+                <h2 class="text-lg font-bold mb-1">Digilayn Platform Addendum</h2>
+                <p class="text-sm opacity-90 leading-relaxed">
+                    LaynFleet is operated by Digilayn and shares the unified Digilayn backend infrastructure. By creating an account or using LaynFleet, you agree to the overarching <a href="/terms" class="text-digilayn-primary font-bold underline">Digilayn Terms of Use</a>, which govern your universal account credentials, strict 18+ eligibility, cross-platform conduct, and database security. The provisions below constitute the service-specific addendum governing transport dispatch, fare calculations, and driver partnerships.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overview Highlights Box -->
+    <div class="card p-6 sm:p-8 rounded-3xl border-l-4 border-l-digilayn-primary">
+        <h2 class="text-xl font-bold mb-3 flex items-center gap-2">
+            <span>⚖️</span> Core Transport Principles
+        </h2>
+        <ul class="space-y-2 text-sm sm:text-base opacity-90">
+            <li class="flex items-start gap-2">
+                <span class="text-digilayn-primary font-bold">✓</span>
+                <span><strong>Technology Platform:</strong> Digilayn provides the dispatch, routing, and communication software connecting independent drivers with riders. Digilayn is not a transport carrier or employer.</span>
+            </li>
+            <li class="flex items-start gap-2">
+                <span class="text-digilayn-primary font-bold">✓</span>
+                <span><strong>Fares &amp; Direct Offline Payment:</strong> Riders view and lock the displayed fare before confirming a booking, paying drivers directly (cash or agreed offline method) upon trip arrival. Excess-waiting fees apply if agreed return waiting times are exceeded.</span>
+            </li>
+            <li class="flex items-start gap-2">
+                <span class="text-digilayn-primary font-bold">✓</span>
+                <span><strong>Democratic Pricing Governance:</strong> Eligible drivers vote on proposed changes to the fleet pricing curve for their vehicle type. Confirmed bookings retain their original locked pricing.</span>
+            </li>
+            <li class="flex items-start gap-2">
+                <span class="text-digilayn-primary font-bold">✓</span>
+                <span><strong>Zero Harassment &amp; Mutual Respect:</strong> We enforce strict standards of safety, mutual respect, and non-discrimination.</span>
+            </li>
+            <li class="flex items-start gap-2">
+                <span class="text-digilayn-warning font-bold">⚠</span>
+                <span><strong>Community Platform &amp; Assumption of Risk:</strong> LaynFleet is a connection tool built for the <strong>Poortjie community</strong>, where riders and drivers largely know one another. Digilayn <strong>does not verify the real identity</strong> of any user. Riders and drivers use the platform <strong>entirely at their own risk</strong> and should only accept or offer rides to and from people they personally know and trust.</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- RIDER TERMS -->
+    <section class="space-y-6" data-terms-section="rider">
+        <div class="flex items-center gap-3">
+            <span class="px-3 py-1 rounded-full text-xs font-black bg-digilayn-info/10 text-digilayn-info dark:text-digilayn-info uppercase">Rider Agreement</span>
+            <h2 class="text-2xl font-bold">Terms for LaynRider Users</h2>
+        </div>
+
+        <div class="card p-6 sm:p-8 rounded-3xl space-y-6">
+            <div>
+                <h3 class="text-lg font-bold mb-2">1. Booking &amp; Fare Payment</h3>
+                <p class="text-sm opacity-90 leading-relaxed">
+                    Before confirming a booking, you see the fare calculated from verified road-route distance, the fleet's active distance-based pricing curve, minimum fare, and applicable return-trip pricing. The curve means fare is not calculated simply by multiplying distance by a fixed rate per kilometre. Changes to the curve steepness require driver voting.
+                </p>
+                <p class="text-sm opacity-90 leading-relaxed mt-3">
+                    The displayed fare and pricing settings are locked when you confirm. Subsequent fleet pricing updates do not alter an already-confirmed booking. By confirming, you agree to pay the driver upon trip completion in cash or by another agreed direct payment method.
+                </p>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold mb-2">2. Return Trips &amp; Excess Waiting Charges</h3>
+                <p class="text-sm opacity-90 leading-relaxed">
+                    For return trips, the agreed waiting duration and the rate for exceeding it are clearly displayed before booking confirmation. If you exceed the agreed waiting time, an additional charge is accumulated using the locked waiting rate. The app displays this accumulating fee while the driver waits. You agree to pay the confirmed fare plus this excess charge upon return completion. Drivers may not add any arbitrary off-app markups.
+                </p>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold mb-2">3. Pickup Location &amp; Accuracy</h3>
+                <p class="text-sm opacity-90 leading-relaxed">
+                    With permission, LaynRider requests location when needed for foreground service-area checks or when you select "Use Current Location" for a pickup. It does not track riders in the background. Pickup and destination coordinates selected for a booking are stored with that trip. You are responsible for ensuring your pickup pin is accurate and situated in a safe, accessible area for the driver to stop.
+                </p>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold mb-2">4. Passenger Conduct &amp; Safety</h3>
+                <p class="text-sm opacity-90 leading-relaxed">
+                    Riders must treat drivers and their vehicles with care and respect. Damaging a driver's vehicle, carrying illegal substances, or engaging in harassing or aggressive behaviour will result in immediate permanent account suspension across all Digilayn platforms.
+                </p>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold mb-2">5. Community Use &amp; Assumption of Risk</h3>
+                <p class="text-sm opacity-90 leading-relaxed">
+                    LaynRider is a connection platform for the Poortjie community, not a transport carrier. Digilayn does not employ drivers and <strong>does not verify the real identity</strong> of any rider or driver &mdash; names, photos, and phone numbers are self-provided and unverified. You use LaynRider <strong>at your own risk</strong> and are solely responsible for deciding whom to ride with; you should only accept rides from drivers you personally know and trust. Digilayn is not liable for user conduct or events occurring during a trip.
+                </p>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold mb-2">6. Cancellations</h3>
+                <p class="text-sm opacity-90 leading-relaxed">
+                    If you must cancel a ride, please cancel promptly through the app before the driver arrives to avoid unnecessary travel and fuel costs for the driver.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- DRIVER TERMS -->
+    <section class="space-y-6" data-terms-section="driver">
+        <div class="flex items-center gap-3">
+            <span class="px-3 py-1 rounded-full text-xs font-black bg-digilayn-warning/10 text-digilayn-warning dark:text-digilayn-warning uppercase">Driver Agreement</span>
+            <h2 class="text-2xl font-bold">Terms for LaynDriver Partners</h2>
+        </div>
+
+        <div class="card p-6 sm:p-8 rounded-3xl space-y-6">
+            <div>
+                <h3 class="text-lg font-bold mb-2">1. Independent Fleet Operator Status</h3>
+                <p class="text-sm opacity-90 leading-relaxed">
+                    Drivers operate as independent transport providers. Digilayn provides technology software and is not an employer or transport carrier. You retain full control over when you choose to go online, go offline, and accept ride requests.
+                </p>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold mb-2">2. Licensing, Roadworthiness &amp; Legal Compliance</h3>
+                <p class="text-sm opacity-90 leading-relaxed">
+                    You represent and warrant that you hold a valid driver's license (with appropriate Professional Driving Permit / PrDP if applicable), that your vehicle is fully licensed and roadworthy, and that you comply with all South African National Road Traffic laws.
+                </p>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold mb-2">3. Live Location Sharing</h3>
+                <p class="text-sm opacity-90 leading-relaxed">
+                    While toggled to <strong>"Online"</strong> or during an assigned booking, LaynDriver requires background and foreground location access. This allows the dispatch radar to broadcast your position to nearby riders and compute accurate pickup routes and ETAs.
+                </p>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold mb-2">4. Democratic Fare Governance</h3>
+                <p class="text-sm opacity-90 leading-relaxed">
+                    Digilayn introduced the distance-based pricing curve. Eligible drivers vote on proposed fleet pricing changes for their vehicle type, including changes to the curve steepness. Approved pricing changes apply to new bookings; already-confirmed bookings retain their original fare and pricing settings. Drivers must charge only the confirmed fare plus the disclosed excess-waiting charge where applicable, and may not add off-app markups.
+                </p>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold mb-2">5. Road Liability &amp; Disclaimers</h3>
+                <p class="text-sm opacity-90 leading-relaxed">
+                    Digilayn is not liable for traffic violations, road accidents, vehicle wear and tear, or third-party claims arising from vehicle operations. Drivers are required to maintain appropriate motor vehicle insurance.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- LAYNFLEET DATA & ACCOUNT POLICIES -->
+    <section class="card p-6 sm:p-8 rounded-3xl space-y-6" data-terms-section="general">
+        <h2 class="text-2xl font-bold">LaynFleet Data &amp; Account Policies</h2>
+
+        <div>
+            <h3 class="text-lg font-bold mb-2">1. LaynFleet Deletion &amp; Retained Trip Records</h3>
+            <p class="text-sm opacity-90 leading-relaxed">
+                Riders can sign in at the public <a href="/portfolio/projects/laynfleet/account-deletion" class="text-digilayn-primary font-bold underline">account-deletion page</a> to inspect and immediately permanently delete their LaynRider account and rider-created trip data. Drivers can submit a deletion request in-app or via email. Driver profile deletion removes personal profile details while retaining booking records unchanged for dispatch auditing and financial verification. See the <a href="/portfolio/projects/laynfleet/privacy" class="text-digilayn-primary font-bold underline">Privacy Policy</a> for retention specifics.
+            </p>
+        </div>
+
+        <div>
+            <h3 class="text-lg font-bold mb-2">2. Universal Account Relationship</h3>
+            <p class="text-sm opacity-90 leading-relaxed">
+                LaynRider and LaynDriver operate on your universal Digilayn Account. Deleting your universal Digilayn Account removes access across all Digilayn Services. If you only wish to stop using LaynFleet, you may remove the app or request LaynFleet-specific profile deactivation.
+            </p>
+        </div>
+
+        <div>
+            <h3 class="text-lg font-bold mb-2">3. Support &amp; Operational Disputes</h3>
+            <p class="text-sm opacity-90 leading-relaxed">
+                For trip disputes, operational questions, or support, contact us at <a href="mailto:digilayn@gmail.com" class="text-digilayn-primary font-bold hover:underline">digilayn@gmail.com</a> or via WhatsApp at <a href="https://wa.me/27815532209" target="_blank" class="text-digilayn-primary font-bold hover:underline">+27 81 553 2209</a>.
+            </p>
+        </div>
+    </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="text-center py-10 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant text-sm opacity-80">
+    <div class="flex flex-wrap justify-center gap-4 mb-3">
+        <a href="/terms" class="hover:text-digilayn-primary font-bold transition">Digilayn Terms of Use</a>
+        <span>&bull;</span>
+        <a href="/laynfleet/terms" class="text-digilayn-primary font-bold">LaynFleet Terms</a>
+        <span>&bull;</span>
+        <a href="/laynfleet/privacy" class="hover:text-digilayn-primary font-bold transition">LaynFleet Privacy</a>
+    </div>
+    <p>&copy; 2026 Digilayn. All rights reserved.</p>
+</footer>
+
+<script>
+    function filterTermsRole(role) {
+        const buttons = document.querySelectorAll('.role-tab-btn');
+        buttons.forEach(btn => {
+            btn.classList.remove('bg-digilayn-primary', 'text-digilayn-on-primary', 'shadow-md');
+            btn.classList.add('bg-digilayn-surface-container-low', 'dark:bg-digilayn-surface-container-low');
+        });
+
+        const activeBtn = document.getElementById('tab-btn-' + role);
+        if (activeBtn) {
+            activeBtn.classList.add('bg-digilayn-primary', 'text-digilayn-on-primary', 'shadow-md');
+            activeBtn.classList.remove('bg-digilayn-surface-container-low', 'dark:bg-digilayn-surface-container-low');
+        }
+
+        const sections = document.querySelectorAll('[data-terms-section]');
+        sections.forEach(sec => {
+            const secRole = sec.getAttribute('data-terms-section');
+            if (role === 'all' || secRole === 'general' || secRole === role) {
+                sec.style.display = 'block';
+            } else {
+                sec.style.display = 'none';
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../styles/digilayn-theme.css">
+    <script src="../scripts/theme.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaynFleet Privacy Policy | Digilayn</title>
+    <meta name="author" content="Digilayn">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../scripts/digilayn-tailwind.js"></script>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="icon" href="/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    <link rel="stylesheet" href="../styles/digilayn-components.css">
+
+    <meta name="description" content="LaynFleet Privacy Addendum: Data practices, location privacy, and rider-driver disclosures for LaynRider and LaynDriver apps.">
+    <link rel="canonical" href="https://digilayn.co.za/laynfleet/privacy">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Digilayn">
+    <meta property="og:title" content="LaynFleet Privacy Policy | Digilayn">
+    <meta property="og:description" content="LaynFleet Privacy Addendum: Data practices, location privacy, and rider-driver disclosures for LaynRider and LaynDriver apps.">
+    <meta property="og:url" content="https://digilayn.co.za/laynfleet/privacy">
+    <meta property="og:image" content="https://digilayn.co.za/img/social-preview-logo.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1732">
+    <meta property="og:image:height" content="908">
+    <meta property="og:image:alt" content="Digilayn — custom business software, mobile apps and web systems">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="LaynFleet Privacy Policy | Digilayn">
+    <meta name="twitter:description" content="LaynFleet Privacy Addendum: Data practices, location privacy, and rider-driver disclosures for LaynRider and LaynDriver apps.">
+    <meta name="twitter:image" content="https://digilayn.co.za/img/social-preview-logo.png">
+    <meta name="twitter:image:alt" content="Digilayn — custom business software, mobile apps and web systems">
+    <meta name="robots" content="index, follow">
+</head>
+
+<body class="font-sans antialiased bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface transition-colors duration-300 min-h-screen flex flex-col justify-between">
+
+<!-- Top Navigation -->
+<nav class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center p-6 pointer-events-none">
+    <a href="/" class="pointer-events-auto text-sm font-black tracking-wide px-4 py-2 rounded-full bg-digilayn-surface-container-lowest/80 dark:bg-digilayn-surface-container-low/80 backdrop-blur-md shadow border border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:text-digilayn-primary transition">
+        digilayn
+    </a>
+
+    <div class="flex items-center gap-3 pointer-events-auto">
+        <a href="/privacy" class="hidden sm:inline-flex text-sm font-bold px-4 py-2 rounded-full bg-digilayn-surface-container-lowest/80 dark:bg-digilayn-surface-container-low/80 backdrop-blur-md shadow border border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:text-digilayn-primary transition">
+            Parent Privacy
+        </a>
+        <a href="/laynfleet/terms" class="text-sm font-bold px-4 py-2 rounded-full bg-digilayn-surface-container-lowest/80 dark:bg-digilayn-surface-container-low/80 backdrop-blur-md shadow border border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:text-digilayn-primary transition">
+            LaynFleet Terms
+        </a>
+        <button id="theme-toggle" class="p-3 bg-digilayn-surface-container-lowest/80 dark:bg-digilayn-surface-container-low/80 backdrop-blur-md rounded-full shadow-lg border border-digilayn-outline-variant dark:border-digilayn-outline-variant transition-transform hover:scale-110 active:scale-95" aria-label="Toggle Theme">
+            <span id="theme-icon" class="text-xl"></span>
+        </button>
+    </div>
+</nav>
+
+<!-- Main Header -->
+<header class="max-w-4xl mx-auto pt-28 pb-8 px-6">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-digilayn-primary/10 text-digilayn-primary dark:text-digilayn-primary text-xs font-black uppercase tracking-wider mb-4 border border-digilayn-primary/20">
+        Privacy Addendum &bull; LaynFleet
+    </div>
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">
+        LaynFleet Privacy Policy
+    </h1>
+    <p class="text-lg opacity-85 leading-relaxed">
+        This policy explains transport-specific data practices, live GPS tracking, and rider-driver information sharing across the <strong>LaynRider</strong> passenger app and <strong>LaynDriver</strong> partner app under POPIA.
+    </p>
+    <p class="text-xs text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant mt-3">
+        Last updated: November 16, 2026 &bull; Published by Musa Mgijima trading as Digilayn &bull; Republic of South Africa.
+    </p>
+
+    <!-- Role Filter Tabs -->
+    <div class="mt-8 flex flex-wrap gap-3">
+        <button id="tab-btn-all" onclick="filterRole('all')" class="role-tab-btn active px-5 py-2.5 rounded-xl font-bold text-sm bg-digilayn-primary text-digilayn-on-primary shadow-md transition digilayn-button">
+            Full Policy
+        </button>
+        <button id="tab-btn-rider" onclick="filterRole('rider')" class="role-tab-btn px-5 py-2.5 rounded-xl font-bold text-sm bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low hover:bg-digilayn-surface-container-high dark:hover:bg-digilayn-surface-container-high transition">
+            🧑 LaynRider (Riders Only)
+        </button>
+        <button id="tab-btn-driver" onclick="filterRole('driver')" class="role-tab-btn px-5 py-2.5 rounded-xl font-bold text-sm bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low hover:bg-digilayn-surface-container-high dark:hover:bg-digilayn-surface-container-high transition">
+            🚗 LaynDriver (Drivers Only)
+        </button>
+    </div>
+</header>
+
+<main class="max-w-4xl mx-auto px-6 space-y-8 pb-20">
+
+    <!-- Parent Platform Relationship Box -->
+    <div class="card p-6 sm:p-8 rounded-3xl border-l-4 border-l-digilayn-info bg-digilayn-info-container/20 dark:bg-digilayn-info/10">
+        <div class="flex items-start gap-3">
+            <span class="text-2xl">🔗</span>
+            <div>
+                <h2 class="text-lg font-bold mb-1">Digilayn Platform Privacy Addendum</h2>
+                <p class="text-sm opacity-90 leading-relaxed">
+                    LaynFleet is powered by the unified Digilayn backend. Your universal account credentials, profile custody, strict 18+ eligibility, security safeguards, and statutory rights are governed by the parent <a href="/privacy" class="text-digilayn-primary font-bold underline">Digilayn Privacy Policy</a> under POPIA. This Addendum details the operational data practices specific to ride dispatch, real-time location sharing, and trip records.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overview Highlights Box -->
+    <div class="card p-6 sm:p-8 rounded-3xl border-l-4 border-l-digilayn-primary" data-section-role="all">
+        <h2 class="text-xl font-bold mb-3 flex items-center gap-2">
+            <span>🛡️</span> Transport Privacy Highlights
+        </h2>
+        <ul class="space-y-2 text-sm sm:text-base opacity-90">
+            <li class="flex items-start gap-2">
+                <span class="text-digilayn-primary font-bold">✓</span>
+                <span><strong>No Data Selling:</strong> We never sell, rent, or trade trip history or personal information to third parties or advertisers.</span>
+            </li>
+            <li class="flex items-start gap-2">
+                <span class="text-digilayn-primary font-bold">✓</span>
+                <span><strong>Rider Location Privacy:</strong> Riders are never tracked in the background. Location is requested in the foreground solely when checking service-area availability or setting a pickup pin.</span>
+            </li>
+            <li class="flex items-start gap-2">
+                <span class="text-digilayn-primary font-bold">✓</span>
+                <span><strong>Driver Live Location:</strong> Drivers broadcast live location while toggled "Online" or executing assigned trips so riders and dispatch radar can monitor vehicle arrivals.</span>
+            </li>
+            <li class="flex items-start gap-2">
+                <span class="text-digilayn-primary font-bold">✓</span>
+                <span><strong>Clear Erasure Rules:</strong> Riders can permanently delete their account and trip history via the account-deletion page. Driver profile deletion removes personal profiles while retaining historical dispatch logs for accounting.</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Community & Own-Risk Disclosure -->
+    <div class="card p-6 sm:p-8 rounded-3xl border-l-4 border-l-digilayn-warning bg-digilayn-warning-container/20 dark:bg-digilayn-warning/10" data-section-role="all">
+        <h2 class="text-xl font-bold mb-3 flex items-center gap-2">
+            <span>⚠️</span> Poortjie Community Platform &mdash; Used at Your Own Risk
+        </h2>
+        <ul class="space-y-2 text-sm sm:text-base opacity-90">
+            <li class="flex items-start gap-2">
+                <span class="text-digilayn-warning font-bold">•</span>
+                <span>LaynFleet is built for the <strong>Poortjie community</strong>, where riders and drivers largely know one another to arrange local trips.</span>
+            </li>
+            <li class="flex items-start gap-2">
+                <span class="text-digilayn-warning font-bold">•</span>
+                <span><strong>We do not verify the real identity of any user.</strong> Names, photos, and phone numbers are self-provided and unverified against official government registers.</span>
+            </li>
+            <li class="flex items-start gap-2">
+                <span class="text-digilayn-warning font-bold">•</span>
+                <span>Riders and drivers use LaynFleet <strong>at their own risk</strong>. You should only accept or offer rides to and from people you personally know and trust.</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- 1. INFORMATION COLLECTED -->
+    <section class="card p-6 sm:p-8 rounded-3xl space-y-6" data-section-role="all rider driver">
+        <h2 class="text-2xl font-bold">1. Information Collected in LaynFleet</h2>
+
+        <!-- Rider Data Box -->
+        <div class="p-5 rounded-2xl bg-digilayn-surface dark:bg-digilayn-surface-container-low/60 border border-digilayn-outline-variant" data-role="rider">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="px-2.5 py-1 rounded-md text-xs font-black bg-digilayn-info/10 text-digilayn-info dark:text-digilayn-info">🧑 LaynRider</span>
+                <h3 class="font-bold text-lg">Rider Information</h3>
+            </div>
+            <ul class="list-disc list-inside space-y-2 text-sm opacity-90">
+                <li><strong>Account Identity:</strong> Display name, registered email, profile photo, and mobile phone number (stored to allow matched drivers to contact you; not verified via SMS).</li>
+                <li><strong>Trip &amp; Booking Data:</strong> Requested pickup location, destination, road-route distance, fare quotation, ride status, and timestamps.</li>
+                <li><strong>On-Demand Foreground Location:</strong> With permission, LaynRider requests location when needed in the foreground to check service-area coverage or set a pickup pin. It does not run background rider tracking.</li>
+                <li><strong>Ratings &amp; Feedback:</strong> Voluntary ratings (1–5 stars) and optional feedback submitted after completed trips.</li>
+            </ul>
+        </div>
+
+        <!-- Driver Data Box -->
+        <div class="p-5 rounded-2xl bg-digilayn-surface dark:bg-digilayn-surface-container-low/60 border border-digilayn-outline-variant" data-role="driver">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="px-2.5 py-1 rounded-md text-xs font-black bg-digilayn-warning/10 text-digilayn-warning dark:text-digilayn-warning">🚗 LaynDriver</span>
+                <h3 class="font-bold text-lg">Driver Information</h3>
+            </div>
+            <ul class="list-disc list-inside space-y-2 text-sm opacity-90">
+                <li><strong>Driver Profile &amp; Vehicle:</strong> Full name, phone number, vehicle details (make, model, colour, plate registration), and documentation status.</li>
+                <li><strong>Live Location Tracking (Foreground &amp; Background):</strong> While toggled to <strong>"Online"</strong> or executing an active trip, LaynDriver collects continuous GPS location to broadcast vehicle availability on radar and calculate accurate arrival times.</li>
+                <li><strong>Fleet Performance:</strong> Trip completion records, rider ratings, acceptance rates, and voting records on fleet pricing curve adjustments.</li>
+            </ul>
+        </div>
+
+        <!-- Device & Technical Data Box -->
+        <div class="p-5 rounded-2xl bg-digilayn-surface dark:bg-digilayn-surface-container-low/60 border border-digilayn-outline-variant">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="px-2.5 py-1 rounded-md text-xs font-black bg-digilayn-surface-container-highest/10 text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant">📱 Technical Infrastructure</span>
+                <h3 class="font-bold text-lg">Device &amp; Telemetry Data</h3>
+            </div>
+            <ul class="list-disc list-inside space-y-2 text-sm opacity-90">
+                <li><strong>Device Registry:</strong> Recording active device sessions to keep accounts secure and allow single-device preferences.</li>
+                <li><strong>Push Tokens:</strong> Cryptographic tokens from Firebase Cloud Messaging (or Huawei Push) to deliver trip dispatch alerts.</li>
+                <li><strong>Maps &amp; SDK Telemetry:</strong> Google Maps and Places SDKs (or Huawei Map Kit) collect technical telemetry, IP addresses, and interaction metrics necessary to render maps and route navigation.</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 2. DATA SHARING BETWEEN USERS -->
+    <section class="card p-6 sm:p-8 rounded-3xl space-y-4" data-section-role="all rider driver">
+        <h2 class="text-2xl font-bold">2. Data Sharing Between Riders &amp; Drivers</h2>
+        <p class="text-sm opacity-90 leading-relaxed">
+            When a rider and driver are matched for a trip, personal details are shared exclusively to coordinate pickup and execution:
+        </p>
+        <ul class="list-disc list-inside space-y-2 text-sm opacity-90">
+            <li>The <strong>driver</strong> sees the rider's name, profile photo, rating, contact phone number, and pickup location pin, and can call the rider directly from the app.</li>
+            <li>The <strong>rider</strong> sees the driver's name, profile photo, vehicle make, model, colour, registration plate number, live GPS location, and phone number, and can call the driver directly.</li>
+        </ul>
+        <p class="text-sm opacity-90 leading-relaxed">
+            Riders can also view driver profiles and community ratings before booking. Submitted driver reviews and star ratings are visible within the platform to assist community transparency.
+        </p>
+    </section>
+
+    <!-- 3. TRANSPORT DATA RETENTION & TRIP RECORDS -->
+    <section class="card p-6 sm:p-8 rounded-3xl space-y-4" data-section-role="all rider driver">
+        <div class="flex items-center gap-2">
+            <span class="text-2xl">📁</span>
+            <h2 class="text-2xl font-bold">3. Transport Data Retention &amp; Trip Records</h2>
+        </div>
+        <p class="text-sm opacity-90 leading-relaxed">
+            Universal account deletion is managed centrally under the parent <a href="/privacy" class="text-digilayn-primary font-bold underline">Digilayn Privacy Policy</a>. When a user account is deleted or when you stop using LaynFleet, transport-specific records are handled as follows:
+        </p>
+
+        <div class="space-y-3 pt-2">
+            <div class="p-4 rounded-2xl bg-digilayn-surface dark:bg-digilayn-surface-container-low/80 border border-digilayn-outline-variant">
+                <h4 class="font-bold text-sm mb-1">Rider Trip Data</h4>
+                <p class="text-xs opacity-80 leading-relaxed">
+                    When a rider account is deleted through the universal Digilayn deletion process, rider-created bookings and associated trip pickup/dropoff logs are permanently removed from active databases.
+                </p>
+            </div>
+            <div class="p-4 rounded-2xl bg-digilayn-surface dark:bg-digilayn-surface-container-low/80 border border-digilayn-outline-variant">
+                <h4 class="font-bold text-sm mb-1">Driver Booking History &amp; Audit Logs</h4>
+                <p class="text-xs opacity-80 leading-relaxed">
+                    When a driver profile is deleted, personal driver details and vehicle registrations are permanently removed. However, completed trip records, dispatch timestamps, and fare logs are retained unchanged in an immutable audit state for dispatch accounting, road safety compliance, and financial verification.
+                </p>
+            </div>
+            <div class="p-4 rounded-2xl bg-digilayn-surface dark:bg-digilayn-surface-container-low/80 border border-digilayn-outline-variant">
+                <h4 class="font-bold text-sm mb-1">Universal Account Deletion</h4>
+                <p class="text-xs opacity-80 leading-relaxed">
+                    To permanently delete your universal Digilayn Account and erase your personal data across all connected platforms, see Section 6 of the <a href="/privacy" class="text-digilayn-primary font-bold underline">Digilayn Privacy Policy</a>.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. CONTACT & DISPUTES -->
+    <section class="card p-6 sm:p-8 rounded-3xl space-y-4" data-section-role="all rider driver">
+        <h2 class="text-2xl font-bold">4. Support &amp; Information Officer Contact</h2>
+        <p class="text-sm opacity-90 leading-relaxed">
+            For questions regarding LaynFleet privacy practices, personal information requests, or account assistance:
+        </p>
+        <div class="p-5 rounded-2xl bg-digilayn-surface-container-low border border-digilayn-outline-variant text-sm space-y-2">
+            <p><strong>Digilayn Technologies &bull; LaynFleet Support</strong></p>
+            <p>Email: <a href="mailto:digilayn@gmail.com" class="text-digilayn-primary font-bold hover:underline">digilayn@gmail.com</a></p>
+            <p>WhatsApp Support: <a href="https://wa.me/27815532209" target="_blank" class="text-digilayn-primary font-bold hover:underline">+27 81 553 2209</a></p>
+            <p>Parent Privacy Policy: <a href="/privacy" class="text-digilayn-primary font-bold hover:underline">digilayn.co.za/privacy</a></p>
+        </div>
+    </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="text-center py-10 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant text-sm opacity-80">
+    <div class="flex flex-wrap justify-center gap-4 mb-3">
+        <a href="/privacy" class="hover:text-digilayn-primary font-bold transition">Digilayn Privacy Policy</a>
+        <span>&bull;</span>
+        <a href="/laynfleet/privacy" class="text-digilayn-primary font-bold">LaynFleet Privacy</a>
+        <span>&bull;</span>
+        <a href="/laynfleet/terms" class="hover:text-digilayn-primary font-bold transition">LaynFleet Terms</a>
+    </div>
+    <p>&copy; 2026 Digilayn. All rights reserved.</p>
+</footer>
+
+<script>
+    function filterRole(role) {
+        const buttons = document.querySelectorAll('.role-tab-btn');
+        buttons.forEach(btn => {
+            btn.classList.remove('bg-digilayn-primary', 'text-digilayn-on-primary', 'shadow-md');
+            btn.classList.add('bg-digilayn-surface-container-low', 'dark:bg-digilayn-surface-container-low');
+        });
+
+        const activeBtn = document.getElementById('tab-btn-' + role);
+        if (activeBtn) {
+            activeBtn.classList.add('bg-digilayn-primary', 'text-digilayn-on-primary', 'shadow-md');
+            activeBtn.classList.remove('bg-digilayn-surface-container-low', 'dark:bg-digilayn-surface-container-low');
+        }
+
+        const sections = document.querySelectorAll('[data-section-role]');
+        sections.forEach(sec => {
+            const roles = sec.getAttribute('data-section-role').split(' ');
+            if (role === 'all' || roles.includes(role)) {
+                sec.style.display = 'block';
+            } else {
+                sec.style.display = 'none';
+            }
+        });
+
+        const roleElements = document.querySelectorAll('[data-role]');
+        roleElements.forEach(el => {
+            const elRole = el.getAttribute('data-role');
+            if (role === 'all' || elRole === role) {
+                el.style.display = 'block';
+            } else {
+                el.style.display = 'none';
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
