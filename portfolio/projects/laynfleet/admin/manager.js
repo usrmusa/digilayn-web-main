@@ -3408,13 +3408,13 @@
   ];
 
   function validPricing(doc) {
-    return !!doc && ['ratePerKm', 'minimumFare', 'returnTripPercent', 'waitRatePerMinute', 'freeWaitMinutes'].every(key => typeof doc[key] === 'number' && Number.isFinite(doc[key]) && doc[key] >= 0) && doc.ratePerKm > 0 && Number.isInteger(doc.freeWaitMinutes) && doc.freeWaitMinutes <= 2147483647 && (doc.curveScaleKm == null || (typeof doc.curveScaleKm === 'number' && Number.isFinite(doc.curveScaleKm) && doc.curveScaleKm > 0));
+    return !!doc && ['ratePerKm', 'minimumFare', 'returnRidePercent', 'waitRatePerMinute', 'freeWaitMinutes'].every(key => typeof doc[key] === 'number' && Number.isFinite(doc[key]) && doc[key] >= 0) && doc.ratePerKm > 0 && Number.isInteger(doc.freeWaitMinutes) && doc.freeWaitMinutes <= 2147483647 && (doc.curveScaleKm == null || (typeof doc.curveScaleKm === 'number' && Number.isFinite(doc.curveScaleKm) && doc.curveScaleKm > 0));
   }
   let pricingEditorSnapshot = new Map();
   let pricingConfigSaving = false;
   const pricingFields = [
     ['ratePerKm', 'Rate / km (R)'], ['minimumFare', 'Minimum fare (R)'],
-    ['returnTripPercent', 'Return trip surcharge (%)'], ['waitRatePerMinute', 'Waiting / minute (R)'],
+    ['returnRidePercent', 'Return ride surcharge (%)'], ['waitRatePerMinute', 'Waiting / minute (R)'],
     ['freeWaitMinutes', 'Free waiting minutes'], ['curveScaleKm', 'Curve scale km (blank = linear)']
   ];
   function openPricingEditor() {
@@ -3440,7 +3440,7 @@
     const suggestion = event.target.closest('[data-pricing-suggest]');
     if (suggestion && !pricingConfigSaving) {
       const vp = DEFAULT_VEHICLE_PRICING.find(v => v.type === suggestion.dataset.pricingSuggest);
-      const values = { ratePerKm: vp.defaultRate, minimumFare: vp.defaultMin, returnTripPercent: 50, waitRatePerMinute: 2, freeWaitMinutes: 5, curveScaleKm: '' };
+      const values = { ratePerKm: vp.defaultRate, minimumFare: vp.defaultMin, returnRidePercent: 50, waitRatePerMinute: 2, freeWaitMinutes: 5, curveScaleKm: '' };
       const row = suggestion.closest('[data-pricing-editor]');
       pricingFields.forEach(([key]) => { row.querySelector(`[data-pricing-field="${key}"]`).value = values[key]; });
     }
