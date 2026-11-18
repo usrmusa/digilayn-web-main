@@ -1465,3 +1465,9 @@ tbody tr:hover { background: var(--digilayn-surface-container-high); }
   gap: 12px;
   flex-wrap: wrap;
 }
+
+/* Ride Testing has no visible entry or content outside explicit dev selection. */
+[data-ride-test-dev-only][hidden] { display: none !important; }
+#ride-test-editor { scroll-margin-top: 1rem; }
+#ride-test-details { max-height: 28rem; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
+#ride-test-list td { overflow-wrap: anywhere; }

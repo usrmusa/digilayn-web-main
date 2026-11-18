@@ -13,14 +13,16 @@
       const user = global.AdminAccess?.currentUser;
       if (!user) throw new Error('Sign in required.');
       const token = await user.getIdToken();
+      const rideTesting = path === '/admin/dev-ride-state';
+      if (rideTesting && environment !== 'dev') throw new Error('Ride testing is available only in dev.');
       const review = path.match(/^\/admin\/driver-applications\/([A-Za-z0-9_-]{1,128})\/review$/);
       const pricing = path === '/admin/pricing-configuration';
       const serviceArea = path === '/admin/service-area';
-      if (!review && !pricing && !serviceArea) throw new Error('This fleet API endpoint is not configured.');
-      const functionName = serviceArea ? 'configureServiceArea' : pricing ? 'configurePricing' : 'reviewDriverApplication';
+      if (!review && !pricing && !serviceArea && !rideTesting) throw new Error('This fleet API endpoint is not configured.');
+      const functionName = rideTesting ? 'editDevRideState' : serviceArea ? 'configureServiceArea' : pricing ? 'configurePricing' : 'reviewDriverApplication';
       const projectId = global.DIGILAYN_FIREBASE_CONFIG?.projectId || 'digilayn-projects';
       const endpoint = `https://us-central1-${projectId}.cloudfunctions.net/${functionName}`;
-      const payload = (pricing || serviceArea) ? { ...body, environment } : { ...body, applicantUid: review[1], environment };
+      const payload = (pricing || serviceArea || rideTesting) ? { ...body, environment } : { ...body, applicantUid: review[1], environment };
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },

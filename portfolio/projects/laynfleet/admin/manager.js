@@ -25,6 +25,7 @@
   if (!firebase.apps.length) {
     firebase.initializeApp(window.LAYNFLEET_FIREBASE_CONFIG);
   }
+  document.querySelectorAll('[data-ride-test-dev-only]').forEach(el => { el.hidden = !fleetEnv.isDev; });
   const auth = firebase.auth();
   const db = firebase.firestore();
   window.installAdminAccess();
@@ -1095,6 +1096,7 @@
   // ---------------------------------------------------------------------------
   // AUTH GATE
   // ---------------------------------------------------------------------------
+  let rideTestingDetach = null;
   let loginGraceTimer = null;
   AdminAccess.observe(async (user, error, checking) => {
     // While the gate is still verifying a (possibly persisted) session, keep the
@@ -1395,6 +1397,7 @@
 
   let trackerDetach = null;
   function detachListeners() {
+    if (rideTestingDetach) { rideTestingDetach(); rideTestingDetach = null; }
     while (unsub.length) { try { unsub.pop()(); } catch (e) { /* ignore */ } }
     if (trackerDetach) { try { trackerDetach(); } catch (e) { /* ignore */ } trackerDetach = null; }
   }
@@ -4299,6 +4302,7 @@ This applies immediately to all connected devices.`,
   // NAVIGATION + MODULAR ROUTER
   // ---------------------------------------------------------------------------
   const sectionMeta = {
+    ...(fleetEnv.isDev ? { 'ride-testing': ['Ride Testing · DEV', 'Change and reverse test ride states in dev'] } : {}),
     overview: ['Overview', 'Live operations across LaynFleet'],
     drivers: ['Drivers', 'Approve applications, demote, and manage the fleet'],
     riders: ['Riders', 'Registered members and account status'],
@@ -4384,6 +4388,10 @@ This applies immediately to all connected devices.`,
           if (serviceAreaState.circle) serviceAreaState.map.fitBounds(serviceAreaState.circle.getBounds());
         }
       }, 200);
+    }
+
+    if (sec === 'ride-testing' && fleetEnv.isDev && AdminAccess.currentUser && !rideTestingDetach) {
+      rideTestingDetach = window.LaynFleetRideTesting.attach({ db, environment: fleetEnv, confirm: openModal, toast });
     }
 
     if (sec === 'tracking' && window.LaynFleetTracker && AdminAccess.currentUser) {

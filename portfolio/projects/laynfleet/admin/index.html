@@ -79,6 +79,7 @@
         <button class="nav-item" data-section="drivers"><span class="nav-glyph">🚗</span> Drivers <span id="nav-badge-drivers" class="nav-badge is-hidden">0</span></button>
         <button class="nav-item" data-section="riders"><span class="nav-glyph">🧑</span> Riders</button>
         <button class="nav-item" data-section="bookings"><span class="nav-glyph">🧾</span> Bookings</button>
+        <button class="nav-item" data-section="ride-testing" data-ride-test-dev-only hidden><span class="nav-glyph">↔</span> Ride Testing <span class="fleet-dev-badge">DEV</span></button>
         <button class="nav-item" data-section="reviews"><span class="nav-glyph">⭐</span> Reviews <span id="nav-badge-reviews" class="nav-badge is-hidden">0</span></button>
         <button class="nav-item" data-section="pricing"><span class="nav-glyph">🏷️</span> Pricing &amp; Governance <span id="nav-badge-pricing" class="nav-badge is-hidden">0</span></button>
         <button class="nav-item" data-section="servicearea"><span class="nav-glyph">📍</span> Service Area</button>
@@ -203,6 +204,34 @@
       </section>
 
       <!-- BOOKINGS -->
+
+      <section id="section-ride-testing" class="section" data-ride-test-dev-only hidden>
+        <div class="panel">
+          <h2>Ride Testing <span class="fleet-dev-badge">DEV ONLY</span></h2>
+          <p>Move a test ride forward or backward. Related assignments, availability, timestamps and commitments change together. Production is blocked by the server.</p>
+          <p class="cell-dim">Resetting a planned ride also resets its participant progress. Reviews and notification history stay intact. Pending Quick Rides dispatch normally. Set a future departure when reopening an overdue Scheduled or Planned Ride.</p>
+          <div class="filter-grid">
+            <label class="field">Ride type<select id="ride-test-type" class="field-input"><option value="">All types</option><option value="quickRequests">Quick Ride</option><option value="scheduledRequests">Scheduled Ride</option><option value="plannedRides">Planned Ride</option><option value="plannedRideRequests">Planned participant</option></select></label>
+            <label class="field">Search<input id="ride-test-search" class="field-input" type="search" placeholder="Ride ID, name, UID or state"></label>
+          </div>
+          <p id="ride-test-message" role="status" aria-live="polite">Choose Ride Testing to load dev rides.</p>
+          <p id="ride-test-count" class="cell-dim"></p>
+          <div id="ride-test-list" class="table-wrap"></div>
+        </div>
+        <form id="ride-test-editor" class="panel is-hidden">
+          <h3 id="ride-test-record"></h3><p id="ride-test-current"></p>
+          <div class="filter-grid">
+            <label class="field">Target state<select id="ride-test-status" class="field-input" required></select></label>
+            <label id="ride-test-driver-wrap" class="field">Dev driver UID<input id="ride-test-driver" class="field-input" pattern="[A-Za-z0-9_-]{1,128}" placeholder="Required for assigned states"></label>
+            <label id="ride-test-eta-wrap" class="field">Driver ETA (minutes)<input id="ride-test-eta" class="field-input" type="number" min="1" step="1" placeholder="Required when assigning a Quick Ride"></label>
+            <label id="ride-test-departure-wrap" class="field">New departure (optional, local time)<input id="ride-test-departure" class="field-input" type="datetime-local"></label>
+          </div>
+          <label class="field">Test reason<textarea id="ride-test-reason" class="field-input" rows="2" maxlength="500" required placeholder="What are you testing?"></textarea></label>
+          <div class="modal-actions"><button id="ride-test-close" class="btn btn-ghost" type="button">Close</button><button id="ride-test-apply" class="btn btn-danger" type="submit">Review change · DEV</button></div>
+          <details><summary>Current record data</summary><pre id="ride-test-details" class="json-code"></pre></details>
+        </form>
+      </section>
+
       <section id="section-bookings" class="section">
         <!-- Quick Status Filter Tabs -->
         <div class="tabs" role="tablist" id="booking-quick-tabs">
@@ -1067,6 +1096,7 @@
   <script src="dashboard-notices.js"></script>
   <script src="errors.js"></script>
   <script src="tracking.js"></script>
+  <script src="ride-testing.js"></script>
   <script src="manager.js"></script>
 </body>
 </html>
