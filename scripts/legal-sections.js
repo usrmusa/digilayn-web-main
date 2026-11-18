@@ -8,6 +8,7 @@
     sections.forEach(section => {
       section.hidden = section.dataset.legalSection !== selected;
     });
+    document.querySelectorAll("[data-driver-agreement]").forEach(section => { section.hidden = selected !== "terms"; });
     links.forEach(link => {
       const current = link.dataset.legalLink === selected;
       if (current) link.setAttribute('aria-current', 'location');
