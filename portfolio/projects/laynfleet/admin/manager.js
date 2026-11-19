@@ -3980,7 +3980,9 @@
       typeof config.maintenanceMessage === 'string' && (!config.maintenanceMode || config.maintenanceMessage.trim().length > 0) &&
       Number.isSafeInteger(config.minVersionCode) && config.minVersionCode >= 1 && config.minVersionCode <= 2147483647 &&
       typeof config.storeUrl === 'string' &&
-      (!Object.hasOwn(config, 'driverLicenceRequired') || typeof config.driverLicenceRequired === 'boolean');
+      (!Object.hasOwn(config, 'driverLicenceRequired') || typeof config.driverLicenceRequired === 'boolean') &&
+      (!Object.hasOwn(config, 'scheduledRidesEnabled') || typeof config.scheduledRidesEnabled === 'boolean') &&
+      (!Object.hasOwn(config, 'plannedRidesEnabled') || typeof config.plannedRidesEnabled === 'boolean');
   }
 
   function renderAppControl() {
@@ -4190,12 +4192,17 @@
   }
 
   function updateFeatureTogglesFromState() {
+    const riderConfig = state.appConfig[fleetEnv.riderPackage];
     const driverConfig = state.appConfig[fleetEnv.driverPackage];
     const verified = state.appConfigVerified;
 
+    const scheduledRidesSwitch = $('input-toggle-scheduled-rides');
+    const plannedRidesSwitch = $('input-toggle-planned-rides');
     const driverLicenceSwitch = $('input-toggle-driver-licence');
     const badgeEl = $('toggles-state-badge');
 
+    if (scheduledRidesSwitch) scheduledRidesSwitch.checked = riderConfig?.scheduledRidesEnabled !== false;
+    if (plannedRidesSwitch) plannedRidesSwitch.checked = driverConfig?.plannedRidesEnabled !== false;
     if (driverLicenceSwitch) driverLicenceSwitch.checked = driverConfig?.driverLicenceRequired === true;
 
     if (badgeEl) {
@@ -4404,35 +4411,52 @@ This applies immediately to all connected devices.`,
   async function saveFeatureToggles() {
     if (!state.appConfigVerified) return toast('Wait for verified app settings.', 'error');
 
+    const scheduledRidesEnabled = $('input-toggle-scheduled-rides')?.checked !== false;
+    const plannedRidesEnabled = $('input-toggle-planned-rides')?.checked !== false;
     const driverLicenceRequired = $('input-toggle-driver-licence')?.checked === true;
 
     const envLabel = fleetEnv.environment === 'dev' ? 'DEV' : 'Production';
     const confirm = await openModal({
       title: `Update ${envLabel} Feature Toggles?`,
       message: `You are about to update live feature toggles for ${envLabel}:
+• LaynRider Scheduled Rides: ${scheduledRidesEnabled ? 'ENABLED' : 'DISABLED'}
+• LaynDriver Planned Rides: ${plannedRidesEnabled ? 'ENABLED' : 'DISABLED'}
 • LaynDriver Licence Requirement: ${driverLicenceRequired ? 'REQUIRED' : 'Optional'}
 
 This applies immediately to all connected devices in ${envLabel}.`,
       confirmText: 'Broadcast Feature Toggles',
-      confirmClass: 'btn-primary'
+      confirmClass: (!scheduledRidesEnabled || !plannedRidesEnabled) ? 'btn-danger' : 'btn-primary'
     });
 
     if (!confirm.confirmed) return;
 
     try {
+      const batch = db.batch();
+      const riderRef = appConfigCol.doc(appConfigId(fleetEnv.riderPackage));
       const driverRef = appConfigCol.doc(appConfigId(fleetEnv.driverPackage));
 
-      await driverRef.set({
-        driverLicenceRequired: driverLicenceRequired,
+      batch.set(riderRef, {
+        scheduledRidesEnabled,
         updatedAt: serverTimestamp(),
         updatedBy: currentAdminEmail()
       }, { merge: true });
+
+      batch.set(driverRef, {
+        plannedRidesEnabled,
+        driverLicenceRequired,
+        updatedAt: serverTimestamp(),
+        updatedBy: currentAdminEmail()
+      }, { merge: true });
+
+      await batch.commit();
 
       if ($('input-app-driver-licence')) {
         $('input-app-driver-licence').checked = driverLicenceRequired;
       }
 
       await logAdminAction('appConfigFeatureTogglesUpdate', 'fleet', `Feature Toggles (${envLabel})`, JSON.stringify({
+        scheduledRidesEnabled,
+        plannedRidesEnabled,
         driverLicenceRequired
       }));
 

@@ -905,6 +905,34 @@
           </div>
 
           <form id="feature-toggles-form" class="app-control-form" onsubmit="return false;">
+            <!-- Scheduled Rides Toggle -->
+            <div class="config-block">
+              <div class="config-block-head">
+                <div>
+                  <h4 class="config-block-title">📅 LaynRider: Scheduled Ride Creation</h4>
+                  <p class="config-block-desc">Allow riders to create new scheduled ride requests. When disabled, scheduled ride creation entry points are hidden; existing scheduled rides continue normally.</p>
+                </div>
+                <label class="toggle-switch toggle-switch-primary">
+                  <input type="checkbox" id="input-toggle-scheduled-rides" aria-label="Enable LaynRider scheduled ride creation" />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Planned Rides Toggle -->
+            <div class="config-block">
+              <div class="config-block-head">
+                <div>
+                  <h4 class="config-block-title">🚗 LaynDriver: Planned Ride Creation</h4>
+                  <p class="config-block-desc">Allow drivers to create and publish new planned rides. When disabled, the plan creation entry points are hidden; existing planned rides continue normally.</p>
+                </div>
+                <label class="toggle-switch toggle-switch-primary">
+                  <input type="checkbox" id="input-toggle-planned-rides" aria-label="Enable LaynDriver planned ride creation" />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+
             <!-- Driver Licence Requirement Toggle -->
             <div class="config-block">
               <div class="config-block-head">
