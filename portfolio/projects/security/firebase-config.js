@@ -18,9 +18,6 @@
   }
   global.LAYNFLEET_FIREBASE_CONFIG = global.DIGILAYN_FIREBASE_CONFIG;
 
-  // Only this account may access the manager dashboard (blueprint: static manager).
-  global.MANAGER_EMAIL = 'usrmusa@gmail.com';
-
   // Firestore layout (must match the Android app — camelCase, app-first).
   global.FS = {
     users: 'users',

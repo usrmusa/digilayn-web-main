@@ -20,7 +20,7 @@
       if (!user) return null;
       const result = await adapter.checkAccess();
       if (expected !== revision || adapter.currentUser()?.uid !== user.uid) return null;
-      if (result?.email !== 'admin@digilayn.co.za' || result?.role !== 'admin') {
+      if (result?.role !== 'admin') {
         throw new Error('Invalid administrator access response.');
       }
       return user;

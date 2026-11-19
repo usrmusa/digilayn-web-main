@@ -2,7 +2,7 @@
  * manager.js — LaynFleet Manager console (isolated static app).
  *
  * Responsibilities:
- *   - Gate access to the single manager account (MANAGER_EMAIL).
+ *   - Gate access via backend AdminAccess (checkAdminAccess).
  *   - Live-list driver applications; review decisions use the authenticated fleet API.
  *     Driver identity and application decisions remain environment-owned.
  *   - Live-list riders/members and globally suspend / reactivate them
@@ -28,6 +28,10 @@
   document.querySelectorAll('[data-ride-test-dev-only]').forEach(el => { el.hidden = !fleetEnv.isDev; });
   const auth = firebase.auth();
   const db = firebase.firestore();
+
+  function currentAdminEmail() {
+    return auth.currentUser?.email || (window.AdminAccess && window.AdminAccess.currentUser && window.AdminAccess.currentUser.email) || 'admin';
+  }
   window.installAdminAccess();
   const rtdb = typeof firebase.database === 'function' ? firebase.database() : null;
   const serverTimestamp = firebase.firestore.FieldValue.serverTimestamp;
@@ -296,7 +300,7 @@
       await driversCol.doc(uid).update({
         licenceUrl: firebase.firestore.FieldValue.delete(),
         licenceDeletedAt: serverTimestamp(),
-        licenceDeletedBy: MANAGER_EMAIL
+        licenceDeletedBy: currentAdminEmail()
       });
 
       // 3. Update local state
@@ -435,7 +439,7 @@
       await driversCol.doc(uid).update({
         phone: firebase.firestore.FieldValue.delete(),
         phoneDeletedAt: serverTimestamp(),
-        phoneDeletedBy: MANAGER_EMAIL
+        phoneDeletedBy: currentAdminEmail()
       });
 
       const d = state.drivers.find((x) => x.uid === uid);
@@ -487,7 +491,7 @@
       await driversCol.doc(uid).update({
         photoUrl: firebase.firestore.FieldValue.delete(),
         photoDeletedAt: serverTimestamp(),
-        photoDeletedBy: MANAGER_EMAIL
+        photoDeletedBy: currentAdminEmail()
       });
 
       const d = state.drivers.find((x) => x.uid === uid);
@@ -565,14 +569,14 @@
       const d = state.drivers.find((x) => x.uid === uid);
       if (!d) throw new Error('Driver unavailable.');
       if (d.vehicleDirectory) throw new Error('An approved car cannot be changed.');
-      await driversCol.doc(uid).update({ vehicle: vehicleData, vehicleType: type, updatedAt: serverTimestamp(), updatedBy: MANAGER_EMAIL });
+      await driversCol.doc(uid).update({ vehicle: vehicleData, vehicleType: type, updatedAt: serverTimestamp(), updatedBy: currentAdminEmail() });
 
       const u = (d && d.user) || userCache.get(uid) || {};
       const driverName = u.displayName || uid;
       if (d) {
         d.vehicle = vehicleData;
         d.updatedAt = Date.now();
-        d.updatedBy = MANAGER_EMAIL;
+        d.updatedBy = currentAdminEmail();
       }
 
       await logAdminAction(
@@ -1150,19 +1154,10 @@
       return;
     }
 
-    if (user && (user.email || '').toLowerCase() === String(MANAGER_EMAIL).toLowerCase()) {
+    if (user) {
       if (loginGraceTimer) { clearTimeout(loginGraceTimer); loginGraceTimer = null; }
       hide($('boot-view'));
       showApp(user);
-      return;
-    }
-
-    if (user) {
-      // Signed in but not the manager account — reject and sign out.
-      if (loginGraceTimer) { clearTimeout(loginGraceTimer); loginGraceTimer = null; }
-      hide($('boot-view'));
-      await auth.signOut();
-      showLogin('This account is not authorised for the manager console.');
       return;
     }
 
@@ -1213,13 +1208,6 @@
     const password = $('login-password').value;
     const btn = $('login-submit');
     hide($('login-error'));
-
-    if (email.toLowerCase() !== String(MANAGER_EMAIL).toLowerCase()) {
-      const err = $('login-error');
-      err.textContent = 'This account is not authorised for the manager console.';
-      show(err);
-      return;
-    }
 
     btn.disabled = true; btn.textContent = 'Signing in…';
     try {
@@ -2373,7 +2361,7 @@
       batch.update(driversCol.doc(uid), {
         approvalStatus: 'DEMOTED',
         online: false,
-        demotedBy: MANAGER_EMAIL,
+        demotedBy: currentAdminEmail(),
         demotedAt: serverTimestamp(),
         demoteReason: res.reason || ''
       });
@@ -2454,7 +2442,7 @@
   async function logAdminAction(action, targetUid, targetName, reason) {
     try {
       await db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(FS.adminActions).add({
-        adminEmail: MANAGER_EMAIL,
+        adminEmail: currentAdminEmail(),
         action,
         targetUid,
         targetName: targetName || '',
@@ -2820,7 +2808,7 @@
                 <span class="cell-dim">${escapeHtml(formatDate(entry.createdAt || entry.date))}</span>
               </div>
               ${entry.note ? `<div class="outreach-item-note">${escapeHtml(entry.note)}</div>` : ''}
-              <div class="cell-dim" style="font-size:10px;">By: ${escapeHtml(entry.adminEmail || MANAGER_EMAIL)}</div>
+              <div class="cell-dim" style="font-size:10px;">By: ${escapeHtml(entry.adminEmail || currentAdminEmail())}</div>
             </div>
           `).join('')}
          </div>`
@@ -3277,7 +3265,7 @@
       await updateReviewData(reviewId, {
         hidden: true,
         hiddenReason: res.reason,
-        hiddenBy: MANAGER_EMAIL,
+        hiddenBy: currentAdminEmail(),
         hiddenAt: serverTimestamp(),
         status: 'HIDDEN'
       });
@@ -3340,7 +3328,7 @@
             feedback: firebase.firestore.FieldValue.delete(),
             reviewDeleted: true,
             reviewDeletedAt: serverTimestamp(),
-            reviewDeletedBy: MANAGER_EMAIL,
+            reviewDeletedBy: currentAdminEmail(),
             reviewDeletedReason: res.reason
           });
         } catch (e) { /* non-fatal */ }
@@ -3362,7 +3350,7 @@
       await updateReviewData(reviewId, {
         flagged: newFlag,
         flaggedAt: newFlag ? serverTimestamp() : firebase.firestore.FieldValue.delete(),
-        flaggedBy: newFlag ? MANAGER_EMAIL : firebase.firestore.FieldValue.delete()
+        flaggedBy: newFlag ? currentAdminEmail() : firebase.firestore.FieldValue.delete()
       });
       await logAdminAction(newFlag ? 'flagReview' : 'unflagReview', reviewId, rev.reviewerName || '', newFlag ? 'Flagged for manager investigation' : 'Resolved scrutiny');
       toast(newFlag ? 'Review flagged for scrutiny.' : 'Review scrutiny flag cleared.', 'success');
@@ -3380,7 +3368,7 @@
         await updateReviewData(reviewId, {
           managerResponse: responseText,
           managerRespondedAt: serverTimestamp(),
-          managerRespondedBy: MANAGER_EMAIL
+          managerRespondedBy: currentAdminEmail()
         });
         await logAdminAction('respondToReview', reviewId, rev ? rev.reviewerName : '', responseText);
         toast('Manager response saved.', 'success');
@@ -3407,7 +3395,7 @@
       method: method || 'Outreach',
       outcome: outcome || 'Logged',
       note: note || '',
-      adminEmail: MANAGER_EMAIL
+      adminEmail: currentAdminEmail()
     };
 
     try {
@@ -3417,7 +3405,7 @@
       await updateReviewData(reviewId, {
         contactHistory: currentHistory,
         lastContactedAt: serverTimestamp(),
-        lastContactedBy: MANAGER_EMAIL,
+        lastContactedBy: currentAdminEmail(),
         lastOutcome: outcome
       });
 
@@ -4187,7 +4175,7 @@
           <td><code>${escapeHtml(item.targetUid || 'Fleet')}</code></td>
           <td><span class="badge badge-pending">${escapeHtml(item.action || 'update')}</span></td>
           <td>${detail}</td>
-          <td>${escapeHtml(item.adminEmail || MANAGER_EMAIL)}</td>
+          <td>${escapeHtml(item.adminEmail || currentAdminEmail())}</td>
         </tr>
       `;
     }).join('');
@@ -4247,7 +4235,7 @@ This applies immediately to all connected devices.`,
         storeUrlAppGallery: storeUrl,
         storeUrlWeb: storeUrl,
         updatedAt: serverTimestamp(),
-        updatedBy: MANAGER_EMAIL
+        updatedBy: currentAdminEmail()
       };
 
       await appConfigCol.doc(appConfigId(pkg)).set(payload, { merge: true });
@@ -4310,7 +4298,7 @@ This applies immediately to all connected devices.`,
             ? 'Emergency maintenance in progress. Please check back shortly.'
             : 'LaynFleet is operational.',
           updatedAt: serverTimestamp(),
-          updatedBy: MANAGER_EMAIL
+          updatedBy: currentAdminEmail()
         }, { merge: true });
       });
 

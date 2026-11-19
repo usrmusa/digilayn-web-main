@@ -2,7 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 require('../scripts/admin-access-core.js');
 const { createAdminAccess } = global.AdminAccessCore;
-const approved = { email: 'admin@digilayn.co.za', role: 'admin' };
+const approved = { email: 'admin@example.com', role: 'admin' };
 function setup(checkAccess = async () => approved) {
   let current = null;
   let observe;
@@ -11,7 +11,7 @@ function setup(checkAccess = async () => approved) {
 }
 test('sign-in publishes only after the backend approves; no account document needed', async () => {
   const state = setup();
-  const user = { uid: 'admin-local', email: 'admin@digilayn.co.za' };
+  const user = { uid: 'admin-local', email: 'admin@example.com' };
   state.gate.observe(() => {});
   await state.gate.signIn(async () => { state.set(user); state.emit(user); return { user }; });
   assert.equal(state.gate.currentUser, user);

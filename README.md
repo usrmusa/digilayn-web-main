@@ -79,8 +79,8 @@ Functions SDK calls target the Functions emulator on port 5001. Backend now incl
 `checkAdminAccess`; restart the local emulator suite after compiling the new backend. Local fleet HTTP API requests explicitly
 fail until an endpoint is configured. Local web tracking is unavailable while the
 Realtime Database emulator is missing. No live-service fallback is used for these paths.
-Admin login requires `checkAdminAccess` to confirm the authenticated email
-`admin@digilayn.co.za` and explicit email verification. No account document,
+Admin login requires `checkAdminAccess` to confirm the designated superuser identity
+and explicit email verification. No account document,
 suspension check, UID allowlist or local-hosting bypass participates in admin access.
 
 ## Superuser Login
