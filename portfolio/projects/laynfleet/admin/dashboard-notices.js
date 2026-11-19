@@ -114,7 +114,7 @@
       };
       if (payload.startsAt !== null && payload.endsAt !== null && payload.endsAt <= payload.startsAt) throw new Error('End must be after start.');
       const response = await window.LaynFleetEnvironment.request('/admin/dashboard-notices', payload);
-      if (!response.data || !response.data.noticeId || !Number.isSafeInteger(response.data.version)) throw new Error('Save was not confirmed.');
+      if (!response.data || typeof response.data.noticeId !== 'string' || !/^[A-Za-z0-9_-]{1,128}$/.test(response.data.noticeId) || !Number.isSafeInteger(response.data.version) || response.data.version < 1) throw new Error('Save was not confirmed.');
       if (currentGeneration !== connectionGeneration) return;
       resetEditor();
       message('Saved version ' + response.data.version + (payload.enabled ? '. It appears during its date window when its message is nonblank.' : '. This notice is hidden.'));

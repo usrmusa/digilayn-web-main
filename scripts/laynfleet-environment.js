@@ -16,13 +16,15 @@
       const rideTesting = path === '/admin/dev-ride-state';
       if (rideTesting && environment !== 'dev') throw new Error('Ride testing is available only in dev.');
       const review = path.match(/^\/admin\/driver-applications\/([A-Za-z0-9_-]{1,128})\/review$/);
+      const notices = path === '/admin/dashboard-notices';
       const pricing = path === '/admin/pricing-configuration';
       const serviceArea = path === '/admin/service-area';
-      if (!review && !pricing && !serviceArea && !rideTesting) throw new Error('This fleet API endpoint is not configured.');
-      const functionName = rideTesting ? 'editDevRideState' : serviceArea ? 'configureServiceArea' : pricing ? 'configurePricing' : 'reviewDriverApplication';
-      const projectId = global.DIGILAYN_FIREBASE_CONFIG?.projectId || 'digilayn-projects';
+      if (!review && !pricing && !serviceArea && !rideTesting && !notices) throw new Error('This fleet API endpoint is not configured.');
+      const functionName = notices ? 'saveDashboardNotice' : rideTesting ? 'editDevRideState' : serviceArea ? 'configureServiceArea' : pricing ? 'configurePricing' : 'reviewDriverApplication';
+      const projectId = global.DIGILAYN_FIREBASE_CONFIG?.projectId;
+      if (typeof projectId !== 'string' || !projectId) throw new Error('Firebase project configuration is missing.');
       const endpoint = `https://us-central1-${projectId}.cloudfunctions.net/${functionName}`;
-      const payload = (pricing || serviceArea || rideTesting) ? { ...body, environment } : { ...body, applicantUid: review[1], environment };
+      const payload = (pricing || serviceArea || rideTesting || notices) ? { ...body, environment } : { ...body, applicantUid: review[1], environment };
       const topBar = global.document?.getElementById?.('page-linear-progress') || global.document?.getElementById?.('topProgressBar');
       if (topBar?.classList) {
         topBar.classList.remove('is-hidden');

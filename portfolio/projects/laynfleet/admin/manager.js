@@ -3975,13 +3975,21 @@
     'com.digilayn.layndriver': 'LaynDriver (Driver App)'
   };
 
+  function validAppConfig(config) {
+    return !!config && typeof config.maintenanceMode === 'boolean' &&
+      typeof config.maintenanceMessage === 'string' && (!config.maintenanceMode || config.maintenanceMessage.trim().length > 0) &&
+      Number.isSafeInteger(config.minVersionCode) && config.minVersionCode >= 1 && config.minVersionCode <= 2147483647 &&
+      typeof config.storeUrl === 'string' &&
+      (!Object.hasOwn(config, 'driverLicenceRequired') || typeof config.driverLicenceRequired === 'boolean');
+  }
+
   function renderAppControl() {
     const riderConfig = state.appConfig[fleetEnv.riderPackage] || {};
     const driverConfig = state.appConfig[fleetEnv.driverPackage] || {};
 
     // 1. Update KPI overview cards
     const riderMaint = riderConfig.maintenanceMode === true;
-    const riderMinVer = Number(riderConfig.minVersionCode || 1);
+    const riderMinVer = riderConfig.minVersionCode;
     const statRiderEl = $('stat-app-rider-status');
     const statRiderDetailsEl = $('stat-app-rider-details');
     if (statRiderEl && statRiderDetailsEl) {
@@ -3998,7 +4006,7 @@
     }
 
     const driverMaint = driverConfig.maintenanceMode === true;
-    const driverMinVer = Number(driverConfig.minVersionCode || 1);
+    const driverMinVer = driverConfig.minVersionCode;
     const statDriverEl = $('stat-app-driver-status');
     const statDriverDetailsEl = $('stat-app-driver-details');
     if (statDriverEl && statDriverDetailsEl) {
@@ -4059,12 +4067,16 @@
     // Render active tab config form
     updateAppConfigFormFromState();
     for (const [app, pkg] of [['rider', fleetEnv.riderPackage], ['driver', fleetEnv.driverPackage]]) {
-      if (!state.appConfigVerified || !state.appConfig[pkg]) {
-        const text = state.appConfigVerified ? 'Not configured' : 'Unavailable';
+      if (!state.appConfigVerified || !validAppConfig(state.appConfig[pkg])) {
+        const text = !state.appConfigVerified ? 'Unavailable' : state.appConfig[pkg] ? 'Invalid configuration' : 'Not configured';
         if ($('stat-app-' + app + '-status')) $('stat-app-' + app + '-status').textContent = text;
         if ($('stat-app-' + app + '-details')) $('stat-app-' + app + '-details').textContent = 'No verified launch gate settings';
         if ($('badge-tab-' + app)) $('badge-tab-' + app).textContent = text;
       }
+    }
+    if (!state.appConfigVerified || !fleetEnv.appPackages.every(pkg => validAppConfig(state.appConfig[pkg]))) {
+      if (statGlobalEl) statGlobalEl.textContent = 'Configuration unavailable';
+      if (statLastUpdatedEl) statLastUpdatedEl.textContent = 'Both apps need complete, verified launch settings.';
     }
   }
 
@@ -4083,6 +4095,8 @@
     hide(emergencyPanel);
 
     const config = state.appConfig[pkg];
+    $('driver-licence-config').classList.toggle('is-hidden', pkg !== fleetEnv.driverPackage);
+    $('input-app-driver-licence').checked = config?.driverLicenceRequired === true;
     if (!config) {
       if ($('app-config-title')) $('app-config-title').textContent = `${APP_NAMES[pkg] || pkg} Configuration`;
       if ($('app-config-pkg')) $('app-config-pkg').textContent = pkg;
@@ -4101,7 +4115,7 @@
     const maintChecked = config.maintenanceMode === true;
     if ($('input-app-maintenance')) $('input-app-maintenance').checked = maintChecked;
     if ($('input-app-maintenance-msg')) $('input-app-maintenance-msg').value = config.maintenanceMessage || '';
-    if ($('input-app-min-version')) $('input-app-min-version').value = Number(config.minVersionCode || 1);
+    if ($('input-app-min-version')) $('input-app-min-version').value = Number.isSafeInteger(config.minVersionCode) ? config.minVersionCode : '';
     if ($('input-app-store-url')) $('input-app-store-url').value = config.storeUrl || '';
 
     const badgeEl = $('app-config-state-badge');
@@ -4116,6 +4130,10 @@
     }
 
     updateSimulatorPreview();
+    if (!validAppConfig(config) && badgeEl) {
+      badgeEl.textContent = 'Invalid configuration';
+      badgeEl.className = 'badge badge-demoted';
+    }
   }
 
   function updateSimulatorPreview() {
@@ -4134,16 +4152,21 @@
     const resultEl = $('preview-sim-result');
     const textEl = $('preview-sim-text');
     if (!resultEl || !textEl) return;
-    if (!Number.isSafeInteger(minVer) || minVer < 1) {
+    if (!Number.isSafeInteger(minVer) || minVer < 1 || minVer > 2147483647) {
       resultEl.textContent = 'Draft incomplete';
       textEl.textContent = 'Enter a minimum version of 1 or higher.';
       return;
     }
 
+    if ((maint && !msg) || (minVer > 1 && !storeUrl)) {
+      resultEl.textContent = 'Draft incomplete';
+      textEl.textContent = maint && !msg ? 'Enter a maintenance message.' : 'Enter a store URL for the upgrade policy.';
+      return;
+    }
     if (maint) {
       resultEl.textContent = 'Blocked by Maintenance Gate';
       resultEl.className = 'preview-result-pill pill-danger';
-      textEl.innerHTML = `<strong>Blocking Screen:</strong> "${escapeHtml(msg || 'LaynFleet is undergoing maintenance. Please check back shortly.')}" — users cannot proceed.`;
+      textEl.innerHTML = `<strong>Blocking Screen:</strong> "${escapeHtml(msg)}" — users cannot proceed.`;
     } else if (minVer > 1) {
       resultEl.textContent = `Force Upgrade Gate (v < ${minVer})`;
       resultEl.className = 'preview-result-pill pill-warn';
@@ -4215,8 +4238,11 @@
     const maintenanceMessage = ($('input-app-maintenance-msg').value || '').trim();
     const minVersionCode = Number($('input-app-min-version').value);
     if (!state.appConfigVerified) return toast('Wait for verified app settings.', 'error');
-    if (!Number.isSafeInteger(minVersionCode) || minVersionCode < 1) return toast('Enter a minimum version of 1 or higher.', 'error');
+    if (!Number.isSafeInteger(minVersionCode) || minVersionCode < 1 || minVersionCode > 2147483647) return toast('Enter a minimum version of 1 or higher.', 'error');
     const storeUrl = ($('input-app-store-url').value || '').trim();
+    if (maintenanceMode && !maintenanceMessage) return toast('Enter a maintenance message.', 'error');
+    if (minVersionCode > 1 && !storeUrl) return toast('Enter a store URL for the upgrade policy.', 'error');
+    const driverLicenceRequired = $('input-app-driver-licence').checked;
 
     const appTitle = APP_NAMES[pkg] || pkg;
     const confirm = await openModal({
@@ -4236,7 +4262,8 @@ This applies immediately to all connected devices.`,
     try {
       const payload = {
         maintenanceMode,
-        maintenanceMessage: maintenanceMessage || 'LaynFleet is undergoing scheduled system maintenance. Please check back shortly.',
+        ...(pkg === fleetEnv.driverPackage ? { driverLicenceRequired } : {}),
+        maintenanceMessage,
         minVersionCode,
         minSupportedAndroidVersion: minVersionCode,
         minSupportedWebVersion: minVersionCode,
@@ -4285,6 +4312,9 @@ This applies immediately to all connected devices.`,
 
   async function setEmergencyMaintenance(enable) {
     if (!state.appConfigVerified) return toast('Wait for verified app settings.', 'error');
+    if (fleetEnv.appPackages.some(pkg => !validAppConfig(state.appConfig[pkg]))) {
+      return toast('Save complete Rider and Driver configurations before using fleet maintenance.', 'error');
+    }
     const confirm = await openModal({
       title: enable ? 'EMERGENCY: Lock Entire Fleet?' : 'Restore Entire Fleet to Operational?',
       message: enable
