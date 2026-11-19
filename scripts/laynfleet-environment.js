@@ -23,14 +23,26 @@
       const projectId = global.DIGILAYN_FIREBASE_CONFIG?.projectId || 'digilayn-projects';
       const endpoint = `https://us-central1-${projectId}.cloudfunctions.net/${functionName}`;
       const payload = (pricing || serviceArea || rideTesting) ? { ...body, environment } : { ...body, applicantUid: review[1], environment };
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const result = await response.json();
-      if (!response.ok || !result.data) throw new Error(result.error?.message || 'Request failed.');
-      return result;
+      const topBar = global.document?.getElementById?.('page-linear-progress') || global.document?.getElementById?.('topProgressBar');
+      if (topBar?.classList) {
+        topBar.classList.remove('is-hidden');
+        topBar.classList.remove('hidden');
+      }
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        if (!response.ok || !result.data) throw new Error(result.error?.message || 'Request failed.');
+        return result;
+      } finally {
+        if (topBar?.classList) {
+          topBar.classList.add('is-hidden');
+          topBar.classList.add('hidden');
+        }
+      }
     },
     presenceForDriver(presence) {
       if (!presence) return undefined;

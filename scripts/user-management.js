@@ -481,17 +481,37 @@ class UserManagement {
 
   async fetchLaynFleetDrivers() {
     requireManager();
-    const snapshot = await getDocs(collection(db, "laynfleet", "prod", "drivers"));
+    const env = fleetEnv?.environment || "prod";
+    const snapshot = await getDocs(collection(db, "laynfleet", env, "drivers"));
     const usersByUid = new Map(this.users.map((u) => [u.userId || u.uid, u]));
     this.driverUids = new Set(snapshot.docs.map((d) => d.id));
+
+    const [privateCarsSnap, transportCarsSnap] = await Promise.all([
+      getDocs(collection(db, "laynfleet", env, "privateCarDirectory")).catch(() => ({ docs: [] })),
+      getDocs(collection(db, "laynfleet", env, "transportDirectory")).catch(() => ({ docs: [] }))
+    ]);
+    const carsById = new Map();
+    privateCarsSnap.docs.forEach((d) => {
+      const c = d.data();
+      carsById.set(d.id, c?.vehicle);
+    });
+    transportCarsSnap.docs.forEach((d) => {
+      const c = d.data();
+      carsById.set(d.id, c?.vehicle);
+    });
 
     return snapshot.docs.map((docSnap) => {
       const data = docSnap.data() || {};
       const user = usersByUid.get(docSnap.id) || {};
+      const dirVehicle = (data.vehicleDirectory && data.vehicleId)
+        ? carsById.get(data.vehicleId)
+        : (carsById.get(docSnap.id) || null);
+      const vehicle = data.vehicle || dirVehicle || {};
       return {
         uid: docSnap.id,
         approvalStatus: data.approvalStatus || "PENDING",
-        vehicle: data.vehicle || {},
+        applicationRevision: data.applicationRevision || 1,
+        vehicle,
         ratingAvg: data.ratingAvg ?? null,
         ratingCount: data.ratingCount ?? 0,
         tripsCount: data.tripsCount ?? data.completedTripsCount ?? 0,
@@ -559,7 +579,8 @@ class UserManagement {
 
   async fetchLaynFleetRiders() {
     requireManager();
-    const snapshot = await getDocs(collection(db, "laynfleet", "prod", "riders"));
+    const env = fleetEnv?.environment || "prod";
+    const snapshot = await getDocs(collection(db, "laynfleet", env, "riders"));
     const usersByUid = new Map(this.users.map((u) => [u.userId || u.uid, u]));
     this.riderUids = new Set(snapshot.docs.map((d) => d.id));
 
@@ -588,77 +609,57 @@ class UserManagement {
     });
   }
 
-  async promoteLaynDriver(uid, vehicleData = {}) {
+  async promoteLaynDriver(uid, vehicleData = {}, expectedRevision = 1) {
     requireManager();
-    const batch = writeBatch(db);
-    const driverRef = doc(db, "laynfleet", "prod", "drivers", uid);
-    const userRef = doc(db, "users", uid);
-    const managerEmail = requireManager().email;
-
-    batch.set(driverRef, {
-      approvalStatus: "APPROVED",
-      approvedBy: managerEmail,
-      approvedAt: Timestamp.now(),
-      demoteReason: null,
-      demotedAt: null,
-      demotedBy: null,
-      updatedAt: Timestamp.now(),
-      vehicle: {
-        make: vehicleData.make || "",
-        model: vehicleData.model || "",
-        colour: vehicleData.colour || "",
-        plate: vehicleData.plate || "",
-        seats: vehicleData.seats || 4,
-        vehicleType: vehicleData.vehicleType || "standard"
+    if (!fleetEnv) throw new Error("Fleet environment is required");
+    const env = fleetEnv.environment || "prod";
+    const driverDocSnap = await getDoc(doc(db, "laynfleet", env, "drivers", uid));
+    if (!driverDocSnap.exists()) {
+      throw new Error("No driver application found for this user. The user must apply in the LaynDriver app first.");
+    }
+    const driverData = driverDocSnap.data() || {};
+    const status = (driverData.approvalStatus || "").toUpperCase();
+    if (status !== "PENDING") {
+      if (status === "APPROVED") {
+        throw new Error("Driver is already approved.");
+      } else if (status === "DEMOTED") {
+        throw new Error("Driver was demoted. They must resubmit their application from the LaynDriver app.");
+      } else if (status === "REJECTED") {
+        throw new Error("Application was rejected (final decision).");
+      } else if (status === "CHANGES_REQUESTED") {
+        throw new Error("Application has changes requested. The driver must update and resubmit first.");
       }
-    }, { merge: true });
+      throw new Error(`Cannot approve driver with status '${driverData.approvalStatus}'. Only PENDING applications can be approved.`);
+    }
 
-    batch.set(userRef, {
-      applications: {
-        laynFleet: {
-          isDriver: true
-        },
-        [fleetEnv.membershipKey]: {
-          isDriver: true
-        }
-      },
-      updatedAt: Timestamp.now()
-    }, { merge: true });
+    const revision = driverData.applicationRevision || expectedRevision || 1;
 
-    await batch.commit();
+    await fleetEnv.request(`/admin/driver-applications/${encodeURIComponent(uid)}/review`, {
+      decision: "APPROVED",
+      reason: null,
+      expectedRevision: revision,
+      expectedStatus: "PENDING"
+    });
+
     await this.refresh();
     return { success: true };
   }
 
   async demoteLaynDriver(uid, reason = "") {
     requireManager();
-    const batch = writeBatch(db);
-    const driverRef = doc(db, "laynfleet", "prod", "drivers", uid);
-    const userRef = doc(db, "users", uid);
+    const env = fleetEnv?.environment || "prod";
+    const driverRef = doc(db, "laynfleet", env, "drivers", uid);
     const managerEmail = requireManager().email;
 
-    batch.set(driverRef, {
+    await updateDoc(driverRef, {
       approvalStatus: "DEMOTED",
       online: false,
       demoteReason: reason || "Demoted by manager",
       demotedAt: Timestamp.now(),
       demotedBy: managerEmail,
       updatedAt: Timestamp.now()
-    }, { merge: true });
+    });
 
-    batch.set(userRef, {
-      applications: {
-        laynFleet: {
-          isDriver: false
-        },
-        [fleetEnv.membershipKey]: {
-          isDriver: false
-        }
-      },
-      updatedAt: Timestamp.now()
-    }, { merge: true });
-
-    await batch.commit();
     await this.refresh();
     return { success: true };
   }

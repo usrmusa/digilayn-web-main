@@ -2502,12 +2502,12 @@
                     btn.disabled = true;
                     btn.classList.add('opacity-70');
                     try {
-                        await userManager.promoteLaynDriver(driver.uid, driver.vehicle || {});
+                        await userManager.promoteLaynDriver(driver.uid, driver.vehicle || {}, driver.applicationRevision || 1);
                         setStatus(`Driver ${driver.uid} approved successfully!`);
                         await loadAppData(true);
                         renderActiveView();
                     } catch (err) {
-                        console.error("Re-approval failed:", err);
+                        console.error("Approval failed:", err);
                         setStatus(`Approval failed: ${err.message}`, true);
                         btn.disabled = false;
                         btn.classList.remove('opacity-70');

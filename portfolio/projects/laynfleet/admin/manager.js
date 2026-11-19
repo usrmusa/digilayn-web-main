@@ -1143,6 +1143,9 @@
   // ---------------------------------------------------------------------------
   let rideTestingDetach = null;
   let loginGraceTimer = null;
+  function showTopProgress() { show($('page-linear-progress')); }
+  function hideTopProgress() { hide($('page-linear-progress')); }
+
   AdminAccess.observe(async (user, error, checking) => {
     // While the gate is still verifying a (possibly persisted) session, keep the
     // loading view — do not flash the login form for an already signed-in admin.
@@ -1151,12 +1154,14 @@
       hide($('login-view'));
       hide($('app-view'));
       show($('boot-view'));
+      showTopProgress();
       return;
     }
 
     if (user) {
       if (loginGraceTimer) { clearTimeout(loginGraceTimer); loginGraceTimer = null; }
       hide($('boot-view'));
+      hideTopProgress();
       showApp(user);
       return;
     }
@@ -1166,14 +1171,17 @@
     // the login form if no admin session arrives (and show immediately on error).
     if (error) {
       if (loginGraceTimer) { clearTimeout(loginGraceTimer); loginGraceTimer = null; }
+      hideTopProgress();
       return showLogin(error.message);
     }
     hide($('login-view'));
     hide($('app-view'));
     show($('boot-view'));
+    showTopProgress();
     if (loginGraceTimer) clearTimeout(loginGraceTimer);
     loginGraceTimer = setTimeout(() => {
       loginGraceTimer = null;
+      hideTopProgress();
       if (!AdminAccess.currentUser && !auth.currentUser) showLogin();
     }, 1500);
   });
@@ -1182,6 +1190,7 @@
     if (loginGraceTimer) { clearTimeout(loginGraceTimer); loginGraceTimer = null; }
     detachListeners();
     hide($('boot-view'));
+    hideTopProgress();
     hide($('app-view'));
     show($('login-view'));
     const err = $('login-error');
@@ -1190,6 +1199,7 @@
 
   function showApp(user) {
     hide($('login-view'));
+    hideTopProgress();
     show($('app-view'));
     $('sidebar-email').textContent = user.email;
     $('sidebar-avatar').textContent = initials(user.displayName || user.email);
