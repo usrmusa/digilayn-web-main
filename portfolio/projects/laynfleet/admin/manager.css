@@ -1160,6 +1160,10 @@ tbody tr:hover { background: var(--digilayn-surface-container-high); }
   background-color: var(--digilayn-error);
   border-color: rgb(var(--digilayn-error-rgb) / 0.4);
 }
+.toggle-switch.toggle-switch-primary input:checked + .toggle-slider {
+  background-color: var(--digilayn-primary);
+  border-color: rgb(var(--digilayn-primary-rgb) / 0.4);
+}
 .toggle-switch input:checked + .toggle-slider:before {
   transform: translateX(22px);
   background-color: var(--digilayn-surface-container-lowest);

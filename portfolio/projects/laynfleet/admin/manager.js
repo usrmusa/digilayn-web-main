@@ -3980,7 +3980,8 @@
       typeof config.maintenanceMessage === 'string' && (!config.maintenanceMode || config.maintenanceMessage.trim().length > 0) &&
       Number.isSafeInteger(config.minVersionCode) && config.minVersionCode >= 1 && config.minVersionCode <= 2147483647 &&
       typeof config.storeUrl === 'string' &&
-      (!Object.hasOwn(config, 'driverLicenceRequired') || typeof config.driverLicenceRequired === 'boolean');
+      (!Object.hasOwn(config, 'driverLicenceRequired') || typeof config.driverLicenceRequired === 'boolean') &&
+      (!Object.hasOwn(config, 'accountCreationEnabled') || typeof config.accountCreationEnabled === 'boolean');
   }
 
   function renderAppControl() {
@@ -4084,15 +4085,26 @@
     const pkg = state.appConfigTab;
     const formPanel = $('appcontrol-form-panel');
     const emergencyPanel = $('appcontrol-emergency-panel');
+    const togglesPanel = $('appcontrol-toggles-panel');
 
     if (pkg === 'emergency') {
       hide(formPanel);
+      hide(togglesPanel);
       show(emergencyPanel);
+      return;
+    }
+
+    if (pkg === 'toggles') {
+      hide(formPanel);
+      hide(emergencyPanel);
+      show(togglesPanel);
+      updateFeatureTogglesFromState();
       return;
     }
 
     show(formPanel);
     hide(emergencyPanel);
+    hide(togglesPanel);
 
     const config = state.appConfig[pkg];
     $('driver-licence-config').classList.toggle('is-hidden', pkg !== fleetEnv.driverPackage);
@@ -4178,6 +4190,34 @@
     }
   }
 
+  function updateFeatureTogglesFromState() {
+    const riderConfig = state.appConfig[fleetEnv.riderPackage];
+    const driverConfig = state.appConfig[fleetEnv.driverPackage];
+    const verified = state.appConfigVerified;
+
+    const riderAccountSwitch = $('input-toggle-rider-account-creation');
+    const driverAccountSwitch = $('input-toggle-driver-account-creation');
+    const driverLicenceSwitch = $('input-toggle-driver-licence');
+    const badgeEl = $('toggles-state-badge');
+
+    if (riderAccountSwitch) riderAccountSwitch.checked = riderConfig?.accountCreationEnabled === true;
+    if (driverAccountSwitch) driverAccountSwitch.checked = driverConfig?.accountCreationEnabled === true;
+    if (driverLicenceSwitch) driverLicenceSwitch.checked = driverConfig?.driverLicenceRequired === true;
+
+    if (badgeEl) {
+      if (!verified) {
+        badgeEl.textContent = 'Unavailable';
+        badgeEl.className = 'badge badge-demoted';
+      } else if (!riderConfig && !driverConfig) {
+        badgeEl.textContent = 'Not configured';
+        badgeEl.className = 'badge badge-demoted';
+      } else {
+        badgeEl.textContent = 'Operational';
+        badgeEl.className = 'badge badge-approved';
+      }
+    }
+  }
+
   function renderAppControlAudit() {
     const container = $('appcontrol-audit-table');
     if (!container) return;
@@ -4231,7 +4271,7 @@
 
   async function saveCurrentAppConfig() {
     const pkg = state.appConfigTab;
-    if (pkg === 'emergency') return;
+    if (pkg === 'emergency' || pkg === 'toggles') return;
     if (!fleetEnv.appPackages.includes(pkg)) throw new Error('App does not belong to this environment');
 
     const maintenanceMode = $('input-app-maintenance').checked;
@@ -4364,6 +4404,65 @@ This applies immediately to all connected devices.`,
     } catch (err) {
       console.error('setEmergencyMaintenance failed', err);
       toast('Emergency action failed: ' + (err.message || ''), 'error');
+    }
+  }
+
+  async function saveFeatureToggles() {
+    if (!state.appConfigVerified) return toast('Wait for verified app settings.', 'error');
+
+    const riderAccountCreation = $('input-toggle-rider-account-creation')?.checked === true;
+    const driverAccountCreation = $('input-toggle-driver-account-creation')?.checked === true;
+    const driverLicenceRequired = $('input-toggle-driver-licence')?.checked === true;
+
+    const envLabel = fleetEnv.environment === 'dev' ? 'DEV' : 'Production';
+    const confirm = await openModal({
+      title: `Update ${envLabel} Feature Toggles?`,
+      message: `You are about to update live feature toggles for ${envLabel}:
+• LaynRider Account Creation & Google Sign-In: ${riderAccountCreation ? 'ENABLED' : 'DISABLED (Blocking)'}
+• LaynDriver Account Creation & Google Sign-In: ${driverAccountCreation ? 'ENABLED' : 'DISABLED (Blocking)'}
+• LaynDriver Licence Requirement: ${driverLicenceRequired ? 'REQUIRED' : 'Optional'}
+
+This applies immediately to all connected devices in ${envLabel}.`,
+      confirmText: 'Broadcast Feature Toggles',
+      confirmClass: (!riderAccountCreation || !driverAccountCreation) ? 'btn-danger' : 'btn-primary'
+    });
+
+    if (!confirm.confirmed) return;
+
+    try {
+      const batch = db.batch();
+      const riderRef = appConfigCol.doc(appConfigId(fleetEnv.riderPackage));
+      const driverRef = appConfigCol.doc(appConfigId(fleetEnv.driverPackage));
+
+      batch.set(riderRef, {
+        accountCreationEnabled: riderAccountCreation,
+        updatedAt: serverTimestamp(),
+        updatedBy: currentAdminEmail()
+      }, { merge: true });
+
+      batch.set(driverRef, {
+        accountCreationEnabled: driverAccountCreation,
+        driverLicenceRequired: driverLicenceRequired,
+        updatedAt: serverTimestamp(),
+        updatedBy: currentAdminEmail()
+      }, { merge: true });
+
+      await batch.commit();
+
+      if ($('input-app-driver-licence')) {
+        $('input-app-driver-licence').checked = driverLicenceRequired;
+      }
+
+      await logAdminAction('appConfigFeatureTogglesUpdate', 'fleet', `Feature Toggles (${envLabel})`, JSON.stringify({
+        riderAccountCreation,
+        driverAccountCreation,
+        driverLicenceRequired
+      }));
+
+      toast('Feature toggles updated successfully.', 'success');
+    } catch (err) {
+      console.error('saveFeatureToggles failed', err);
+      toast('Failed to update feature toggles: ' + (err.message || ''), 'error');
     }
   }
 
@@ -4510,6 +4609,12 @@ This applies immediately to all connected devices.`,
     goToReviewTab,
     goToAppTab,
     syncRouteFromHash
+  };
+
+  window.LaynFleetAppControl = {
+    validAppConfig,
+    updateFeatureTogglesFromState,
+    saveFeatureToggles
   };
 
   document.querySelectorAll('.nav-item[data-section]').forEach((b) =>
@@ -4928,6 +5033,12 @@ This applies immediately to all connected devices.`,
   if (btnSaveConfig) btnSaveConfig.addEventListener('click', saveCurrentAppConfig);
   const btnRevertConfig = $('btn-revert-app-config');
   if (btnRevertConfig) btnRevertConfig.addEventListener('click', updateAppConfigFormFromState);
+
+  // Feature Toggles Form Actions
+  const btnSaveToggles = $('btn-save-feature-toggles');
+  if (btnSaveToggles) btnSaveToggles.addEventListener('click', saveFeatureToggles);
+  const btnRevertToggles = $('btn-revert-feature-toggles');
+  if (btnRevertToggles) btnRevertToggles.addEventListener('click', updateFeatureTogglesFromState);
 
   // Emergency Actions
   const btnEmergMaint = $('btn-emergency-all-maintenance');
