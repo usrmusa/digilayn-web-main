@@ -1404,9 +1404,15 @@
 
         function renderOrphans(inventory = {}) {
             currentInventory = inventory || { orphanStorage: [], orphanUsernames: [], orphanDocuments: [] };
-            const storage = currentInventory.orphanStorage || [];
+            const storage = (currentInventory.orphanStorage || []).filter(
+                s => !String(s.path || '').toLowerCase().replace(/^\/+/, '').startsWith('audit/')
+            );
             const usernames = currentInventory.orphanUsernames || [];
-            const documents = currentInventory.orphanDocuments || [];
+            const documents = (currentInventory.orphanDocuments || []).filter(d => {
+                const p = String(d.path || '').toLowerCase().replace(/^\/+/, '');
+                const c = String(d.collectionName || '').toLowerCase().replace(/^\/+/, '');
+                return !p.startsWith('audit/') && !p.startsWith('audit') && c !== 'audit' && !c.startsWith('audit/');
+            });
             const total = storage.length + usernames.length + documents.length;
 
             orphanCountBadge.textContent = total;

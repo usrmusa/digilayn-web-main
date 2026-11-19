@@ -104,9 +104,15 @@ class UserManagement {
         inventory = response.data || {};
       }
       this.users = (inventory.accounts || []).map((account) => this.normalizeAccount(account));
-      this.orphanStorage = inventory.orphanStorage || [];
+      this.orphanStorage = (inventory.orphanStorage || []).filter(
+        (item) => !String(item.path || "").toLowerCase().replace(/^\/+/, "").startsWith("audit/")
+      );
       this.orphanUsernames = inventory.orphanUsernames || [];
-      this.orphanDocuments = inventory.orphanDocuments || [];
+      this.orphanDocuments = (inventory.orphanDocuments || []).filter((doc) => {
+        const path = String(doc.path || "").toLowerCase().replace(/^\/+/, "");
+        const col = String(doc.collectionName || "").toLowerCase().replace(/^\/+/, "");
+        return !path.startsWith("audit/") && !path.startsWith("audit") && col !== "audit" && !col.startsWith("audit/");
+      });
       this.onUpdate?.(this.applyFilters(this.users), {
         orphanStorage: this.orphanStorage,
         orphanUsernames: this.orphanUsernames,
