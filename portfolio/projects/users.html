@@ -1411,7 +1411,9 @@
             const documents = (currentInventory.orphanDocuments || []).filter(d => {
                 const p = String(d.path || '').toLowerCase().replace(/^\/+/, '');
                 const c = String(d.collectionName || '').toLowerCase().replace(/^\/+/, '');
-                return !p.startsWith('audit/') && !p.startsWith('audit') && c !== 'audit' && !c.startsWith('audit/');
+                const cat = String(d.category || '').toLowerCase();
+                return !p.startsWith('audit/') && !p.startsWith('audit') && c !== 'audit' && !c.startsWith('audit/')
+                    && !p.startsWith('laynfleet/') && cat !== 'laynfleet' && !c.startsWith('laynfleet/');
             });
             const total = storage.length + usernames.length + documents.length;
 

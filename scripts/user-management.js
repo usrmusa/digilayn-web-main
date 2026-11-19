@@ -111,7 +111,16 @@ class UserManagement {
       this.orphanDocuments = (inventory.orphanDocuments || []).filter((doc) => {
         const path = String(doc.path || "").toLowerCase().replace(/^\/+/, "");
         const col = String(doc.collectionName || "").toLowerCase().replace(/^\/+/, "");
-        return !path.startsWith("audit/") && !path.startsWith("audit") && col !== "audit" && !col.startsWith("audit/");
+        const cat = String(doc.category || "").toLowerCase();
+        return (
+          !path.startsWith("audit/") &&
+          !path.startsWith("audit") &&
+          col !== "audit" &&
+          !col.startsWith("audit/") &&
+          !path.startsWith("laynfleet/") &&
+          cat !== "laynfleet" &&
+          !col.startsWith("laynfleet/")
+        );
       });
       this.onUpdate?.(this.applyFilters(this.users), {
         orphanStorage: this.orphanStorage,
