@@ -117,7 +117,7 @@
           Management Console
         </h1>
         <p class="text-sm sm:text-base text-digilayn-on-surface-variant leading-relaxed">
-          Welcome to the Digilayn management console. Access and configure your core platforms from here: global user directory, LaynFleet operations, and the Poortjie platform.
+          Welcome to the Digilayn management console. Access and configure your core platforms from here: global user directory, LaynFleet operations, and global project configuration.
         </p>
       </div>
     </div>
@@ -218,42 +218,47 @@
           </div>
         </div>
 
-        <!-- Pillar 3: Poortjie Website (Honest Placeholder - Not Built Yet) -->
-        <div class="bg-digilayn-surface-container-lowest dark:bg-digilayn-surface rounded-3xl p-6 sm:p-7 border border-dashed border-digilayn-outline-variant dark:border-digilayn-outline-variant flex flex-col justify-between relative overflow-hidden">
-          <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-digilayn-tertiary/5 rounded-full blur-2xl pointer-events-none"></div>
-
+        <!-- Pillar 3: Global Config (Project-Wide Configuration & Toggles) -->
+        <div class="bg-digilayn-surface-container-lowest dark:bg-digilayn-surface rounded-3xl p-6 sm:p-7 border border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:border-digilayn-primary dark:hover:border-digilayn-primary transition-all hover:shadow-xl flex flex-col justify-between group">
           <div>
             <div class="flex items-start justify-between mb-4">
-              <div class="w-14 h-14 rounded-2xl bg-digilayn-tertiary-container dark:bg-digilayn-tertiary/10 text-digilayn-on-tertiary-container dark:text-digilayn-tertiary flex items-center justify-center text-2xl font-bold opacity-80">
-                <i class="fas fa-city"></i>
+              <div class="w-14 h-14 rounded-2xl bg-digilayn-primary-container dark:bg-digilayn-primary/10 text-digilayn-on-primary-container dark:text-digilayn-primary flex items-center justify-center text-2xl font-bold group-hover:scale-105 transition-transform">
+                <i class="fas fa-sliders"></i>
               </div>
-              <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-digilayn-warning-container dark:bg-digilayn-warning/10 text-digilayn-on-warning-container dark:text-digilayn-warning border border-digilayn-warning dark:border-digilayn-warning/60">
-                Coming Soon
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-digilayn-primary-container dark:bg-digilayn-primary/10 text-digilayn-on-primary-container dark:text-digilayn-primary border border-digilayn-primary dark:border-digilayn-primary">
+                Project-Wide · Global
               </span>
             </div>
 
-            <h3 class="text-xl font-black text-digilayn-on-surface dark:text-digilayn-on-surface mb-1.5">Manage Poortjie</h3>
+            <h3 class="text-xl font-black text-digilayn-on-surface dark:text-digilayn-on-surface mb-1.5">Global Config</h3>
             <p class="text-xs text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant leading-relaxed mb-5">
-              Dedicated management console for the Poortjie website and community platform.
+              Project-wide configuration and feature toggles governing the entire Firebase backend across LaynRider, LaynDriver, and Poortjie.info.
             </p>
 
-            <div class="p-4 rounded-2xl bg-digilayn-surface dark:bg-digilayn-surface-container-low/50 border border-digilayn-outline-variant dark:border-digilayn-outline-variant mb-6 text-xs text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant">
-              <div class="flex items-start gap-2.5">
-                <i class="fas fa-info-circle text-digilayn-warning text-sm mt-0.5 shrink-0"></i>
-                <div class="space-y-1">
-                  <p class="font-bold text-digilayn-on-surface-variant dark:text-digilayn-on-surface">In Development</p>
-                  <p class="text-[11px] leading-relaxed">
-                    A dedicated management interface for the Poortjie website (business directory, marketplace classifieds, and taxi rank management) is not built yet.
-                  </p>
-                </div>
+            <div class="space-y-2 mb-6 text-xs text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-check text-digilayn-primary text-[11px]"></i>
+                <span>Global feature toggles &amp; account creation policies</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <i class="fas fa-check text-digilayn-primary text-[11px]"></i>
+                <span>Unified gate across mobile apps and Poortjie web</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <i class="fas fa-check text-digilayn-primary text-[11px]"></i>
+                <span>Direct Firestore synchronization (<code>globalConfig/featureToggles</code>)</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <i class="fas fa-check text-digilayn-primary text-[11px]"></i>
+                <span>Zero fallbacks, fail-closed operational safety</span>
               </div>
             </div>
           </div>
 
-          <button type="button" disabled class="w-full py-3.5 px-4 rounded-xl bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant font-bold text-xs cursor-not-allowed flex items-center justify-center gap-2 border border-digilayn-outline-variant dark:border-digilayn-outline-variant/60">
-            <i class="fas fa-clock text-[11px]"></i>
-            <span>Poortjie Console · In Development</span>
-          </button>
+          <a href="global-config.html" class="w-full py-3.5 px-4 rounded-xl bg-digilayn-primary hover:bg-digilayn-primary text-digilayn-on-primary font-bold text-xs transition flex items-center justify-between shadow-md shadow-digilayn-primary/20 digilayn-button">
+            <span>Global Config Console</span>
+            <i class="fas fa-arrow-right text-[11px]"></i>
+          </a>
         </div>
 
       </div>
