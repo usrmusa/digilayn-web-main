@@ -1204,6 +1204,8 @@
         let cachedLaynDrivers = [];
         let cachedDogTowing = [];
         let cachedLaynRiders = [];
+        let cachedDriverUids = new Set();
+        let cachedRiderUids = new Set();
 
         let matchedPromoteDriverUser = null;
         let matchedPromoteAssistUser = null;
@@ -1920,12 +1922,14 @@
             try {
                 if (force || cachedLaynDrivers.length === 0) {
                     cachedLaynDrivers = await userManager.fetchLaynFleetDrivers();
+                    cachedDriverUids = new Set(cachedLaynDrivers.map(d => d.uid));
                 }
                 if (force || cachedDogTowing.length === 0) {
                     cachedDogTowing = await userManager.fetchDogTowingDrivers();
                 }
                 if (force || cachedLaynRiders.length === 0) {
                     cachedLaynRiders = await userManager.fetchLaynFleetRiders();
+                    cachedRiderUids = new Set(cachedLaynRiders.map(r => r.uid));
                 }
                 updateTabCounters();
             } catch (err) {
@@ -2205,8 +2209,14 @@
                     : `<div class="w-12 h-12 rounded-full bg-digilayn-primary-container dark:bg-digilayn-primary/10 text-digilayn-on-primary-container dark:text-digilayn-primary flex items-center justify-center font-bold text-xl">${(user.displayName || '?')[0].toUpperCase()}</div>`;
 
                 let appBadges = [];
-                if (user.applications?.[window.LaynFleetEnvironment.membershipKey]?.isDriver) {
+                const userUid = user.userId || user.uid;
+                const isDriver = cachedDriverUids.has(userUid) || !!user.applications?.[window.LaynFleetEnvironment.membershipKey]?.isDriver || !!user.applications?.laynFleet?.isDriver;
+                const isRider = cachedRiderUids.has(userUid);
+                if (isDriver) {
                     appBadges.push(`<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-digilayn-success-container text-digilayn-on-success-container dark:bg-digilayn-success/10 dark:text-digilayn-success flex items-center gap-1"><i class="fas fa-car-side"></i>LaynDriver</span>`);
+                }
+                if (isRider) {
+                    appBadges.push(`<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-digilayn-info-container text-digilayn-on-info-container dark:bg-digilayn-info/10 dark:text-digilayn-info flex items-center gap-1"><i class="fas fa-user"></i>LaynRider</span>`);
                 }
                 if (user.applications?.laynAssist?.isOwner) {
                     appBadges.push(`<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-digilayn-warning-container text-digilayn-on-warning-container dark:bg-digilayn-warning/10 dark:text-digilayn-warning flex items-center gap-1"><i class="fas fa-crown"></i>Assist Owner</span>`);

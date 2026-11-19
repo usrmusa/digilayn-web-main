@@ -48,11 +48,13 @@ class UserManagement {
     this.users = [];
     this.orphanStorage = [];
     this.orphanUsernames = [];
+    this.driverUids = new Set();
+    this.riderUids = new Set();
     this.onUpdate = null;
     this.onError = null;
     this.filters = {
       search: "", suspensionReason: "all", suspended: "all", hasUsername: "all",
-      laynFleetDriver: "all", poortjieAdmin: "all", poortjieTaxiAdmin: "all",
+      laynFleetDriver: "all", laynFleetRider: "all", poortjieAdmin: "all", poortjieTaxiAdmin: "all",
       poortjieSupport: "all", tuktukDriver: "all", tuktukOwner: "all",
       emailDomain: "all", integrity: "all",
       dateStart: null, dateEnd: null, sortBy: "newest"
@@ -202,7 +204,8 @@ class UserManagement {
       }
     }
     booleanFilter("hasUsername", (user) => user.username);
-    booleanFilter("laynFleetDriver", (user) => user.applications?.[fleetEnv.membershipKey]?.isDriver);
+    booleanFilter("laynFleetDriver", (user) => this.driverUids.has(user.userId || user.uid) || user.applications?.[fleetEnv.membershipKey]?.isDriver || user.applications?.laynFleet?.isDriver);
+    booleanFilter("laynFleetRider", (user) => this.riderUids.has(user.userId || user.uid));
     booleanFilter("poortjieAdmin", (user) => user.roles?.poortjie?.isAdmin);
     booleanFilter("poortjieTaxiAdmin", (user) => user.roles?.poortjie?.isTaxiRankAdmin);
     booleanFilter("poortjieSupport", (user) => user.roles?.poortjie?.listForSupport);
@@ -478,8 +481,9 @@ class UserManagement {
 
   async fetchLaynFleetDrivers() {
     requireManager();
-    const snapshot = await getDocs(collection(db, "laynfleet", fleetEnv.environment, "drivers"));
+    const snapshot = await getDocs(collection(db, "laynfleet", "prod", "drivers"));
     const usersByUid = new Map(this.users.map((u) => [u.userId || u.uid, u]));
+    this.driverUids = new Set(snapshot.docs.map((d) => d.id));
 
     return snapshot.docs.map((docSnap) => {
       const data = docSnap.data() || {};
@@ -555,8 +559,9 @@ class UserManagement {
 
   async fetchLaynFleetRiders() {
     requireManager();
-    const snapshot = await getDocs(collection(db, "laynfleet", fleetEnv.environment, "riders"));
+    const snapshot = await getDocs(collection(db, "laynfleet", "prod", "riders"));
     const usersByUid = new Map(this.users.map((u) => [u.userId || u.uid, u]));
+    this.riderUids = new Set(snapshot.docs.map((d) => d.id));
 
     return snapshot.docs.map((docSnap) => {
       const data = docSnap.data() || {};
@@ -586,7 +591,7 @@ class UserManagement {
   async promoteLaynDriver(uid, vehicleData = {}) {
     requireManager();
     const batch = writeBatch(db);
-    const driverRef = doc(db, "laynfleet", fleetEnv.environment, "drivers", uid);
+    const driverRef = doc(db, "laynfleet", "prod", "drivers", uid);
     const userRef = doc(db, "users", uid);
     const managerEmail = requireManager().email;
 
@@ -610,6 +615,9 @@ class UserManagement {
 
     batch.set(userRef, {
       applications: {
+        laynFleet: {
+          isDriver: true
+        },
         [fleetEnv.membershipKey]: {
           isDriver: true
         }
@@ -625,7 +633,7 @@ class UserManagement {
   async demoteLaynDriver(uid, reason = "") {
     requireManager();
     const batch = writeBatch(db);
-    const driverRef = doc(db, "laynfleet", fleetEnv.environment, "drivers", uid);
+    const driverRef = doc(db, "laynfleet", "prod", "drivers", uid);
     const userRef = doc(db, "users", uid);
     const managerEmail = requireManager().email;
 
@@ -640,6 +648,9 @@ class UserManagement {
 
     batch.set(userRef, {
       applications: {
+        laynFleet: {
+          isDriver: false
+        },
         [fleetEnv.membershipKey]: {
           isDriver: false
         }
