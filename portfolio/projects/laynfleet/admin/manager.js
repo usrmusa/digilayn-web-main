@@ -267,6 +267,13 @@
     const { uid, url, name } = currentViewingLicence;
     if (!uid) return;
 
+    const targetDriver = state.drivers.find((x) => x.uid === uid);
+    if (targetDriver?.isProtected || targetDriver?.protected) {
+      toast('This protected record cannot be deleted.', 'error');
+      cancelDeleteLicencePhoto();
+      return;
+    }
+
     const confirmBtn = $('delete-licence-confirm');
     if (confirmBtn) {
       confirmBtn.disabled = true;
@@ -336,6 +343,11 @@
   let currentViewingDriverUid = null;
 
   function promptPermanentDelete({ title, subtitle, driverName, itemLabel, detailsText, onConfirm }) {
+    const targetDriver = currentViewingDriverUid ? state.drivers.find((x) => x.uid === currentViewingDriverUid) : null;
+    if (targetDriver?.isProtected || targetDriver?.protected) {
+      toast('This protected record cannot be deleted.', 'error');
+      return;
+    }
     const overlay = $('delete-permanent-overlay');
     if (!overlay) return;
 
@@ -413,6 +425,12 @@
   }
 
   async function deleteDriverPhoneNumber(uid, driverName, phone) {
+    const targetDriver = state.drivers.find((x) => x.uid === uid);
+    if (targetDriver?.isProtected || targetDriver?.protected) {
+      toast('This protected record cannot be deleted.', 'error');
+      cancelPermanentDelete();
+      return;
+    }
     try {
       await driversCol.doc(uid).update({
         phone: firebase.firestore.FieldValue.delete(),
@@ -444,6 +462,12 @@
   }
 
   async function deleteDriverProfilePhoto(uid, driverName, photoUrl) {
+    const targetDriver = state.drivers.find((x) => x.uid === uid);
+    if (targetDriver?.isProtected || targetDriver?.protected) {
+      toast('This protected record cannot be deleted.', 'error');
+      cancelPermanentDelete();
+      return;
+    }
     try {
       // Only delete from Storage if the file is in the driver storage directory
       // and NOT shared with the user's personal profile photo.
@@ -860,18 +884,25 @@
       saveVehicleBtn.addEventListener('click', () => saveDriverVehicle(uid));
     }
 
+    const isProtectedRecord = Boolean(d?.isProtected || d?.protected);
+
     const deletePhoneBtn = $('btn-delete-phone-direct');
-    if (deletePhoneBtn && phone) {
-      deletePhoneBtn.addEventListener('click', () => {
-        promptPermanentDelete({
-          title: '⚠️ Permanently Delete Driver Phone Number',
-          subtitle: 'Irreversible action — permanent removal from driver fleet record',
-          driverName: `${name} (${uid.slice(0, 8)}…)`,
-          itemLabel: `driver phone number "${phone}"`,
-          detailsText: `You are about to permanently delete the phone number (${phone}) from the driver fleet record for ${name}. The user's main profile record will remain untouched. The driver will have no contact number on file. This cannot be undone.`,
-          onConfirm: () => deleteDriverPhoneNumber(uid, name, phone)
+    if (deletePhoneBtn) {
+      if (phone && !isProtectedRecord) {
+        show(deletePhoneBtn);
+        deletePhoneBtn.addEventListener('click', () => {
+          promptPermanentDelete({
+            title: '⚠️ Permanently Delete Driver Phone Number',
+            subtitle: 'Irreversible action — permanent removal from driver fleet record',
+            driverName: `${name} (${uid.slice(0, 8)}…)`,
+            itemLabel: `driver phone number "${phone}"`,
+            detailsText: `You are about to permanently delete the phone number (${phone}) from the driver fleet record for ${name}. The user's main profile record will remain untouched. The driver will have no contact number on file. This cannot be undone.`,
+            onConfirm: () => deleteDriverPhoneNumber(uid, name, phone)
+          });
         });
-      });
+      } else {
+        hide(deletePhoneBtn);
+      }
     }
 
     const viewPhotoBtn = $('btn-view-photo-direct');
@@ -880,17 +911,22 @@
     }
 
     const deletePhotoBtn = $('btn-delete-photo-direct');
-    if (deletePhotoBtn && photoUrl) {
-      deletePhotoBtn.addEventListener('click', () => {
-        promptPermanentDelete({
-          title: '⚠️ Permanently Delete Driver Profile Picture',
-          subtitle: 'Irreversible action — permanent removal from driver fleet record',
-          driverName: `${name} (${uid.slice(0, 8)}…)`,
-          itemLabel: 'driver profile picture',
-          detailsText: `You are about to permanently delete the profile picture for ${name} from the driver fleet record. The user's main profile and personal photos will remain untouched. This cannot be undone.`,
-          onConfirm: () => deleteDriverProfilePhoto(uid, name, d.photoUrl)
+    if (deletePhotoBtn) {
+      if (photoUrl && !isProtectedRecord) {
+        show(deletePhotoBtn);
+        deletePhotoBtn.addEventListener('click', () => {
+          promptPermanentDelete({
+            title: '⚠️ Permanently Delete Driver Profile Picture',
+            subtitle: 'Irreversible action — permanent removal from driver fleet record',
+            driverName: `${name} (${uid.slice(0, 8)}…)`,
+            itemLabel: 'driver profile picture',
+            detailsText: `You are about to permanently delete the profile picture for ${name} from the driver fleet record. The user's main profile and personal photos will remain untouched. This cannot be undone.`,
+            onConfirm: () => deleteDriverProfilePhoto(uid, name, d.photoUrl)
+          });
         });
-      });
+      } else {
+        hide(deletePhotoBtn);
+      }
     }
 
     const viewLicenceBtn = $('btn-view-licence-direct');
@@ -899,22 +935,27 @@
     }
 
     const deleteLicenceModalBtn = $('btn-delete-licence-modal');
-    if (deleteLicenceModalBtn && licenceUrl) {
-      deleteLicenceModalBtn.addEventListener('click', () => {
-        currentViewingLicence = { url: licenceUrl, uid, name };
-        promptPermanentDelete({
-          title: '⚠️ Permanently Delete Licence Photo',
-          subtitle: 'Irreversible action — permanent removal from storage and database',
-          driverName: `${name} (${uid.slice(0, 8)}…)`,
-          itemLabel: 'driver licence document',
-          detailsText: `You are about to permanently delete the licence document for ${name}. The file will be deleted from Cloud Storage and database records. The driver will no longer have a licence on file. This cannot be undone.`,
-          onConfirm: async () => {
-            await confirmDeleteLicencePhoto();
-            cancelPermanentDelete();
-            if (currentViewingDriverUid === uid) showDriverProfile(uid);
-          }
+    if (deleteLicenceModalBtn) {
+      if (licenceUrl && !isProtectedRecord) {
+        show(deleteLicenceModalBtn);
+        deleteLicenceModalBtn.addEventListener('click', () => {
+          currentViewingLicence = { url: licenceUrl, uid, name };
+          promptPermanentDelete({
+            title: '⚠️ Permanently Delete Licence Photo',
+            subtitle: 'Irreversible action — permanent removal from storage and database',
+            driverName: `${name} (${uid.slice(0, 8)}…)`,
+            itemLabel: 'driver licence document',
+            detailsText: `You are about to permanently delete the licence document for ${name}. The file will be deleted from Cloud Storage and database records. The driver will no longer have a licence on file. This cannot be undone.`,
+            onConfirm: async () => {
+              await confirmDeleteLicencePhoto();
+              cancelPermanentDelete();
+              if (currentViewingDriverUid === uid) showDriverProfile(uid);
+            }
+          });
         });
-      });
+      } else {
+        hide(deleteLicenceModalBtn);
+      }
     }
 
     const filterReviewsBtn = $('btn-modal-filter-reviews');

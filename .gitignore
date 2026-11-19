@@ -8,3 +8,10 @@ portfolio/projects/laynfleet/.DS_Store
 /AGENTS.md
 
 /dist/
+
+# Credentials and secrets
+service-account*.json
+*.key
+.env*
+*.pem
+

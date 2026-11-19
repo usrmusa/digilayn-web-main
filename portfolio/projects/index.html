@@ -20,16 +20,21 @@
 </head>
 <body class="bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface min-h-screen antialiased flex flex-col justify-between">
 
+  <!-- Top Linear Progress Bar (for dynamic loading) -->
+  <div id="pageLoadingBar" class="digilayn-linear-progress page-top">
+    <div class="digilayn-linear-progress-bar"></div>
+  </div>
+
   <!-- Initial Page Loader -->
   <div id="initialPageLoader" class="fixed inset-0 z-50 bg-digilayn-surface dark:bg-digilayn-surface-container-lowest flex flex-col items-center justify-center transition-opacity duration-300">
-    <div class="relative flex items-center justify-center">
-      <div class="w-14 h-14 rounded-full border-4 border-digilayn-outline-variant dark:border-digilayn-outline-variant border-t-digilayn-primary animate-spin"></div>
-      <div class="absolute text-digilayn-primary text-lg font-bold">
-        <i class="fas fa-shield-halved"></i>
-      </div>
+    <div class="w-12 h-12 rounded-2xl bg-digilayn-primary/10 text-digilayn-primary dark:text-digilayn-primary flex items-center justify-center text-xl font-bold mb-4">
+      <i class="fas fa-shield-halved"></i>
     </div>
-    <h3 class="mt-4 text-sm font-bold text-digilayn-on-surface dark:text-digilayn-on-surface tracking-wide">Digilayn Management Console</h3>
-    <p class="text-xs text-digilayn-on-surface-variant mt-1">Verifying manager credentials...</p>
+    <h3 class="text-sm font-bold text-digilayn-on-surface dark:text-digilayn-on-surface tracking-wide">Digilayn Management Console</h3>
+    <p class="text-xs text-digilayn-on-surface-variant mt-1 mb-5">Verifying manager credentials...</p>
+    <div class="w-64 max-w-[80vw] digilayn-linear-progress">
+      <div class="digilayn-linear-progress-bar"></div>
+    </div>
   </div>
 
   <!-- Login Gate (when unauthenticated) -->
@@ -281,8 +286,10 @@
     const loginError = document.getElementById("loginError");
     const logoutBtn = document.getElementById("logoutBtn");
     const managerEmailText = document.getElementById("managerEmailText");
+    const pageLoadingBar = document.getElementById("pageLoadingBar");
 
     function dismissLoader() {
+      if (pageLoadingBar) pageLoadingBar.classList.add("hidden");
       if (!initialPageLoader) return;
       initialPageLoader.classList.add("opacity-0", "pointer-events-none");
       setTimeout(() => {
@@ -322,11 +329,13 @@
       }
       loginError.classList.add("hidden");
       loginSubmitBtn.disabled = true;
-      loginSubmitBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i>Signing in...`;
+      if (pageLoadingBar) pageLoadingBar.classList.remove("hidden");
+      loginSubmitBtn.innerHTML = `<i class="fas fa-arrow-right-to-bracket mr-2"></i>Signing in...`;
 
       try {
         await loginAdmin(email, password);
       } catch (err) {
+        if (pageLoadingBar) pageLoadingBar.classList.add("hidden");
         loginError.textContent = err.message || "Failed to sign in. Verify your credentials.";
         loginError.classList.remove("hidden");
       } finally {

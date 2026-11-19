@@ -22,16 +22,21 @@
 </head>
 <body class="bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface min-h-screen">
 
+    <!-- Top Linear Progress Bar -->
+    <div id="topProgressBar" class="digilayn-linear-progress page-top">
+        <div class="digilayn-linear-progress-bar"></div>
+    </div>
+
     <!-- Initial Page Loader (active until admin session is validated) -->
     <div id="initialPageLoader" class="fixed inset-0 z-50 bg-digilayn-surface dark:bg-digilayn-surface-container-lowest flex flex-col items-center justify-center transition-opacity duration-300">
-        <div class="relative flex items-center justify-center">
-            <div class="w-14 h-14 rounded-full border-4 border-digilayn-outline-variant dark:border-digilayn-outline-variant border-t-digilayn-primary animate-spin"></div>
-            <div class="absolute text-digilayn-primary text-lg font-bold">
-                <i class="fas fa-shield-alt"></i>
-            </div>
+        <div class="w-12 h-12 rounded-2xl bg-digilayn-primary/10 text-digilayn-primary dark:text-digilayn-primary flex items-center justify-center text-xl font-bold mb-4">
+            <i class="fas fa-shield-alt"></i>
         </div>
-        <h3 class="mt-4 text-sm font-bold text-digilayn-on-surface dark:text-digilayn-on-surface tracking-wide">Digilayn Admin Hub</h3>
-        <p class="text-xs text-digilayn-on-surface-variant mt-1">Verifying administrative credentials...</p>
+        <h3 class="text-sm font-bold text-digilayn-on-surface dark:text-digilayn-on-surface tracking-wide">Digilayn Admin Hub</h3>
+        <p class="text-xs text-digilayn-on-surface-variant mt-1 mb-5">Verifying administrative credentials...</p>
+        <div class="w-64 max-w-[80vw] digilayn-linear-progress">
+            <div class="digilayn-linear-progress-bar"></div>
+        </div>
     </div>
 
     <!-- Navigation -->
@@ -238,11 +243,15 @@
             </div>
         </div>
 
-        <!-- Loading State (Shimmer Skeleton Cards + Status Banner) -->
+        <!-- Loading State (Shimmer Skeleton Cards + Linear Progress Banner) -->
         <div id="loadingState" class="mb-8">
-            <div class="flex items-center justify-center gap-3 p-4 mb-6 rounded-2xl bg-digilayn-primary-container dark:bg-digilayn-primary/10 border border-digilayn-primary dark:border-digilayn-primary/40 text-digilayn-on-primary-container dark:text-digilayn-primary text-sm font-medium animate-pulse">
-                <i class="fas fa-circle-notch fa-spin text-digilayn-primary text-base"></i>
-                <span id="loadingMessage">Fetching global accounts, fleet records, and cloud storage inventory...</span>
+            <div class="p-4 mb-6 rounded-2xl bg-digilayn-primary-container dark:bg-digilayn-primary/10 border border-digilayn-primary dark:border-digilayn-primary/40 text-digilayn-on-primary-container dark:text-digilayn-primary text-sm font-medium">
+                <div class="flex items-center justify-center gap-3 mb-3">
+                    <span id="loadingMessage">Fetching global accounts, fleet records, and cloud storage inventory...</span>
+                </div>
+                <div class="digilayn-linear-progress max-w-md mx-auto">
+                    <div class="digilayn-linear-progress-bar"></div>
+                </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Skeleton Card 1 -->
@@ -1057,7 +1066,8 @@
                     <label class="block text-sm font-bold mb-2 opacity-70">Password</label>
                     <input type="password" id="password" autocomplete="new-password" class="w-full px-4 py-3 rounded-xl bg-digilayn-surface-container-low dark:bg-digilayn-surface border border-digilayn-outline-variant dark:border-digilayn-outline-variant focus:ring-2 focus:ring-digilayn-primary outline-none transition">
                 </div>
-                <button id="loginBtn" class="w-full py-4 bg-digilayn-primary text-digilayn-on-primary font-black rounded-xl hover:bg-digilayn-primary transition transform hover:scale-[1.02] active:scale-[0.98] digilayn-button">
+                <p id="loginError" class="hidden text-xs text-digilayn-on-error-container font-semibold bg-digilayn-error-container dark:bg-digilayn-error/10 p-3 rounded-xl border border-digilayn-error dark:border-digilayn-error/50"></p>
+                <button id="loginBtn" type="button" class="w-full py-4 bg-digilayn-primary text-digilayn-on-primary font-black rounded-xl hover:bg-digilayn-primary transition transform hover:scale-[1.02] active:scale-[0.98] digilayn-button">
                     Sign In
                 </button>
             </div>
@@ -1085,6 +1095,7 @@
         import { userManager, getTimestampMs } from "../../scripts/user-management.js";
 
         const initialPageLoader = document.getElementById('initialPageLoader');
+        const topProgressBar = document.getElementById('topProgressBar');
         const usersList = document.getElementById('usersList');
         const loadingState = document.getElementById('loadingState');
         const loadingMessage = document.getElementById('loadingMessage');
@@ -1289,6 +1300,7 @@
         const adminPanel = document.getElementById('adminPanel');
         const navBar = document.getElementById('navBar');
         const loginBtn = document.getElementById('loginBtn');
+        const loginError = document.getElementById('loginError');
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
 
@@ -1896,6 +1908,7 @@
         }
 
         async function loadAppData(force = false) {
+            topProgressBar?.classList.remove('hidden');
             try {
                 if (force || cachedLaynDrivers.length === 0) {
                     cachedLaynDrivers = await userManager.fetchLaynFleetDrivers();
@@ -1909,6 +1922,8 @@
                 updateTabCounters();
             } catch (err) {
                 console.error("Failed loading app data:", err);
+            } finally {
+                topProgressBar?.classList.add('hidden');
             }
         }
 
@@ -2217,9 +2232,15 @@
                                 <button class="suspend-btn text-digilayn-on-surface-variant hover:text-digilayn-warning transition-colors p-1.5" data-uid="${user.userId}" data-username="${user.username || ''}" data-email="${user.email || ''}" data-displayname="${user.displayName || ''}" data-suspended="${user.suspended}" data-suspendedreason="${escapeHtml(user.suspendedReason || '')}" title="${user.suspended ? 'Unsuspend' : 'Suspend'}">
                                     <i class="fas ${user.suspended ? 'fa-user-check text-digilayn-warning' : 'fa-user-slash'}"></i>
                                 </button>
-                                <button class="delete-btn text-digilayn-on-surface-variant hover:text-digilayn-error transition-colors p-1.5" data-uid="${user.userId}" data-username="${user.username || ''}" data-email="${user.email || ''}" data-displayname="${user.displayName || ''}" title="Permanently Delete">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+                                ${user.isProtected ? `
+                                    <span class="p-1.5 text-digilayn-primary" title="Protected System Account — Deletion Locked">
+                                        <i class="fas fa-shield-alt"></i>
+                                    </span>
+                                ` : `
+                                    <button class="delete-btn text-digilayn-on-surface-variant hover:text-digilayn-error transition-colors p-1.5" data-uid="${user.userId}" data-username="${user.username || ''}" data-email="${user.email || ''}" data-displayname="${user.displayName || ''}" title="Permanently Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                `}
                             </div>
                         </div>
 
@@ -2233,13 +2254,14 @@
                                 <span>${user.phone || 'No Phone'}</span>
                             </div>
                             <div class="pt-2 flex flex-wrap items-center gap-1.5">
+                                ${user.isProtected ? `<span class="px-2 py-0.5 bg-digilayn-primary-container dark:bg-digilayn-primary/10 text-digilayn-on-primary-container text-[10px] font-bold uppercase rounded flex items-center gap-1"><i class="fas fa-shield-alt text-[9px]"></i> Protected</span>` : ''}
                                 ${susp.badgeHtml || ''}
                                 ${user.integrity !== 'complete' ? `<span class="px-2 py-0.5 bg-digilayn-error-container dark:bg-digilayn-error/10 text-digilayn-on-error-container text-[10px] font-bold uppercase rounded">${user.integrity}</span>` : '<span class="px-2 py-0.5 bg-digilayn-primary-container dark:bg-digilayn-primary/10 text-digilayn-on-primary-container text-[10px] font-bold uppercase rounded">Auth + Firestore</span>'}
                                 <span class="px-2 py-0.5 bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface-variant text-[10px] font-bold rounded">${user.storageObjects.length} files</span>
                                 <span class="px-2 py-0.5 bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface-variant text-[10px] font-bold rounded">${user.providers.join(', ') || 'Password'}</span>
                             </div>
 
-                            ${susp.isPendingDelete && susp.isExpired ? `
+                            ${susp.isPendingDelete && susp.isExpired && !user.isProtected ? `
                                 <div class="mt-3 p-2.5 bg-digilayn-error-container dark:bg-digilayn-error/10 border border-digilayn-error dark:border-digilayn-error rounded-xl flex items-center justify-between gap-2">
                                     <div class="text-[11px] font-semibold text-digilayn-on-error-container dark:text-digilayn-error flex items-center gap-1.5">
                                         <i class="fas fa-clock text-digilayn-error"></i>
@@ -3165,6 +3187,11 @@
         });
 
         async function showDeleteModal(user) {
+            const targetAccount = userManager.users.find((u) => u.userId === user?.uid);
+            if (user?.isProtected || targetAccount?.isProtected) {
+                setStatus("This protected system account cannot be deleted.", true);
+                return;
+            }
             userToDelete = user;
             isDeletingUser = false;
 
@@ -3394,6 +3421,12 @@
 
         confirmDeleteBtn.addEventListener('click', async () => {
             const uid = userToDelete.uid;
+            const targetAccount = userManager.users.find((u) => u.userId === uid);
+            if (userToDelete?.isProtected || targetAccount?.isProtected) {
+                setStatus("This protected system account cannot be deleted.", true);
+                deleteModal.classList.add('hidden');
+                return;
+            }
             const confirmation = deleteConfirmInput.value.trim();
             clearInterval(countdownTimer);
 
@@ -3572,6 +3605,7 @@
         // Initialize App
         console.log("Users.html: Initializing Admin Auth...");
         const dismissInitialLoader = () => {
+            topProgressBar?.classList.add('hidden');
             if (initialPageLoader) {
                 initialPageLoader.classList.add('opacity-0', 'pointer-events-none');
                 setTimeout(() => {
@@ -3616,27 +3650,58 @@
             (error) => {
                 console.log("Users.html: Admin unauthorized or logged out.");
                 dismissInitialLoader();
+                topProgressBar?.classList.add('hidden');
                 loginSection.classList.remove('hidden');
                 adminPanel.classList.add('hidden');
                 navBar.classList.add('hidden');
-                if (error) {
+                if (error && loginError) {
                     console.error("Users.html: Auth error:", error);
-                    setStatus(error, true);
+                    loginError.textContent = error;
+                    loginError.classList.remove('hidden');
                 }
             }
         );
 
-        loginBtn.addEventListener('click', async () => {
-            const email = emailInput.value;
-            const password = passwordInput.value;
+        async function handleLogin() {
+            const email = (emailInput?.value || '').trim();
+            const password = passwordInput?.value || '';
+            if (!email || !password) {
+                if (loginError) {
+                    loginError.textContent = 'Please enter both email and password.';
+                    loginError.classList.remove('hidden');
+                }
+                return;
+            }
+            if (loginError) loginError.classList.add('hidden');
+            if (loginBtn) {
+                loginBtn.disabled = true;
+                loginBtn.innerHTML = `<i class="fas fa-arrow-right-to-bracket mr-2"></i>Signing in...`;
+            }
+            topProgressBar?.classList.remove('hidden');
             try {
                 console.log("Attempting login...");
-                setStatus("Authenticating...");
                 await loginAdmin(email, password);
             } catch (error) {
                 console.error("Login failed:", error);
-                setStatus(`Login failed: ${error.message}`, true);
+                topProgressBar?.classList.add('hidden');
+                if (loginError) {
+                    loginError.textContent = error.message || 'Login failed. Verify your administrator credentials.';
+                    loginError.classList.remove('hidden');
+                }
+            } finally {
+                if (loginBtn) {
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Sign In';
+                }
             }
+        }
+
+        loginBtn?.addEventListener('click', handleLogin);
+        passwordInput?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleLogin();
+        });
+        emailInput?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleLogin();
         });
 
         // App Switcher Tabs

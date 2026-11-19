@@ -31,10 +31,19 @@
 
     async function loadData() {
         setStatus('data-status', 'Loading your data…');
+        const progressEl = byId('data-loading-progress');
+        if (progressEl) progressEl.classList.remove('hidden');
         const refreshBtn = byId('refresh-button');
         if (refreshBtn) refreshBtn.disabled = true;
         try {
             const result = await getMyData({});
+            if (result.data?.isProtected || result.data?.protected) {
+                if (deleteCard) deleteCard.classList.add('hidden');
+                if (deleteButton) deleteButton.disabled = true;
+                setStatus('data-status', 'This account is a protected system account and cannot be deleted.', 'error');
+                byId('data-output').textContent = JSON.stringify(result.data, null, 2);
+                return;
+            }
             byId('data-output').textContent = JSON.stringify(result.data, null, 2);
             setStatus('data-status', 'Your current account data is shown below.', 'success');
         } catch (error) {
@@ -49,6 +58,7 @@
             setStatus('data-status', message, 'error');
             byId('data-output').textContent = 'Unable to load account data.';
         } finally {
+            if (progressEl) progressEl.classList.add('hidden');
             if (refreshBtn) refreshBtn.disabled = false;
         }
     }

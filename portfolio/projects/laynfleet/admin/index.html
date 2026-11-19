@@ -55,10 +55,18 @@
     </form>
   </div>
 
+  <!-- Top Linear Progress Bar -->
+  <div id="page-linear-progress" class="digilayn-linear-progress page-top">
+    <div class="digilayn-linear-progress-bar"></div>
+  </div>
+
   <!-- ===================== BOOT / SPLASH ===================== -->
   <div id="boot-view" class="boot-view">
-    <div class="spinner"></div>
-    <p>Loading…</p>
+    <div class="login-logo" style="margin-bottom: 8px;">LF</div>
+    <p style="font-weight: 600; font-size: 14px;">Loading LaynFleet Manager…</p>
+    <div class="digilayn-linear-progress" style="width: 220px; max-width: 80vw; margin-top: 8px;">
+      <div class="digilayn-linear-progress-bar"></div>
+    </div>
   </div>
 
   <!-- ===================== APP ===================== -->
@@ -714,7 +722,9 @@
             </div>
             <div id="err-container">
               <div class="empty-state">
-                <div class="spinner"></div>
+                <div class="digilayn-linear-progress" style="width: 200px; margin: 12px auto;">
+                  <div class="digilayn-linear-progress-bar"></div>
+                </div>
                 <p>Loading client errors…</p>
               </div>
             </div>

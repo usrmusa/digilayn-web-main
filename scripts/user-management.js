@@ -151,6 +151,7 @@ class UserManagement {
       emailVerified: !!authData?.emailVerified,
       providers: authData?.providers || [],
       integrity,
+      isProtected: Boolean(account.isProtected || source.isProtected || account.protected || source.protected),
       storageObjects,
       usernameReservations
     };
@@ -247,6 +248,8 @@ class UserManagement {
   async deleteUser(uid, confirmation, onProgress) {
     requireManager();
     if (requireManager().uid === uid) throw new Error("You cannot delete yourself.");
+    const existing = this.users.find((u) => u.userId === uid);
+    if (existing?.isProtected) throw new Error("This protected account cannot be deleted.");
     onProgress?.({ step: "requesting", percent: 25, message: "Validating credentials and sending delete request..." });
     if (isLocalhost) {
       await deleteDoc(doc(db, "users", uid));
