@@ -3980,8 +3980,7 @@
       typeof config.maintenanceMessage === 'string' && (!config.maintenanceMode || config.maintenanceMessage.trim().length > 0) &&
       Number.isSafeInteger(config.minVersionCode) && config.minVersionCode >= 1 && config.minVersionCode <= 2147483647 &&
       typeof config.storeUrl === 'string' &&
-      (!Object.hasOwn(config, 'driverLicenceRequired') || typeof config.driverLicenceRequired === 'boolean') &&
-      (!Object.hasOwn(config, 'accountCreationEnabled') || typeof config.accountCreationEnabled === 'boolean');
+      (!Object.hasOwn(config, 'driverLicenceRequired') || typeof config.driverLicenceRequired === 'boolean');
   }
 
   function renderAppControl() {
@@ -4191,17 +4190,12 @@
   }
 
   function updateFeatureTogglesFromState() {
-    const riderConfig = state.appConfig[fleetEnv.riderPackage];
     const driverConfig = state.appConfig[fleetEnv.driverPackage];
     const verified = state.appConfigVerified;
 
-    const riderAccountSwitch = $('input-toggle-rider-account-creation');
-    const driverAccountSwitch = $('input-toggle-driver-account-creation');
     const driverLicenceSwitch = $('input-toggle-driver-licence');
     const badgeEl = $('toggles-state-badge');
 
-    if (riderAccountSwitch) riderAccountSwitch.checked = riderConfig?.accountCreationEnabled === true;
-    if (driverAccountSwitch) driverAccountSwitch.checked = driverConfig?.accountCreationEnabled === true;
     if (driverLicenceSwitch) driverLicenceSwitch.checked = driverConfig?.driverLicenceRequired === true;
 
     if (badgeEl) {
@@ -4410,52 +4404,35 @@ This applies immediately to all connected devices.`,
   async function saveFeatureToggles() {
     if (!state.appConfigVerified) return toast('Wait for verified app settings.', 'error');
 
-    const riderAccountCreation = $('input-toggle-rider-account-creation')?.checked === true;
-    const driverAccountCreation = $('input-toggle-driver-account-creation')?.checked === true;
     const driverLicenceRequired = $('input-toggle-driver-licence')?.checked === true;
 
     const envLabel = fleetEnv.environment === 'dev' ? 'DEV' : 'Production';
     const confirm = await openModal({
       title: `Update ${envLabel} Feature Toggles?`,
       message: `You are about to update live feature toggles for ${envLabel}:
-• LaynRider Account Creation & Google Sign-In: ${riderAccountCreation ? 'ENABLED' : 'DISABLED (Blocking)'}
-• LaynDriver Account Creation & Google Sign-In: ${driverAccountCreation ? 'ENABLED' : 'DISABLED (Blocking)'}
 • LaynDriver Licence Requirement: ${driverLicenceRequired ? 'REQUIRED' : 'Optional'}
 
 This applies immediately to all connected devices in ${envLabel}.`,
       confirmText: 'Broadcast Feature Toggles',
-      confirmClass: (!riderAccountCreation || !driverAccountCreation) ? 'btn-danger' : 'btn-primary'
+      confirmClass: 'btn-primary'
     });
 
     if (!confirm.confirmed) return;
 
     try {
-      const batch = db.batch();
-      const riderRef = appConfigCol.doc(appConfigId(fleetEnv.riderPackage));
       const driverRef = appConfigCol.doc(appConfigId(fleetEnv.driverPackage));
 
-      batch.set(riderRef, {
-        accountCreationEnabled: riderAccountCreation,
-        updatedAt: serverTimestamp(),
-        updatedBy: currentAdminEmail()
-      }, { merge: true });
-
-      batch.set(driverRef, {
-        accountCreationEnabled: driverAccountCreation,
+      await driverRef.set({
         driverLicenceRequired: driverLicenceRequired,
         updatedAt: serverTimestamp(),
         updatedBy: currentAdminEmail()
       }, { merge: true });
-
-      await batch.commit();
 
       if ($('input-app-driver-licence')) {
         $('input-app-driver-licence').checked = driverLicenceRequired;
       }
 
       await logAdminAction('appConfigFeatureTogglesUpdate', 'fleet', `Feature Toggles (${envLabel})`, JSON.stringify({
-        riderAccountCreation,
-        driverAccountCreation,
         driverLicenceRequired
       }));
 
